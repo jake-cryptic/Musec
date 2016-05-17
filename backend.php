@@ -90,6 +90,9 @@ if (isset($_POST)) {
 		sleep(1);
 		$results["count"] = $count;
 		echo @json_encode($results);
+	} elseif ($type == "v") {
+		// Returns file versions
+		die('{"response":"version","total":2}');
 	} else {
 		die('{"response":"error","error":"The backend cannot process your request"}');
 	}
