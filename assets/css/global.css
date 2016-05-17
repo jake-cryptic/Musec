@@ -1,0 +1,297 @@
+body {
+	margin:0;
+	padding:0;
+	font-weight:100;
+	font-family:sans-serif;
+	text-align:center;
+}
+input[type='range'] {
+	width:75%;
+	margin:0 12.5%;
+    -webkit-appearance: none !important;
+    background:rgba(0,0,0,0.9);
+	border:#666 1px solid;
+    height:3px;
+}
+.clickable {
+	cursor:pointer;
+}
+
+#pageTop {
+	z-index:15;
+	position:fixed;
+	top:0;
+	height:7.5vh;
+	width:100%;
+	background-color:rgba(255,255,255,0.95);
+}
+#pageCenter {
+	position:fixed;
+	overflow-y:scroll;
+	top:7.5vh;
+	bottom:12.5vh;
+	height:80vh;
+	width:100%;
+	background-color:rgba(0,0,0,0.8);
+	color:white;
+}
+#pageBottom {
+	z-index:15;
+	position:fixed;
+	bottom:0;
+	height:12.5vh;
+	width:100%;
+	background-color:rgba(255,255,255,0.95);
+}
+
+#songFolder, #queueFolder, #searchFolder {
+	display:none;
+}
+
+#back,#search {
+	display:block;
+	float:left;
+	width:4.8vw;
+	height:100%;
+	line-height:7.5vh;
+	font-size:2em;
+	border-right:0.2vw solid #000;
+	cursor:pointer;
+}
+#queue {
+	display:block;
+	float:right;
+	width:4.8vw;
+	height:100%;
+	line-height:7.5vh;
+	font-size:2em;
+	border-left:0.2vw solid #000;
+	cursor:pointer;
+}
+#playpause {
+	display:block;
+	float:left;
+	width:4.8vw;
+	height:100%;
+	line-height:12.5vh;
+	font-size:2em;
+	border-right:0.2vw solid #000;
+	cursor:pointer;
+}
+#search_container {
+	display:none;
+	opacity:0.2;
+	width:85vw;
+	float:left;
+	height:100%;
+	line-height:7.5vh;
+	font-size:2em;
+}
+#search_box {
+	display:inline-block;
+	width:75%;
+    height:1.5em;
+    padding:6px 12px;
+    font-size:14px;
+    line-height:1em;
+    color:#555;
+    background-color:#fff;
+    border:1px solid #000;
+	border-radius:0;
+    -webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow:inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+#do_search {
+	background-color:rgba(0,0,0,0.5);
+    color:#fff !important;
+	transition:background-color 0.2s ease-in-out;
+    border:0;
+    border-radius:0;
+    cursor:pointer;
+    display:inline-block;
+    font-family:Helvetica, sans-serif;
+    font-weight:500;
+    height:2.6em;
+    width:7.5vw;
+    line-height:2.75em;
+    padding:0 .5vw 0 .5vw;
+    text-align:center;
+    text-decoration:none;
+    text-transform:uppercase;
+    white-space:nowrap;
+}
+#do_search:hover {
+	background-color:rgba(0,0,0,0.9);
+}
+
+#folder, #mediacontrols {
+	display:block;
+	float:left;
+	height:100%;
+	line-height:7.5vh;
+	font-size:2em;
+}
+#folder {
+	width:85vw;
+}
+#mediacontrols {
+	width:95vw;
+}
+#pageCenter::-webkit-scrollbar { 
+    display: none; 
+}
+
+.tile {
+	width:20vw;
+	height:40vh;
+	max-height:100%;
+	max-width:100%;
+	float:left;
+	cursor:pointer;
+}
+.tile_bg {
+	display:block;
+	position:relative;
+	padding:0;
+	margin:0;
+	height:100%;
+	width:100%;
+}
+.tile_content {
+	z-index:30;
+	display:none;
+	position:absolute;
+	padding:0;
+	margin:0;
+	float:left;
+	height:inherit;
+	width:inherit;
+}
+.tile_table {
+	z-index:40;
+	width:100%;
+	height:100%;
+	background-color:rgba(0,0,0,0.3);
+}
+.tileTrow {
+	border-bottom:1px solid white;
+	font-size:1.3em;
+	padding:3px 1px;
+}
+.tileTitle {
+	background-color:rgba(0,0,0,0.1);
+	font-size:1.7em;
+}
+.tileAct:hover {
+	background-color:rgba(0,0,0,0.5);
+}
+.blur {
+	transition:all 1s ease-in-out;
+	-webkit-filter:blur(5px);
+	-moz-filter:blur(5px);
+	-o-filter:blur(5px);
+	-ms-filter:blur(5px);
+	filter:blur(5px);
+}
+.song_longclick {
+	cursor:pointer;
+}
+.bcircle {
+	background-color:rgba(255,255,255,0.9);
+	border:0;
+	border-radius:10px;
+	padding:5px;
+	margin-top:5px;
+	font-size:1em;
+	font-family:sans-serif;
+	cursor:pointer;
+}
+
+table tbody {
+	overflow-y:scroll;
+}
+table {
+	width:100%;
+}
+table th {
+	font-size:1.5em;
+}
+table tbody td {
+	background-color:rgba(0,0,0,0.5);
+	padding:.5em;
+}
+
+@media screen and (max-width: 1120px) { 
+	.tile {
+		width:33.3vw;
+		height:45vh;
+	}
+}
+@media screen and (max-width: 770px) { 
+	.tile {
+		width:50vw;
+		height:37.5vh;
+	}
+	#playpause {
+		width:9.8vw;
+		line-height:12.5vh;
+		font-size:2em;
+	}
+	#queue, #back, #search {
+		width:8.75vw;
+	}
+	#folder {
+		width:73vw;
+		line-height:7.5vh;
+		font-size:1.7em;
+	}
+	#mediacontrols {
+		width:90vw;
+		line-height:7.5vh;
+		font-size:1.9em;
+	}
+}
+@media screen and (max-width: 440px) {
+	.tile {
+		width:50vw;
+		height:30vh;
+	}
+	#back,#queue,#search {
+		height:50%;
+		width:33.333vw;
+		border:0;
+		border-bottom:1px black solid;
+	}
+	#playpause {
+		width:14.8vw;
+		line-height:12.5vh;
+		font-size:2em;
+	}
+	#pageTop {
+		bottom:12.5vh;
+		height:15vh;
+	}
+	#pageCenter {
+		top:15vh;
+		height:72.5vh;
+		bottom:12.5vh;
+		margin-bottom:12.5vh;
+	}
+	#pageBottom {
+		height:12vh;
+	}
+	#folder {
+		float:right;
+		width:100vw;
+		height:50%;
+		font-size:1.4em;
+	}
+	#mediacontrols {
+		width:85vw;
+		height:20%;
+		font-size:1.9em;
+	}
+}

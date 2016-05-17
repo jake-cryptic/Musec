@@ -1,0 +1,36 @@
+{
+	"response":"lsdir",
+	"data":[
+		"ncs_infinity",
+		"ncs_uplifting"
+	]
+}
+
+{
+	"response":"lsfiles",
+	"data":[
+		"song1",
+		"song2"
+	]
+}
+
+{
+	"response":"sresult",
+	"r":{
+		"1":[
+			"Song Name",
+			"Song Folder"
+		]
+	},
+	"count":"1"
+}
+
+
+
+var intv = [];
+intv[0] = setInterval("tiles.AudioElement.pause()", 400);
+intv[1] = setInterval("tiles.AudioElement.play()", 350);
+
+clearInterval(intv[1]);
+clearInterval(intv[0]);
+tiles.AudioElement.pause();

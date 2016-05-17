@@ -1,0 +1,16 @@
+# 1 Month
+<FilesMatch "\.(jpg|png|gif|mp3|m4a)$">
+Header set Cache-Control "max-age=2592000"
+Header set Vary "Accept-Encoding"
+</FilesMatch>
+
+# 5 Days
+<FilesMatch "\.(js|css|log)$">
+Header set Cache-Control "max-age=0"
+Header set Vary "Accept-Encoding"
+</FilesMatch>
+
+# NEVER CACHE - notice the extra directives
+<FilesMatch "\.(html|htm|php)$">
+Header set Cache-Control "max-age=0, private, no-store, no-cache, must-revalidate"
+</FilesMatch>
