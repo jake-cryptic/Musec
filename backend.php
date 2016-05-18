@@ -58,11 +58,16 @@ if (isset($_POST)) {
 		$it = new RecursiveDirectoryIterator("resources/music/",RecursiveDirectoryIterator::SKIP_DOTS);
 		
 		if (isset($_POST["s"])){
-			$searchTerm = htmlspecialchars(stripslashes(trim(base64_decode($_POST["s"]))));
+			$searchTerm = base64_decode($_POST["s"]);
 			$searchTerm = strtolower($searchTerm);
 			
 			if (in_array($searchTerm,$forbiddenSearches)){
 				die('{"response":"error","error":"Invalid Search"}');
+			}
+			if (preg_match("/([0-9A-Za-z .])/", $searchTerm)) {
+				$searchTerm = htmlspecialchars(stripslashes(trim($_POST["s"])));
+			} else {
+				die('{"response":"error","error":"Your search must be alphanumeric"}');
 			}
 		} else {
 			die('{"response":"error","error":"Search Failed"}');
@@ -92,7 +97,7 @@ if (isset($_POST)) {
 		echo @json_encode($results);
 	} elseif ($type == "v") {
 		// Returns file versions
-		die('{"response":"version","total":2}');
+		die('{"response":"version","total":4}');
 	} else {
 		die('{"response":"error","error":"The backend cannot process your request"}');
 	}

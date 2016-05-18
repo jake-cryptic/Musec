@@ -1,4 +1,5 @@
 var tiles = {
+	cacheVersion:4,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -28,6 +29,8 @@ var tiles = {
 					tiles.showSongs(decoded);
 				} else if (decoded.response == "sresult") {
 					tiles.handleSearch(decoded);
+				} else if (decoded.response == "version") {
+					tiles.handleCacheErrors(decoded);
 				} else {
 					tiles.showError(decoded,2,sendData);
 				}
@@ -127,7 +130,10 @@ var tiles = {
 		
 		return newSongName;
 	},
-	nextSong: function() {
+	checkPlayback: function(ae){
+		return !ae.paused;
+	},
+	nextSong: function(){
 		loc = tiles.songQueue[tiles.currentSong*2];
 		tiles.songName = tiles.songQueue[(tiles.currentSong*2)+1];
 		
@@ -212,6 +218,15 @@ var tiles = {
 			tiles.nextSong();
 			if ($("#queueFolder").is(":visible")) {
 				tiles.reloadQueueView();
+			}
+			
+			//WHAT IS PROBLEM!!??
+			if (tiles.m == true) {
+				if (!tiles.checkPlayback(tiles.AudioElement)) {
+					setTimeout(function(){
+						tiles.AudioElement.changeMediaState();
+					},500);
+				}
 			}
 		}
 	},
@@ -383,21 +398,27 @@ var tiles = {
 			tiles.songQueue.splice(tiles.currentSong*2, 0, loc);
 			tiles.songQueue.splice((tiles.currentSong*2)+1, 0, songname);
 		} else if (whatDo == "delete") {
-			tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)+1] + "; Array will split at " + ((songID*2)+1) + "," + ((songID*2)+2));
-			tiles.dev(tiles.songQueue);
-			if (songID == 0) {
-				tiles.dev("C:0");
-				tiles.songQueue.splice(0,1);
-				tiles.songQueue.splice(0,1);
+			var yeah = confirm("Are you sure you wish to delete " + tiles.songQueue[(songID*2)+1] + "?");
+			if (yeah == true) {
+				tiles.dev(tiles.songQueue);
+				if (songID == 0) {
+					tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)+1] + "; Array will split at " + ((songID*2)+1) + "," + ((songID*2)+2));
+					tiles.songQueue.splice(0,1);
+					tiles.songQueue.splice(0,1);
+				} else {
+					spliceAt = songID*2;
+					tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)]);
+					
+					tiles.songQueue.splice(spliceAt,2);
+				}
+				if (tiles.currentSong > songID) {
+					tiles.currentSong -= 1;
+				}
+				tiles.dev(tiles.songQueue);
+				tiles.reloadQueueView();
 			} else {
-				tiles.dev("C:gt0");
-				tiles.songQueue.splice(((songID*2)),(songID*2));
+				tiles.dev("Deletion cancelled");
 			}
-			if (tiles.currentSong > songID) {
-				tiles.currentSong -= 1;
-			}
-			tiles.dev(tiles.songQueue);
-			tiles.reloadQueueView();
 		} else {
 			alert("Error: Not implemented");
 			tiles.reloadQueueView();
@@ -424,7 +445,7 @@ var tiles = {
 			tiles.dev("Queue is empty!");
 			$("#queue_list").html("<tr><td colspan=\"3\">Queue is empty</td></tr>");
 		} else {
-			tiles.dev("Queue has values!");
+			tiles.dev("Queue has " + (tiles.songQueue.length) + " values! Which means " + (tiles.songQueue.length/2) + " songs");
 			for(var i = 0;i < ((tiles.songQueue.length-1)/2);i++) {
 				tiles.dev("Parsing queue data for song id " + i + " which is " + tiles.songQueue[(i*2)+1]);
 				
@@ -532,8 +553,13 @@ var tiles = {
 		if (tiles.searchBox.val() == "" || tiles.searchBox.val().length < 2) {
 			alert("Cannot search");
 		} else {
-			tiles.activeView.fadeOut(500);
-			tiles.load("t=l&s=" + btoa(tiles.searchBox.val()));
+			var searchPattern = /([0-9A-Za-z .])/;
+			//if (searchPattern.test(tiles.searchBox.val())) {
+				tiles.activeView.fadeOut(500);
+				tiles.load("t=l&s=" + btoa(tiles.searchBox.val()));
+			//} else {
+				//alert("Illegal characters!");
+			//}
 		}
 	},
 	handleSearch:function(searchData){
@@ -568,6 +594,15 @@ var tiles = {
 		tiles.folder.fadeIn(300,function(){tiles.folder.animate({width:eW,opacity:1},500);});
 		$("#search_container").fadeOut(300,function(){$("#search_container").animate({width:"0",opacity:0.2},500);});
 	},
+	handleCacheErrors:function(verData) {
+		if (verData.total == tiles.cacheVersion) {
+			tiles.dev("No caching validation errors");
+		} else if (verData.total > tiles.cacheVersion) {
+			window.location.reload(true); // Clears cache
+		} else {
+			tiles.dev("Nice try");
+		}
+	},
 	fix: function(){
 		tiles.db = true;
 		tiles.dev("Musec->Forced Reset");
@@ -597,6 +632,7 @@ var tiles = {
 	}
 };
 $(document).ready(function(){
+	tiles.load("t=v");
 	tiles.load("t=f&d=" + btoa("/"));
 	tiles.mediaStateTrigger = document.getElementById("playpause");
 	tiles.qB = $("#queue");
