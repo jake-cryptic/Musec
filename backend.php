@@ -97,7 +97,7 @@ if (isset($_POST)) {
 		echo @json_encode($results);
 	} elseif ($type == "v") {
 		// Returns file versions
-		die('{"response":"version","total":4}');
+		die('{"response":"version","total":5}');
 	} else {
 		die('{"response":"error","error":"The backend cannot process your request"}');
 	}

@@ -26,9 +26,9 @@
 			<div style="display:none">
 		<!--<![endif]-->
 		<div id="pageTop">
-			<span id="back" do="refresh">&#x21bb;</span>
-			<span id="search">&#x1f50e;</span>
-			<span id="queue" do="showQ">&#9776;</span>
+			<span id="back" do="refresh" class="impButton">&#x21bb;</span>
+			<span id="search" class="impButton">&#x1f50e;</span>
+			<span id="queue" do="showQ" class="impButton">&#9776;</span>
 			<div id="search_container"><input type="text" id="search_box" placeholder="Search for a song" /><button id="do_search">Search All</button></div>
 			<span id="folder">Please Wait</span>
 		</div>
@@ -47,7 +47,7 @@
 			</div>
 		</div>
 		<div id="pageBottom">
-			<span id="playpause" class="disabled">&#9658;</span>
+			<span id="playpause" class="disabled impButton">&#9658;</span>
 			<span id="mediacontrols">No Music Playing</span>
 		</div>
 		
