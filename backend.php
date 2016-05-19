@@ -1,12 +1,15 @@
 <?php
+error_reporting(0);
+session_start();
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET");
 header("Access-Control-Allow-Headers: X-PINGOTHER, Content-Type");
 header("Access-Control-Max-Age: 86400");
-//header("HTTP/1.1 418 I'm a teapot");
-session_start();
+
 
 if (isset($_POST)) {
+	
 	if (isset($_POST["t"])) {
 		$type = trim($_POST["t"]);
 	} else {
@@ -30,28 +33,48 @@ if (isset($_POST)) {
 			}
 		}
 		echo "$data]}";
-	} elseif ($type == "s") {
+		
+	} elseif ($type == "s" || $type == "b") {
 		// Song (List songs in directory)
 		$allowedExtensions = ["mp3","m4a"];
 		
 		$_SESSION["folder"] = $dir;
 		$files = scandir("resources/music/" . $dir);
-		$data = '{"response":"lsfiles","data":[';
+		if ($type == "b") {
+			$data = '{"response":"tfiles","folder":"' . $dir . '","d":[';
+		} else {
+			$data = '{"response":"lsfiles","data":[';
+		}
+		$count = 0;
 		foreach ($files as $file) {
 			if ($file != "." && $file != "..") {
 				$fileExtArr = explode(".",$file);
 				$fileExt = end($fileExtArr);
 				if (in_array($fileExt,$allowedExtensions)) {
 					if (end($files) == $file) {
-						$data .= '"' . $dir . "/" . $file . '"';
+						if ($type == "b") {
+							$data .= '"' . $file . '"';
+						} else {
+							$data .= '"' . $dir . "/" . $file . '"';
+						}
 					} else {
-						$data .= '"' . $dir . "/" . $file . '",';
+						if ($type == "b") {
+							$data .= '"' . $file . '",';
+						} else {
+							$data .= '"' . $dir . "/" . $file . '",';
+						}
 					}
+					$count++;
 				}
 			}
 		}
-		sleep(1);
-		echo "$data]}";
+		usleep(500000); // .5 Seconds
+		if ($type == "b") {
+			echo "$data],\"count\":\"$count\"}";
+		} else {
+			echo "$data]}";
+		}
+		
 	} elseif ($type == "l") {
 		// Look (Search for song in all folders)
 		$forbiddenSearches = ["mp3","m4a"];
@@ -65,7 +88,7 @@ if (isset($_POST)) {
 				die('{"response":"error","error":"Invalid Search"}');
 			}
 			if (preg_match("/([0-9A-Za-z .])/", $searchTerm)) {
-				$searchTerm = htmlspecialchars(stripslashes(trim($_POST["s"])));
+				$searchTerm = htmlspecialchars(stripslashes(trim($searchTerm)));
 			} else {
 				die('{"response":"error","error":"Your search must be alphanumeric"}');
 			}
@@ -92,9 +115,9 @@ if (isset($_POST)) {
 				$results["r"][$count] = array($file,$dir);
 			}
 		}
-		sleep(1);
 		$results["count"] = $count;
 		echo @json_encode($results);
+		
 	} elseif ($type == "v") {
 		// Returns file versions
 		die('{"response":"version","total":5}');

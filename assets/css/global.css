@@ -78,7 +78,7 @@ input[type='range'] {
 	border-right:0.2vw solid #000;
 	cursor:pointer;
 }
-.impButton:hover {
+.impButton:active {
 	background-color:rgba(0,0,0,0.75);
 	color:#fff;
 }
@@ -227,6 +227,17 @@ input[type='range'] {
 @-o-keyframes bounce { to { transform: scale(0.8); } }
 @-moz-keyframes bounce { to { transform: scale(0.8); } }
 @keyframes bounce { to { transform: scale(0.8); } }
+
+div.marquee {
+    white-space:no-wrap;
+    overflow:hidden;
+}
+div.marquee > div.marquee-text {
+    white-space:nowrap;
+    display:inline;
+    width:auto;
+}
+
 table tbody {
 	overflow-y:scroll;
 }
@@ -252,6 +263,13 @@ table tbody td {
 		width:50vw;
 		height:37.5vh;
 	}
+	#search_box {
+		width:65%;
+		height:1.2em;
+	}
+	#do_search {
+		width:12.5vw;
+	}
 	#playpause {
 		width:9.8vw;
 		line-height:12.5vh;
@@ -275,6 +293,24 @@ table tbody td {
 	.tile {
 		width:50vw;
 		height:30vh;
+	}
+	.tileTrow {
+		font-size:1em;
+		padding:3px 1px;
+	}
+	.tileTitle {
+		font-size:1.25em;
+	}
+	#search_box {
+		width:50%;
+		height:1em;
+		line-height:0.75em;
+	}
+	#do_search {
+		width:auto;
+		height:2.3em;
+		line-height:1.85em;
+		font-weight:200;
 	}
 	#back,#queue,#search {
 		height:50%;

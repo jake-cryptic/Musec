@@ -4,7 +4,7 @@ var tiles = {
 	songQueue:[],
 	currentSong:0,
 	queueDelay:250, // milliseconds
-	connDelays:[5,15,30,60,120,"reload"],
+	connDelays:[3,5,15,30,60,"reload"],
 	connAttempt:0,
 	cfn:undefined,
 	lastSearchVal:"",
@@ -27,6 +27,8 @@ var tiles = {
 					tiles.showFolder(decoded);
 				} else if (decoded.response == "lsfiles") {
 					tiles.showSongs(decoded);
+				} else if (decoded.response == "tfiles") {
+					tiles.backgroundAdd(decoded);
 				} else if (decoded.response == "sresult") {
 					tiles.handleSearch(decoded);
 				} else if (decoded.response == "version") {
@@ -70,9 +72,9 @@ var tiles = {
 				$("#tile_id_" + i).prop("folder",x);
 			}
 			$(".tile_longclick").each(function(x){
-				$("#tile_id_" + x).contextmenu(function(evn){evn.preventDefault();tiles.showTileMenu(x);});
-				$("#tile_id_" + x).longclick(300,function(){tiles.showTileMenu(x);});
-				$("#tile_id_" + x).click(function(){tiles.loadSongs(x);});
+				$("#tile_id_" + x + "_bg").contextmenu(function(evn){evn.preventDefault();tiles.showTileMenu(x);});
+				$("#tile_id_" + x + "_bg").longclick(300,function(){tiles.showTileMenu(x);});
+				$("#tile_id_" + x + "_bg").click(function(){tiles.loadSongs(x);});
 			});
 		}
 	},
@@ -139,14 +141,20 @@ var tiles = {
 		
 		tiles.dev("playSong called with loc: " + loc);
 		
-		if (typeof(tiles.AudioElement) != "undefined") {
-			tiles.folder.html("Unsetting");
-			tiles.AudioElement.pause();
-			tiles.AudioElement = null;
+		if (typeof(tiles.AudioElement) == "undefined") {
+			tiles.folder.html("Loading Song");
+			try {
+				tiles.AudioElement = new Audio();
+			} catch(e) {
+				alert("Error creating audio element");
+				tiles.dev(e);
+				return false;
+			}
+			tiles.dev("Audio Element Created!");
+		} else {
+			tiles.folder.html("Loading next song");
 		}
-		
-		tiles.AudioElement = new Audio();
-		tiles.dev("Audio Element Created: 'resources/music" + loc + "'");
+		tiles.dev("Audio Element: 'resources/music" + loc + "'");
 		
 		tiles.AudioElement.addEventListener('loadeddata',function(){
 			tiles.AudioElement.play();
@@ -219,12 +227,13 @@ var tiles = {
 			if ($("#queueFolder").is(":visible")) {
 				tiles.reloadQueueView();
 			}
-			
-			//WHAT IS PROBLEM!!??
 			if (tiles.m == true) {
 				if (!tiles.checkPlayback(tiles.AudioElement)) {
 					setTimeout(function(){
-						tiles.AudioElement.changeMediaState();
+						tiles.changeMediaState();
+						setTimeout(function(){
+							tiles.changeMediaState();
+						},500);
 					},500);
 				}
 			}
@@ -285,7 +294,7 @@ var tiles = {
 			percentLoaded = Math.round((tiles.songRawTime / tiles.songRawBuffer) * 100);
 			percentPlayed = Math.round((tiles.songRawTime / tiles.songRawDuration) * 100);
 			
-			tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "%");
+			//tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "%");
 			document.getElementById("folder").style.background = "linear-gradient(to right, white " + percentLoaded + "%, rgba(0,0,0,0.5))";
 		} else {
 			var percent = (event.loaded / event.total) * 100;
@@ -335,10 +344,15 @@ var tiles = {
 
 			$("#tile_id_" + song_id + "_bg").addClass("blur");
 
-			tmp = '<div class="tile_table"><div class="tileTrow tileTitle">' + title + '</div><div class="tileTrow tileAct" id="OTF">Open Folder</div>';
-			tmp += '<div class="tileTrow tileAct" id="ATTQ">Add all to queue</div><div class="tileTrow tileAct" id="AATQ">Play all now</div><div class="tileTrow tileAct" id="APFT">Add to favourites</div></div>';
+			tmp = '<div class="tile_table"><div class="tileTrow tileTitle">' + title + '</div>';
+			tmp += '<div class="tileTrow tileAct" onclick="tiles.showTileMenu(\'' + song_id + '\');tiles.loadSongs(\'' + song_id + '\');">Open Folder</div>';
+			tmp += '<div class="tileTrow tileAct" onclick="tiles.tileMenuDo(\'atq\',\'' + $("#tile_id_" + song_id).prop("folder") + '\')">Add all to queue</div>';
+			tmp += '<div class="tileTrow tileAct" onclick="tiles.tileMenuDo(\'fav\',\'' + $("#tile_id_" + song_id).prop("folder") + '\')">Add to favourites</div></div>';
 			tiles.cWt.html(tmp);
 			tiles.cWt.fadeIn(500);
+			
+			tiles.cWt.contextmenu(function(evn){evn.preventDefault();tiles.showTileMenu(song_id);});
+			tiles.cWt.longclick(300,function(){tiles.showTileMenu(song_id);});
 		} else {
 			tiles.cWt.fadeOut(500);
 			tiles.cWt = undefined;
@@ -346,6 +360,32 @@ var tiles = {
 			if (tiles.cWtI != song_id) {
 				tiles.showTileMenu(song_id);
 			}
+		}
+	},
+	tileMenuDo:function(whatDo, folder) {
+		if (whatDo == "atq") {
+			tiles.load("t=b&d=" + btoa(folder));
+		} else if (whatDo == "fav") {
+			alert("This feature isn't available yet :(");
+		} else {
+			alert("Not Implemented");
+		}
+	},
+	backgroundAdd:function(dataArray) {
+		if (dataArray.d.length == 0) {
+			alert("There was nothing added to the queue");
+		} else {
+			tiles.dev("Adding " + dataArray.d.length + " item(s) to queue from folder " + dataArray.folder);
+			tiles.dev(dataArray);
+			
+			for(var i = 1;i < (dataArray.count);i++) {
+				x = tiles.removeSongNumbers(dataArray.d[i].replace(".m4a", "").replace(".mp3", ""));
+				loc = "resources/music/" + dataArray.folder + "/" + dataArray.d[i];
+				
+				tiles.songQueue.push(loc);
+				tiles.songQueue.push(x);
+			}
+			alert("Added all songs from " + capitalise(dataArray.folder.replace(/_/g," ")) + " to queue");
 		}
 	},
 	alterQueue: function(whatDo, songID) {
@@ -555,12 +595,12 @@ var tiles = {
 			alert("Cannot search");
 		} else {
 			var searchPattern = /([0-9A-Za-z .])/;
-			//if (searchPattern.test(tiles.searchBox.val())) {
+			if (searchPattern.test(tiles.searchBox.val())) {
 				tiles.activeView.fadeOut(500);
 				tiles.load("t=l&s=" + btoa(tiles.searchBox.val()));
-			//} else {
-				//alert("Illegal characters!");
-			//}
+			} else {
+				alert("Illegal characters!");
+			}
 		}
 	},
 	handleSearch:function(searchData){
