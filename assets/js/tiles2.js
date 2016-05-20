@@ -15,34 +15,46 @@ var tiles = {
 	},
 	load: function(sendData) {
 		tiles.dev(sendData);
-		$.ajax({
-			url:tiles.backendUrl + "backend.php",
-			type:"POST",
-			data:sendData,
-			success:function(r){
-				$(".tile_bg").removeClass("blur");
-				
-				var decoded = JSON.parse(r);
-				if (decoded.response == "lsdir"){
-					tiles.showFolder(decoded);
-				} else if (decoded.response == "lsfiles") {
-					tiles.showSongs(decoded);
-				} else if (decoded.response == "tfiles") {
-					tiles.backgroundAdd(decoded);
-				} else if (decoded.response == "sresult") {
-					tiles.handleSearch(decoded);
-				} else if (decoded.response == "version") {
-					tiles.handleCacheErrors(decoded);
-				} else {
-					tiles.showError(decoded,2,sendData);
+		if (navigator.onLine) {
+			$.ajax({
+				url:tiles.backendUrl + "backend.php",
+				type:"POST",
+				data:sendData,
+				success:function(r){
+					$(".tile_bg").removeClass("blur");
+					
+					try {
+						var decoded = JSON.parse(r);
+					} catch(e) {
+						alert("There is a problem with our server, please try again :/");
+						return false;
+					}
+					
+					if (decoded.response == "lsdir"){
+						tiles.showFolder(decoded);
+					} else if (decoded.response == "lsfiles") {
+						tiles.showSongs(decoded);
+					} else if (decoded.response == "tfiles") {
+						tiles.backgroundAdd(decoded);
+					} else if (decoded.response == "sresult") {
+						tiles.handleSearch(decoded);
+					} else if (decoded.response == "elog") {
+						tiles.dev("EReport success!");
+					} else if (decoded.response == "version") {
+						tiles.handleCacheErrors(decoded);
+					} else {
+						tiles.showError(decoded,2,sendData);
+					}
+				},
+				error:function(e){
+					$(".tile_bg").addClass("blur");
+					tiles.showError(e,1,sendData);
+					return false;
 				}
-			},
-			error:function(e){
-				$(".tile_bg").addClass("blur");
-				tiles.showError(e,1,sendData);
-				return false;
-			}
-		});
+			});
+		} else {
+			alert("You don't seem to be online.");
+		}
 	},
 	loadSongs: function(folder) {
 		var folderName = $("#tile_id_" + folder).prop("folder");
@@ -88,7 +100,7 @@ var tiles = {
 		if (typeof(tiles.currentMediaState) == "undefined") {
 			tiles.folder.html(tiles.cfc);
 		} else {
-			tiles.folder.html(tiles.cfc + " | " + tiles.songName);
+			tiles.folder.html(tiles.cfc);
 			document.title = "Musec - " + tiles.songName;
 		}
 		
@@ -154,7 +166,7 @@ var tiles = {
 		} else {
 			tiles.folder.html("Loading next song");
 		}
-		tiles.dev("Audio Element: 'resources/music" + loc + "'");
+		tiles.dev("Audio Element:"  + loc);
 		
 		tiles.AudioElement.addEventListener('loadeddata',function(){
 			tiles.AudioElement.play();
@@ -164,7 +176,7 @@ var tiles = {
 			}
 
 			document.title = "Musec - " + tiles.songName;
-			document.getElementById("folder").innerHTML = tiles.songName;
+			tiles.folder.html(tiles.songName);
 			tiles.mediaStateTrigger.innerHTML = "&#10074;&#10074;";
 			
 			$("#mediacontrols").html('<input id="playbackslider" type="range" min="0" max="100" value="0" step="1"> <span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>');
@@ -182,7 +194,7 @@ var tiles = {
 		},false);
 		tiles.AudioElement.addEventListener('error',function(){
 			alert('Error Loading Data');
-			document.getElementById("folder").innerHTML = "Error";
+			tiles.folder.html("Error");
 		},false);
 		tiles.AudioElement.addEventListener("ended",tiles.songEnd,false);
 		tiles.AudioElement.addEventListener("progress",tiles.songLoadProgress,false);
@@ -338,7 +350,7 @@ var tiles = {
 		if (typeof(tiles.cWt) == "undefined") {
 			tiles.cWt = $("#tile_id_" + song_id + "_c");
 			tiles.cWtI = song_id;
-			tiles.cWtS = tiles.cWt.prop("folder");
+			tiles.cWtS = $("#tile_id_" + song_id).prop("folder");
 			var title = capitalise($("#tile_id_" + song_id).prop("folder").replace(/_/g," "));
 			tiles.dev("STM: " + song_id + " && " + tiles.cWtS);
 
@@ -442,16 +454,10 @@ var tiles = {
 			var yeah = confirm("Are you sure you wish to delete " + tiles.songQueue[(songID*2)+1] + "?");
 			if (yeah == true) {
 				tiles.dev(tiles.songQueue);
-				if (songID == 0) {
-					tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)+1] + "; Array will split at " + ((songID*2)+1) + "," + ((songID*2)+2));
-					tiles.songQueue.splice(0,1);
-					tiles.songQueue.splice(0,1);
-				} else {
-					spliceAt = songID*2;
-					tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)]);
-					
-					tiles.songQueue.splice(spliceAt,2);
-				}
+				spliceAt = songID*2;
+				tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)]);
+				
+				tiles.songQueue.splice(spliceAt,2);
 				if (tiles.currentSong > songID) {
 					tiles.currentSong -= 1;
 				}
@@ -491,13 +497,13 @@ var tiles = {
 				tiles.dev("Parsing queue data for song id " + i + " which is " + tiles.songQueue[(i*2)+1]);
 				
 				// Move up, Play next, Play now, Remove, Move down, Repeat?
-				queueCtrls = "<span class='clickable' onclick=\"tiles.alterQueue('delete'," + i + ")\">Remove</span> | ";
+				queueCtrls = "<span class='clickable' onclick=\"tiles.alterQueue('delete'," + i + ")\">Remove</span>";
 				//queueCtrls += "<span class='clickable' onclick=\"tiles.alterQueue('moveup'," + i + ")\">Move up</span>";
 				
 				if (tiles.currentSong-1 == i) {
-					stat = i + " &#9658;";
+					stat = (i+1) + " &#9658;";
 				} else {
-					stat = i;
+					stat = (i+1);
 				}
 				
 				sB = "<tr>\
@@ -606,30 +612,31 @@ var tiles = {
 	handleSearch:function(searchData){
 		console.log(searchData);
 		
-		var $srf = $("#searchFolder");
+		tiles.activeView = $("#songFolder");
+		var $srf = $("#songFolder");
 		$srf.slideDown(500);
 		$srf.html("<table><thead><tr><th>Search Results</th></tr></thead><tbody id=\"search_r_lst\"><tr><td><h2>Found " + searchData.count + " result(s)</h2></td></tr></tbody></table>");
 		
 		for(var i = 1;i < (searchData.count+1);i++) {
 			x = tiles.removeSongNumbers(searchData.r[i][0].replace(".m4a", "").replace(".mp3", ""));
 			songFileData = btoa("/" + searchData.r[i][1] + "/" + searchData.r[i][0]);
-			temp = '<tr song="' + songFileData + '" id="sr_' + i + '" class="song_longclick"><td id="sr_inner_' + i + '"><span id="sr_name_' + i + '" class="__song_DontSearch">' + x + '</span></td></tr>';
+			temp = '<tr song="' + songFileData + '" id="song_' + i + '" class="song_longclick"><td id="song_inner_' + i + '"><span id="song_name_' + i + '" class="__song_DontSearch">' + x + '</span></td></tr>';
 			
 			$("#search_r_lst").append(temp);
 		}
 		$(".song_longclick").each(function(x){
-			$("#sr_" + x).contextmenu(function(evn){
+			$("#song_" + x).contextmenu(function(evn){
 				evn.preventDefault();
-				tiles.showSongMenu("#sr_" + x);
+				tiles.showSongMenu("#song_" + x);
 			});
-			$("#sr_" + x).longclick(500,function(){
-				tiles.showSongMenu("#sr_" + x);
+			$("#song_" + x).longclick(500,function(){
+				tiles.showSongMenu("#song_" + x);
 			});
 			$("#song_name_" + x).click(function(){
-				tiles.alterQueue("playnow","#sr_" + x);
+				tiles.alterQueue("playnow","#song_" + x);
 				tiles.nextSong();
 			});
-			console.log("Assigned functions to: sr_" + i);
+			console.log("Assigned functions to: song_" + i);
 		});
 		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770) {eW = "72vw";} else {eW = "85vw";}
 		tiles.folder.fadeIn(300,function(){tiles.folder.animate({width:eW,opacity:1},500);});
@@ -653,7 +660,6 @@ var tiles = {
 		$("#musicFolders").html("<h1>Loading Content...</h1>");
 		$("#songFolder").html("Loading Songs...");
 		$("#queueFolder").html("Just a second...");
-		$("#searchFolder").html("Checking For Songs...");
 		
 		$("#pageCenter").css("background-color","rgba(0,0,0,1)");
 		setTimeout(function(){
@@ -723,13 +729,11 @@ $(document).ready(function(){
 		if (tiles.bB.prop("do") == "refresh") {
 			tiles.load("t=f&d=" + btoa("/"));
 			$("#queueFolder").hide();
-			$("#searchFolder").hide();
 		} else {
 			tiles.cfn = undefined;
 			tiles.qB.prop("do","showQ");
 			tiles.bB.prop("do","refresh");
 			tiles.activeView = $("#musicFolders");
-			$("#searchFolder").hide();
 			$(".tile_bg").removeClass("blur");
 			tiles.bB.html("&#x21bb;");
 			document.getElementById("musicFolders").style.display = "block";
@@ -740,6 +744,14 @@ $(document).ready(function(){
 			tiles.folder.html("Music");
 		} else {
 			tiles.folder.html("Music | " + tiles.songName);
+			if (tiles.m == true) {
+				tiles.folder.css({"font-size":"1.1em"});
+				dE = document.getElementById("folder");
+				if (dE.offsetHeight < dE.scrollHeight || dE.offsetWidth < dE.scrollWidth) {
+					tiles.folder.css({"font-size":"1em"});
+					tiles.dev("Bb: Overflow!");
+				}
+			}
 		}
 		document.title = "Musec!";
 	});
@@ -750,7 +762,7 @@ $(document).ready(function(){
 			tiles.dev("Action Button: Search show " + eW);
 			
 			tiles.folder.animate({width:"0vw",opacity:0.2},500,function(){tiles.folder.hide();});
-			sc.animate({width:eW,opacity:1},500,function(){sc.fadeIn(300,function(){tiles.searchBox.focus();});});
+			sc.animate({width:eW,opacity:1},500,function(){sc.fadeIn(300,function(){tiles.searchBox.focus();tiles.searchBox.click();});});
 		} else {
 			if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770 && $(document).width() > 440) {eW = "72vw";} else {eW = "85vw";}
 			tiles.dev("Action Button: Search hide " + eW);
@@ -762,7 +774,6 @@ $(document).ready(function(){
 	tiles.qB.click(function(){
 		tiles.dev("Action Button: " + tiles.qB.prop("do"));
 		if (tiles.qB.prop("do") == "showQ") {
-			$("#searchFolder").slideUp(500);
 			tiles.qB.prop("do","hideQ");
 			$(".tile_content").hide();
 			$(".tile_bg").removeClass("blur");

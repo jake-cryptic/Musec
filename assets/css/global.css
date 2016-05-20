@@ -8,7 +8,7 @@ body {
 input[type='range'] {
 	width:75%;
 	margin:0 12.5%;
-    -webkit-appearance: none !important;
+    -webkit-appearance:none !important;
     background:rgba(0,0,0,0.9);
 	border:#666 1px solid;
     height:3px;
@@ -145,7 +145,7 @@ input[type='range'] {
 	width:95vw;
 }
 #pageCenter::-webkit-scrollbar { 
-    display: none; 
+    display:none; 
 }
 
 .tile {
@@ -214,19 +214,19 @@ input[type='range'] {
 	cursor:pointer;
 }
 .bcircle:hover {
-	-webkit-animation: bounce .3s infinite alternate;
-	-o-animation: bounce .3s infinite alternate;
-	-moz-animation: bounce .3s infinite alternate;
-	animation: bounce .3s infinite alternate;
-	-webkit-animation-iteration-count: 2;
-	-o-animation-iteration-count: 2;
-	-moz-animation-iteration-count: 2;
-	animation-iteration-count: 2;
+	-webkit-animation:bounce .3s infinite alternate;
+	-o-animation:bounce .3s infinite alternate;
+	-moz-animation:bounce .3s infinite alternate;
+	animation:bounce .3s infinite alternate;
+	-webkit-animation-iteration-count:2;
+	-o-animation-iteration-count:2;
+	-moz-animation-iteration-count:2;
+	animation-iteration-count:2;
 }
-@-webkit-keyframes bounce { to { transform: scale(0.8); } }
-@-o-keyframes bounce { to { transform: scale(0.8); } }
-@-moz-keyframes bounce { to { transform: scale(0.8); } }
-@keyframes bounce { to { transform: scale(0.8); } }
+@-webkit-keyframes bounce { to { transform:scale(0.8); } }
+@-o-keyframes bounce { to { transform:scale(0.8); } }
+@-moz-keyframes bounce { to { transform:scale(0.8); } }
+@keyframes bounce { to { transform:scale(0.8); } }
 
 div.marquee {
     white-space:no-wrap;

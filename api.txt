@@ -42,12 +42,21 @@ API Responses:
 	"total":5
 }
 
+{
+	"response":"elog",
+	"result":1
+}
 
+// Types
+F - Folders (List directories of music)
+S - Song (List songs in directory)
+B - Background Song (List songs in directory silently)
+L - Lookup (Search for song in all folders)
+V - Version (Returns cache version)
+E - Error log (Logs errors)
 
-var intv = [];
-intv[0] = setInterval("tiles.AudioElement.pause()", 400);
-intv[1] = setInterval("tiles.AudioElement.play()", 350);
-
-clearInterval(intv[1]);
-clearInterval(intv[0]);
-tiles.AudioElement.pause();
+// Parameters
+T - Specifies type of request
+D - Directory
+S - Search term
+E - Error Data

@@ -8,6 +8,28 @@ header("Access-Control-Allow-Headers: X-PINGOTHER, Content-Type");
 header("Access-Control-Max-Age: 86400");
 
 
+function arrayToCsv( array &$fields, $delimiter = ';', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false ) {
+    $delimiter_esc = preg_quote($delimiter, '/');
+    $enclosure_esc = preg_quote($enclosure, '/');
+
+    $output = array();
+    foreach ( $fields as $field ) {
+        if ($field === null && $nullToMysqlNull) {
+            $output[] = 'NULL';
+            continue;
+        }
+
+        // Enclose fields containing $delimiter, $enclosure or whitespace
+        if ( $encloseAll || preg_match( "/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field ) ) {
+            $output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
+        } else {
+            $output[] = $field;
+        }
+    }
+
+    return implode( $delimiter, $output );
+}
+
 if (isset($_POST)) {
 	
 	if (isset($_POST["t"])) {
@@ -68,15 +90,15 @@ if (isset($_POST)) {
 				}
 			}
 		}
-		usleep(500000); // .5 Seconds
 		if ($type == "b") {
 			echo "$data],\"count\":\"$count\"}";
 		} else {
+			usleep(500000); // .5 Seconds
 			echo "$data]}";
 		}
 		
 	} elseif ($type == "l") {
-		// Look (Search for song in all folders)
+		// Lookup (Search for song in all folders)
 		$forbiddenSearches = ["mp3","m4a"];
 		$it = new RecursiveDirectoryIterator("resources/music/",RecursiveDirectoryIterator::SKIP_DOTS);
 		
@@ -119,8 +141,22 @@ if (isset($_POST)) {
 		echo @json_encode($results);
 		
 	} elseif ($type == "v") {
-		// Returns file versions
+		// Version (Returns cache version)
 		die('{"response":"version","total":5}');
+	} elseif ($type == "e") {
+		if (isset($_POST["e"])) {
+			$data = @base64_decode($_POST["e"]);
+			$arr = @(array)json_decode($data);
+			
+			$string = arrayToCsv($arr);
+			
+			$eLog = @fopen("errorlog.csv", "a") or die('{"response":"error","error":"Error reporting failed :("}');
+			@fwrite($eLog,$string . "\n");
+			@fclose($eLog);
+			die('{"response":"elog","result":1}');
+		} else {
+			die('{"response":"error","error":"Error reporting failed :("}');
+		}
 	} else {
 		die('{"response":"error","error":"The backend cannot process your request"}');
 	}

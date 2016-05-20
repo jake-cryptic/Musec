@@ -42,9 +42,6 @@
 			<div id="queueFolder">
 				<h1>Just a second...</h1>
 			</div>
-			<div id="searchFolder">
-				<h1>Checking For Songs...</h1>
-			</div>
 		</div>
 		<div id="pageBottom">
 			<span id="playpause" class="disabled impButton">&#9658;</span>
@@ -54,20 +51,25 @@
 		<!-- Scripts and Libraries -->
 		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script type="text/javascript" crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-		<script type="text/javascript" src="assets/js/jquery.longclick-min.js"></script>
 		<script type="text/javascript" src="assets/polyfills/modernizr-custom.js"></script>
 		<script type="text/javascript">
-			window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
-				alert('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber + ' Column: ' + column + ' StackTrace: ' +  errorObj);
-			}
+			window.onload = function(){
+				window.onerror = function (errorMsg, script, lineNumber, column, errorObj) {
+					var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};
+					tiles.load("t=e&e=" + btoa(JSON.stringify(eData)));
+					console.log(JSON.stringify(eData));
+					alert('Error: ' + errorMsg + ' Script: ' + script + ' Line: ' + lineNumber + ' Column: ' + column + ' StackTrace: ' + errorObj);
+				};
+			};
 			console.log("Musec: Loading...");
-			if (typeof(jQuery) == "undefined"){document.write('<script src="assets/libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
+			if (typeof(jQuery) == "undefined"){document.write('<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
 			if (typeof(FastClick) == "undefined"){document.write('<script src="assets/js/fastclick.js" type="text/javascript"><\/script>');}
 			if (!Modernizr.atobbtoa){document.write('<script type="text/javascript" src="assets/polyfills/base64.min.js"><\/script>');}
 			if (!Modernizr.json){document.write('<script type="text/javascript" src="assets/polyfills/json3.min.js"><\/script>');}
 			function isNumeric(n){return !isNaN(parseFloat(n)) && isFinite(n);}
 			function capitalise(t){return t.replace(/\w\S*/g, function(s){return s.charAt(0).toUpperCase() + s.substr(1).toLowerCase();});}
 		</script>
+		<script type="text/javascript" src="assets/js/jquery.longclick-min.js"></script>
 		<script type="text/javascript" src="assets/js/tiles2.js"></script>
 	</body>
 </html>
