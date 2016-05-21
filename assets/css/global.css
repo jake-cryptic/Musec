@@ -1,9 +1,15 @@
-body {
+body,html {
+	min-height:100%;
 	margin:0;
 	padding:0;
 	font-weight:100;
 	font-family:sans-serif;
 	text-align:center;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-o-user-select:none;
+	-ms-user-select:none;
+	user-select:none;
 }
 input[type='range'] {
 	width:75%;
@@ -28,9 +34,9 @@ input[type='range'] {
 #pageCenter {
 	position:fixed;
 	overflow-y:scroll;
+	-webkit-overflow-scrolling:touch;
 	top:7.5vh;
 	bottom:12.5vh;
-	height:80vh;
 	width:100%;
 	background-color:rgba(0,0,0,0.8);
 	color:white;
@@ -228,16 +234,6 @@ input[type='range'] {
 @-moz-keyframes bounce { to { transform:scale(0.8); } }
 @keyframes bounce { to { transform:scale(0.8); } }
 
-div.marquee {
-    white-space:no-wrap;
-    overflow:hidden;
-}
-div.marquee > div.marquee-text {
-    white-space:nowrap;
-    display:inline;
-    width:auto;
-}
-
 table tbody {
 	overflow-y:scroll;
 }
@@ -252,10 +248,56 @@ table tbody td {
 	padding:.5em;
 }
 
+#sAlert {
+	display:none;
+	height:100%;
+	left:0;
+	position:fixed;
+	top:0;
+	width:100%;
+}
+#sAlert .container {
+	height:15vh;
+	left:50%;
+	position:absolute;
+	top:50%;
+	z-index:51;
+	width:10vw;
+}
+#sAlert .container .txt {
+	height:100%;
+	width:100%;
+	left:-50%;
+	top:-50%;
+	position:absolute;
+	border-radius:10px;
+	color:#fff;
+	font-size:1.3em;
+	text-align:center;
+	background:rgba(0,0,0,0.85);
+}
+#sAlert .container .txt img {
+	max-height:75%;
+	max-width:75%;
+}
+#sAlert .bo {
+	background:rgba(0,0,0,0.2);
+	height:100%;
+	left:0;
+	position:absolute;
+	top:0;
+	width:100%;
+	z-index:50;
+}
+
 @media screen and (max-width: 1120px) { 
 	.tile {
 		width:33.3vw;
 		height:45vh;
+	}
+	#sAlert .container {
+		height:20vh;
+		width:17.5vw;
 	}
 }
 @media screen and (max-width: 770px) { 
@@ -288,6 +330,13 @@ table tbody td {
 		line-height:7.5vh;
 		font-size:1.9em;
 	}
+	#sAlert .container {
+		height:20vh;
+		width:25vw;
+	}
+	/*#pageCenter {
+		height:75vh;
+	}*/
 }
 @media screen and (max-width: 440px) {
 	.tile {
@@ -346,5 +395,9 @@ table tbody td {
 		width:85vw;
 		height:20%;
 		font-size:1.9em;
+	}
+	#sAlert .container {
+		height:25vh;
+		width:40vw;
 	}
 }

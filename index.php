@@ -48,6 +48,16 @@
 			<span id="mediacontrols">No Music Playing</span>
 		</div>
 		
+		<div id="sAlert">
+			<div class="container">
+				<div class="txt">
+					<img src="assets/img/Musec!.jpg" id="sAlertImg" /><br />
+					<span id="sAlertTxt">Something</span>
+				</div>
+			</div>
+			<div class="bo"></div>
+		</div>
+		
 		<!-- Scripts and Libraries -->
 		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script type="text/javascript" crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>

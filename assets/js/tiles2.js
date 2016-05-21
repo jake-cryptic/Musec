@@ -1,5 +1,5 @@
 var tiles = {
-	cacheVersion:5,
+	cacheVersion:8,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -12,6 +12,16 @@ var tiles = {
 	m:false,
 	dev: function(log) {
 		if (tiles.db == true) { console.log(log); } //"Musec-> " + 
+	},
+	sAlert: function(m,i,d) {
+		tiles.dev("Alerted: '" + m + "' for " + (d*4) + "ms with image " + i);
+		$("#sAlertImg").attr("src","assets/img/i/" + i);
+		$("#sAlertTxt").html(m);
+		
+		$("#sAlert").fadeIn(d);
+		setTimeout(function(){
+			$("#sAlert").fadeOut(d);
+		},d*4);
 	},
 	load: function(sendData) {
 		tiles.dev(sendData);
@@ -397,7 +407,8 @@ var tiles = {
 				tiles.songQueue.push(loc);
 				tiles.songQueue.push(x);
 			}
-			alert("Added all songs from " + capitalise(dataArray.folder.replace(/_/g," ")) + " to queue");
+			tiles.sAlert("Added","plus.svg",250);
+			//alert("Added all songs from " + capitalise(dataArray.folder.replace(/_/g," ")) + " to queue");
 		}
 	},
 	alterQueue: function(whatDo, songID) {
@@ -652,6 +663,7 @@ var tiles = {
 		}
 	},
 	fix: function(){
+		tiles.sAlert("Clearing","",500);
 		tiles.db = true;
 		tiles.dev("Musec->Forced Reset");
 		
@@ -714,6 +726,7 @@ $(document).ready(function(){
 
 	if (tiles.m == true) {
 		tiles.dev("Mobile Browser! " + navigator.userAgent);
+		tiles.sAlert("Hello","plus.svg",500);
 	}
 	$(window).resize(function(){
 		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770) {eW = "72vw";} else {eW = "85vw";}
@@ -722,7 +735,7 @@ $(document).ready(function(){
 		} else {
 			$("#search_container").css({width:eW});
 		}
-		tiles.dev("Window Resize");
+		tiles.dev("Window Resize - " + $(window).width() + "x" + $(window).height());
 	});
 	tiles.bB.click(function(){
 		tiles.dev("Action Button: " + tiles.bB.prop("do"));
