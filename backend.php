@@ -8,26 +8,26 @@ header("Access-Control-Allow-Headers: X-PINGOTHER, Content-Type");
 header("Access-Control-Max-Age: 86400");
 
 
-function arrayToCsv( array &$fields, $delimiter = ';', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false ) {
+function arrayToCsv(array &$fields, $delimiter = ',', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false) {
     $delimiter_esc = preg_quote($delimiter, '/');
     $enclosure_esc = preg_quote($enclosure, '/');
 
-    $output = array();
-    foreach ( $fields as $field ) {
+    $output = array(time());
+    foreach ($fields as $field) {
         if ($field === null && $nullToMysqlNull) {
             $output[] = 'NULL';
             continue;
         }
 
         // Enclose fields containing $delimiter, $enclosure or whitespace
-        if ( $encloseAll || preg_match( "/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field ) ) {
+        if ($encloseAll || preg_match("/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field) ) {
             $output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
         } else {
             $output[] = $field;
         }
     }
 
-    return implode( $delimiter, $output );
+    return implode($delimiter, $output);
 }
 
 if (isset($_POST)) {
@@ -142,7 +142,7 @@ if (isset($_POST)) {
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":8}');
+		die('{"response":"version","total":9}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = @base64_decode($_POST["e"]);

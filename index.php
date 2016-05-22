@@ -12,7 +12,8 @@
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		
-		<!-- Styles and Graphics -->
+		<!-- Links -->
+		<link rel="manifest" href="manifest.json" />
 		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" />
 		<link rel="apple-touch-icon" sizes="250x250" href="assets/img/Musec!3.jpg">
 		<link rel="icon" href="assets/img/Musec!.jpg" type="image/gif">

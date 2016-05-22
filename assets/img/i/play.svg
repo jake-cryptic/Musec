@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.0//EN'  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" xml:space="preserve" height="45.822mm" width="45.822mm" version="1.0" clip-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 773 773">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil3 {fill:#333333}
+    .fil0 {fill:#999999}
+    .fil1 {fill:#B3B3B3}
+    .fil2 {fill:white}
+    .fil4 {fill:white;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Warstwa_x0020_1">
+  <g id="_1033079920">
+   <path class="fil0" d="m29 0h716c16 0 28 13 28 29v716c0 16-12 28-28 28h-716c-16 0-29-12-29-28v-716c0-16 13-29 29-29z"/>
+   <path class="fil1" d="m29 0h351v773h-351c-16 0-29-12-29-28v-716c0-16 13-29 29-29z"/>
+   <path class="fil2" d="m387 144c134 0 243 109 243 243s-109 243-243 243-243-109-243-243 109-243 243-243z"/>
+   <path class="fil3" d="m387 189c109 0 198 88 198 198 0 109-89 198-198 198-110 0-198-89-198-198 0-110 88-198 198-198z"/>
+   <path class="fil4" d="m497 390l-197-107v213l197-106z"/>
+  </g>
+ </g>
+</svg>
