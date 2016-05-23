@@ -1,5 +1,5 @@
 # 1 Month
-<FilesMatch "\.(jpg|png|gif|mp3|m4a)$">
+<FilesMatch "\.(svg|jpg|png|gif|mp3|m4a)$">
 Header set Cache-Control "max-age=2592000"
 Header set Vary "Accept-Encoding"
 </FilesMatch>

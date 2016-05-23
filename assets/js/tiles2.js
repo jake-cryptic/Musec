@@ -1,5 +1,5 @@
 var tiles = {
-	cacheVersion:9,
+	cacheVersion:10,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -14,14 +14,14 @@ var tiles = {
 		if (tiles.db == true) { console.log(log); } //"Musec-> " + 
 	},
 	sAlert: function(m,i,d) {
-		tiles.dev("Alerted: '" + m + "' for " + (d*4) + "ms with image " + i);
+		tiles.dev("Alerted: '" + m + "' for " + (d*3) + "ms with image " + i);
 		$("#sAlertImg").attr("src","assets/img/i/" + i);
 		$("#sAlertTxt").html(m);
 		
 		$("#sAlert").fadeIn(d);
 		setTimeout(function(){
 			$("#sAlert").fadeOut(d);
-		},d*4);
+		},d*3);
 	},
 	load: function(sendData) {
 		tiles.dev(sendData);
@@ -132,7 +132,8 @@ var tiles = {
 				$("#song_" + x).longclick(500,function(){
 					tiles.showSongMenu("#song_" + x);
 				});
-				$("#song_name_" + x).click(function(){
+				$("#song_" + x).click(function(){
+					if($(this).hasClass('disabled__')) return;
 					tiles.alterQueue("playnow","#song_" + x);
 					tiles.nextSong();
 				});
@@ -160,7 +161,12 @@ var tiles = {
 	nextSong: function(){
 		loc = tiles.songQueue[tiles.currentSong*2];
 		tiles.songName = tiles.songQueue[(tiles.currentSong*2)+1];
-		
+		if (typeof(loc) == "undefined") {
+			tiles.sAlert("Fixing","broom.svg",250);
+			tiles.currentSong = tiles.songQueue[tiles.songQueue.length];
+			loc = tiles.songQueue[tiles.currentSong*2];
+			tiles.songName = tiles.songQueue[(tiles.currentSong*2)+1];
+		}
 		tiles.dev("playSong called with loc: " + loc);
 		
 		if (typeof(tiles.AudioElement) == "undefined") {
@@ -179,6 +185,7 @@ var tiles = {
 		tiles.dev("Audio Element:"  + loc);
 		
 		tiles.AudioElement.addEventListener('loadeddata',function(){
+			tiles.currentSong++;
 			tiles.AudioElement.play();
 			if (tiles.m != true) { // Give desktop browsers a hint
 				setTimeout("tiles.AudioElement.pause()", 10);
@@ -212,13 +219,13 @@ var tiles = {
 		
 		tiles.AudioElement.src = tiles.backendUrl + loc;
 		tiles.dev("SRV:" + tiles.backendUrl + loc);
-		tiles.currentSong = tiles.currentSong + 1;
 		if (tiles.m == true) {
 			tiles.AudioElement.play(); // Give mobile browsers a hint
 		}
 	},
 	updateMediaInfo:function() {
-		if (typeof(tiles.AudioElement.duration) == "undefined") {
+		if (typeof(tiles.AudioElement.duration) == "undefined" || tiles.AudioElement.duration == null || isNaN(tiles.AudioElement.duration)) {
+			tiles.dev("It seems that duration isn't playing nice... Poly fill");
 			tiles.MediaCurrentTime.innerHTML = "00:00";
 			tiles.MediaTotalTime.innerHTML = "00:00";
 		} else {
@@ -243,7 +250,7 @@ var tiles = {
 	songEnd:function(){
 		if (tiles.songQueue.length == (tiles.currentSong*2)) {
 			tiles.changeMediaState();
-			alert("End of queue");
+			tiles.sAlert("End of Queue","stop.svg",500);
 		} else {
 			tiles.nextSong();
 			if ($("#queueFolder").is(":visible")) {
@@ -330,7 +337,7 @@ var tiles = {
 	showSongMenu: function(song_id){
 		var innerID = song_id.replace("song","song_inner");
 		tiles.dev("Showing song menu for " + song_id + "; LSSM: " + $(song_id).attr("song"));
-
+		$(song_id).addClass("disabled__");
 		currentContent = $(innerID).html().substring(-5);
 
 		if (typeof(tiles.lastSongMenu) == "undefined" && typeof(tiles.lastMenuSong) == "undefined") {
@@ -340,6 +347,8 @@ var tiles = {
 		} else {
 			if ($(tiles.lastMenuSong).length) {
 				$(tiles.lastMenuSong).html(tiles.lastSongMenu);
+				arr = tiles.lastMenuSong.split("_");
+				$("#song_" + arr[arr.length-1]).removeClass("disabled__");
 				tiles.dev("showSongMenu->Path->2->1");
 				if (innerID == tiles.lastMenuSong) {
 					tiles.dev("showSongMenu->Path->2->1->1");
@@ -368,6 +377,8 @@ var tiles = {
 			tiles.cWtS = $("#tile_id_" + song_id).prop("folder");
 			var title = capitalise($("#tile_id_" + song_id).prop("folder").replace(/_/g," "));
 			tiles.dev("STM: " + song_id + " && " + tiles.cWtS);
+			
+			tiles.cWt.unbind();
 
 			$("#tile_id_" + song_id + "_bg").addClass("blur");
 
@@ -382,18 +393,16 @@ var tiles = {
 			tiles.cWt.longclick(300,function(){tiles.showTileMenu(song_id);});
 		} else {
 			tiles.cWt.fadeOut(500);
+			tiles.dev("Count on account of " + song_id);
 			tiles.cWt = undefined;
 			tiles.cWtS = undefined;
-			if (tiles.cWtI != song_id) {
-				tiles.showTileMenu(song_id);
-			}
 		}
 	},
 	tileMenuDo:function(whatDo, folder) {
 		if (whatDo == "atq") {
 			tiles.load("t=b&d=" + btoa(folder));
 		} else if (whatDo == "fav") {
-			alert("This feature isn't available yet :(");
+			tiles.sAlert("Unavailable","sad.svg",550);
 		} else {
 			alert("Not Implemented");
 		}
@@ -655,13 +664,14 @@ var tiles = {
 			$("#song_" + x).longclick(500,function(){
 				tiles.showSongMenu("#song_" + x);
 			});
-			$("#song_name_" + x).click(function(){
+			$("#song_" + x).click(function(){
+				if($(this).hasClass('disabled__')) return;
 				tiles.alterQueue("playnow","#song_" + x);
 				tiles.nextSong();
 			});
 			console.log("Assigned functions to: song_" + i);
 		});
-		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770) {eW = "72vw";} else {eW = "85vw";}
+		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770) {eW = "73vw";} else {eW = "85vw";}
 		tiles.folder.fadeIn(300,function(){tiles.folder.animate({width:eW,opacity:1},500);});
 		$("#search_container").fadeOut(300,function(){$("#search_container").animate({width:"0",opacity:0.2},500);});
 	},
@@ -675,6 +685,7 @@ var tiles = {
 		}
 	},
 	fix: function(){
+		tiles.togglePanel();
 		tiles.sAlert("Clearing","broom.svg",500);
 		tiles.db = true;
 		tiles.dev("Musec->Forced Reset");
@@ -687,12 +698,16 @@ var tiles = {
 		
 		$("#pageCenter").css("background-color","rgba(0,0,0,1)");
 		setTimeout(function(){
-			tiles.AudioElement = null;
+			if (typeof(tiles.AudioElement) != "undefined") {
+				tiles.AudioElement.pause();
+			}
+			tiles.AudioElement = undefined;
 			tiles.currentSong = 0;
 			tiles.songQueue = [];
 			tiles.activeView = $("#musicFolders");
 			
 			tiles.load("t=f&d=" + btoa("/"));
+			tiles.load("t=v");
 			
 			tiles.folder.html("Music");
 			tiles.bB.prop("do","refresh");
@@ -700,6 +715,25 @@ var tiles = {
 			$("#pageCenter").css("background-color","rgba(0,0,0,0.8)");
 			tiles.activeView.fadeIn(500);
 		},1000);
+	},
+	togglePanel:function(){
+		if ($("#optionsPanel").is(":visible")) {
+			$("#optionsPanel").fadeOut(500);
+			$("#pageTop").delay(500).fadeIn(500);
+			$("#pageCenter").delay(500).fadeIn(500);
+			$("#pageBottom").delay(500).fadeIn(500);
+			setTimeout(function(){$("body").css({backgroundColor:"#fff"});},1000);
+		} else {
+			$("body").css({backgroundColor:"rgba(0,0,0,0.8)"});
+			$("#pageTop").fadeOut(500);
+			$("#pageCenter").fadeOut(500);
+			$("#pageBottom").fadeOut(500);
+			$("#optionsPanel").delay(500).fadeIn(400);
+		}
+	},
+	widthCheck:function(){
+		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770 && $(document).width() > 440) {eW = "73vw";} else {eW = "85vw";}
+		return eW;
 	}
 };
 $(document).ready(function(){
@@ -720,9 +754,9 @@ $(document).ready(function(){
 		FastClick.attach(document.body);
 		tiles.dev("FastClick Attached to document.body");
 	});
-	tiles.folder.longclick(1000,function(){
-		tiles.fix();
-	});
+	tiles.folder.longclick(1000,function(){tiles.togglePanel();});
+	tiles.folder.contextmenu(function(){tiles.togglePanel();});
+	
 	tiles.mediaStateTrigger.addEventListener("click",tiles.changeMediaState,false);
 	tiles.searchBox.keyup(function(){tiles.preemptSearch();});
 	tiles.searchBox.keypress(function(k){if(k.which == 13){tiles.doSearch();}}); // Enter to do search
@@ -738,10 +772,15 @@ $(document).ready(function(){
 	
 	if (tiles.m == true) {
 		tiles.dev("Mobile Browser! " + navigator.userAgent);
-		tiles.sAlert("Beta","../Musec!3.jpg",500);
+		if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+			tiles.sAlert("iDevice","../Musec!3.jpg",500);
+			$("#pageCenter").css({height:"60vh"});
+		} else {
+			tiles.sAlert("Beta","../Musec!3.jpg",500);
+		}
 	}
 	$(window).resize(function(){
-		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770) {eW = "72vw";} else {eW = "85vw";}
+		eW = tiles.widthCheck();
 		if (tiles.folder.is(":visible")) {
 			tiles.folder.css({width:eW});
 		} else {
@@ -753,6 +792,7 @@ $(document).ready(function(){
 		tiles.dev("Action Button: " + tiles.bB.prop("do"));
 		if (tiles.bB.prop("do") == "refresh") {
 			tiles.load("t=f&d=" + btoa("/"));
+			tiles.sAlert("Refreshed","refresh.svg",400);
 			$("#queueFolder").hide();
 		} else {
 			tiles.cfn = undefined;
@@ -783,13 +823,13 @@ $(document).ready(function(){
 	tiles.sB.click(function(){
 		var sc = $("#search_container");
 		if (tiles.folder.is(":visible")) {
-			if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770) {eW = "72vw";} else {eW = "85vw";}
+			eW = tiles.widthCheck();
 			tiles.dev("Action Button: Search show " + eW);
 			
 			tiles.folder.animate({width:"0vw",opacity:0.2},500,function(){tiles.folder.hide();});
 			sc.animate({width:eW,opacity:1},500,function(){sc.fadeIn(300,function(){tiles.searchBox.focus();tiles.searchBox.click();});});
 		} else {
-			if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770 && $(document).width() > 440) {eW = "72vw";} else {eW = "85vw";}
+			eW = tiles.widthCheck();
 			tiles.dev("Action Button: Search hide " + eW);
 			
 			tiles.folder.fadeIn(300,function(){tiles.folder.animate({width:eW,opacity:1},500);});
@@ -822,3 +862,11 @@ $(document).ready(function(){
 		document.title = "Musec!";
 	});
 });
+var i = 0;
+var assets = ["broom.svg","cross.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
+for (i = 0;i<assets.length;i++) {
+	hint = document.createElement("link");
+	hint.setAttribute("rel","prefetch");
+	hint.setAttribute("href","assets/img/i/" + assets[i]);
+	document.getElementsByTagName("head")[0].appendChild(hint);
+}

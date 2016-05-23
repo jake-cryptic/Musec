@@ -1,5 +1,6 @@
 <?php
-$betaKeysIssued = ["Bacon","NotBacon"];
+// 0 - Me, 1 - Danny, 2 - Joel, 3 - Becky
+$betaKeysIssued = ["Bacon","Game","NotBacon","Ghost"];
 
 if (isset($_COOKIE["beta"]) && $_COOKIE["beta"] > time()) {
 	require("index.php");
@@ -11,7 +12,8 @@ if (isset($_COOKIE["beta"]) && $_COOKIE["beta"] > time()) {
 if (isset($_POST["potential"])) {
 	$p = trim($_POST["potential"]);
 	if (in_array($p,$betaKeysIssued)) {
-		setcookie("beta",time()+172800,time()+172800,"/"); // 2 Days
+		setcookie("beta",time()+1814400,time()+1814400,"/"); // 3 Weeks
+		setcookie("beta_key",$p,time()+2419200,"/"); // 4 Weeks
 		$cont = "<h1>Beta login</h1><h2 class='s'>Success, click here to continue</h2><script>document.body.addEventListener(\"click\",function(){location.href='index.php';},false);</script>";
 	} else {
 		$cont = "<h1>Beta login</h1><h2 class='e'>Beta key invalid</h2>";
@@ -33,9 +35,7 @@ if (isset($_POST["potential"])) {
 		<meta name="description" content="Please login" />
 
 		<!-- Styles and Graphics -->
-		<style type="text/css">
-			h1,h2{width:100%;margin:15px 0;padding:7.5px 0;}.s{background-color:rgba(0,150,0,0.8);}.n{background-color:rgba(230,130,0,0.8);}.e{background-color:rgba(200,0,0,0.8);}body{color:#fff;background-color:rgba(0,0,0,0.8);}div.container{font-size:1.1em;font-family:sans-serif;font-weight:100;margin:5% 12.5%;width:75%;text-align:center}input[type=text]{display:inline-block;width:72.5%;height:1.5em;padding:6px 2.5%;font-size:14px;line-height:1em;color:#555;background-color:#fff;border:1px solid #000;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}input[type=submit]{background-color:rgba(0,0,0,.5);color:#fff!important;transition:background-color .2s ease-in-out;border:0;border-radius:0;cursor:pointer;display:inline-block;font-family:Helvetica,sans-serif;font-weight:500;height:2.6em;line-height:2.75em;padding:0 1vw;text-align:center;text-decoration:none;text-transform:uppercase;white-space:nowrap}input[type=submit]:hover{background-color:rgba(0,0,0,.9)}
-		</style>
+		<style type="text/css">h1,h2{width:100%;margin:15px 0;padding:7.5px 0;}.s{background-color:rgba(0,150,0,0.8);}.n{background-color:rgba(230,130,0,0.8);}.e{background-color:rgba(200,0,0,0.8);}body{color:#fff;background-color:rgba(0,0,0,0.8);}div.container{font-size:1.1em;font-family:sans-serif;font-weight:100;margin:5% 12.5%;width:75%;text-align:center}input[type=text]{display:inline-block;width:72.5%;height:1.5em;padding:6px 2.5%;font-size:14px;line-height:1em;color:#555;background-color:#fff;border:1px solid #000;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}input[type=submit]{background-color:rgba(0,0,0,.5);color:#fff!important;transition:background-color .2s ease-in-out;border:0;border-radius:0;cursor:pointer;display:inline-block;font-family:Helvetica,sans-serif;font-weight:500;height:2.6em;line-height:2.75em;padding:0 1vw;text-align:center;text-decoration:none;text-transform:uppercase;white-space:nowrap}input[type=submit]:hover{background-color:rgba(0,0,0,.9)}</style>
 		<link rel="apple-touch-icon" sizes="250x250" href="assets/img/Musec!3.jpg">
 		<link rel="icon" href="assets/img/Musec!.jpg" type="image/gif">
 
@@ -56,10 +56,19 @@ if (isset($_POST["potential"])) {
 		<script type="text/javascript" src="assets/polyfills/modernizr-custom.js"></script>
 		<script type="text/javascript">
 			if (typeof(jQuery) == "undefined"){document.write('<script src="assets/libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
-			if (typeof(FastClick) == "undefined"){document.write('<script src="assets/assets/js/fastclick.js" type="text/javascript"><\/script>');}
+			if (typeof(FastClick) == "undefined"){document.write('<script src="assets/js/fastclick.js" type="text/javascript"><\/script>');}
 			if (!Modernizr.atobbtoa){document.write('<script type="text/javascript" src="assets/polyfills/base64.min.js"><\/script>');}
 			if (!Modernizr.json){document.write('<script type="text/javascript" src="assets/polyfills/json3.min.js"><\/script>');}
 			FastClick.attach(document.body);
+			var i = 0;
+			var assets = ["broom.svg","cross.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
+			for (i = 0;i<assets.length;i++) {
+				hint = document.createElement("link");
+				hint.setAttribute("rel","prefetch");
+				hint.setAttribute("href","assets/img/i/" + assets[i]);
+				document.getElementsByTagName("head")[0].appendChild(hint);
+			}
 		</script>
+		<script type="text/javascript" src="assets/js/jquery.longclick-min.js"></script>
 	</body>
 </html>

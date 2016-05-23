@@ -49,6 +49,28 @@ input[type='range'] {
 	width:100%;
 	background-color:rgba(255,255,255,0.95);
 }
+#optionsPanel {
+	display:none;
+	top:0;
+	height:100%;
+	width:100%;
+	position:relative;
+	color:#fff;
+	font-size:1.1em;
+}
+#options {
+	width:95%;
+	height:auto;
+	margin:2.5%;
+}
+#options h1,h2 {
+	font-weight:100;
+}
+#options div {
+	width:100%;
+	border-top:1px dotted #fff;
+	font-size:1.1em;
+}
 
 #songFolder, #queueFolder, #searchFolder {
 	display:none;
@@ -114,7 +136,7 @@ input[type='range'] {
     -o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
-#do_search {
+#do_search,.oButton {
 	background-color:rgba(0,0,0,0.5);
     color:#fff !important;
 	transition:background-color 0.2s ease-in-out;
@@ -219,7 +241,7 @@ input[type='range'] {
 	font-family:sans-serif;
 	cursor:pointer;
 }
-.bcircle:hover {
+.bcircle:active {
 	-webkit-animation:bounce .3s infinite alternate;
 	-o-animation:bounce .3s infinite alternate;
 	-moz-animation:bounce .3s infinite alternate;
@@ -296,6 +318,9 @@ table tbody td {
 		width:33.3vw;
 		height:45vh;
 	}
+	#pageCenter {
+		height:76.5vh;
+	}
 	#sAlert .container {
 		height:20vh;
 		width:17.5vw;
@@ -310,7 +335,7 @@ table tbody td {
 		width:65%;
 		height:1.2em;
 	}
-	#do_search {
+	#do_search,.oButton {
 		width:12.5vw;
 	}
 	#playpause {
@@ -331,13 +356,13 @@ table tbody td {
 		line-height:7.5vh;
 		font-size:1.9em;
 	}
+	#pageCenter {
+		height:77.5vh;
+	}
 	#sAlert .container {
 		height:20vh;
 		width:25vw;
 	}
-	/*#pageCenter {
-		height:75vh;
-	}*/
 }
 @media screen and (max-width: 440px) {
 	.tile {
@@ -356,11 +381,15 @@ table tbody td {
 		height:1em;
 		line-height:0.75em;
 	}
-	#do_search {
+	#do_search,.oButton {
 		width:auto;
 		height:2.3em;
 		line-height:1.85em;
 		font-weight:200;
+	}
+	.oButton {
+		font-size:1em;
+		padding:0 2.5vw;
 	}
 	#back,#queue,#search {
 		height:50%;
@@ -374,16 +403,19 @@ table tbody td {
 		font-size:2em;
 	}
 	#pageTop {
+		display:block;
 		bottom:12.5vh;
 		height:15vh;
 	}
 	#pageCenter {
+		display:block;
 		top:15vh;
 		height:72.5vh;
 		bottom:12.5vh;
 		margin-bottom:12.5vh;
 	}
 	#pageBottom {
+		display:block;
 		height:12vh;
 	}
 	#folder {

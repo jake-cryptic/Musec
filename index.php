@@ -1,4 +1,4 @@
-<?php if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.php"); die(); } else { session_start(); }?>
+<?php if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.php"); die(); } else { session_start(); } ?>
 <!DOCTYPE HTML>
 <html lang="en" dir="ltr">
 	<head>
@@ -6,14 +6,14 @@
 		<!-- Title and Metadata -->
 		<title>Loading</title>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 		<meta name="author" content="Jake Mcneill" />
 		<meta name="google" content="notranslate" />
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		
 		<!-- Links -->
-		<link rel="manifest" href="manifest.json" />
+		<link rel="manifest" href="assets/manifest.json" />
 		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" />
 		<link rel="apple-touch-icon" sizes="250x250" href="assets/img/Musec!3.jpg">
 		<link rel="icon" href="assets/img/Musec!.jpg" type="image/gif">
@@ -59,8 +59,21 @@
 			<div class="bo"></div>
 		</div>
 		
+		<div id="optionsPanel">
+			<div id="options">
+				<h1>Musec Panel</h1>
+				<button class="oButton" onclick="tiles.togglePanel()">Close</button> |
+				<button class="oButton" onclick="tiles.fix()">Clean</button><br /><br />
+				<h2>About</h2>
+				<div>
+					Musec was created by Jake :P<br />
+					Because I was sick of not being able to find songs online when Youtube and any other decent streaming service is blocked<br />
+				</div>
+			</div>
+		</div>
+		
 		<!-- Scripts and Libraries -->
-		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 		<script type="text/javascript" crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
 		<script type="text/javascript" src="assets/polyfills/modernizr-custom.js"></script>
 		<script type="text/javascript">
