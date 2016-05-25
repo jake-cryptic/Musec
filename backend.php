@@ -7,10 +7,9 @@ header("Access-Control-Allow-Methods: POST, GET");
 header("Access-Control-Allow-Headers: X-PINGOTHER, Content-Type");
 header("Access-Control-Max-Age: 86400");
 
-
 function arrayToCsv(array &$fields, $delimiter = ',', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false) {
-    $delimiter_esc = preg_quote($delimiter, '/');
-    $enclosure_esc = preg_quote($enclosure, '/');
+    $delimiter_esc = preg_quote($delimiter,'/');
+    $enclosure_esc = preg_quote($enclosure,'/');
 
     $output = array(time());
     foreach ($fields as $field) {

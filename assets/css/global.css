@@ -72,7 +72,7 @@ input[type='range'] {
 	font-size:1.1em;
 }
 
-#songFolder, #queueFolder, #searchFolder {
+#songFolder, #queueFolder {
 	display:none;
 }
 
@@ -315,7 +315,7 @@ table tbody td {
 
 @media screen and (max-width: 1120px) { 
 	.tile {
-		width:33.3vw;
+		width:33.333%;
 		height:45vh;
 	}
 	#pageCenter {
@@ -328,7 +328,7 @@ table tbody td {
 }
 @media screen and (max-width: 770px) { 
 	.tile {
-		width:50vw;
+		width:50%;
 		height:37.5vh;
 	}
 	#search_box {
@@ -400,7 +400,7 @@ table tbody td {
 	#playpause {
 		width:14.8vw;
 		line-height:12.5vh;
-		font-size:2em;
+		font-size:1.8em;
 	}
 	#pageTop {
 		display:block;
@@ -432,5 +432,28 @@ table tbody td {
 	#sAlert .container {
 		height:25vh;
 		width:40vw;
+	}
+}
+@media screen and (max-width: 320px) {
+	#search_box {
+		line-height:1.25em;
+	}
+	#back,#queue,#search {
+		height:7.5vh;
+		width:33.333vw;
+		border:0;
+		border-bottom:1px black solid;
+	}
+	#folder {
+		height:10vh;
+		line-height:10vh;
+		font-size:1.25em;
+	}
+	#pageTop {
+		height:17.5vh;
+	}
+	#pageCenter {
+		top:17.5vh;
+		height:70vh;
 	}
 }
