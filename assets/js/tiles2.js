@@ -8,6 +8,7 @@ var tiles = {
 	connAttempt:0,
 	cfn:undefined,
 	lastSearchVal:"",
+	appLoadTime:Math.floor(Date.now() / 1000),
 	db:true,
 	m:false,
 	dev: function(log) {
@@ -24,6 +25,7 @@ var tiles = {
 		},d*3);
 	},
 	desktopNotify: function(t,b,i) {
+		tiles.dev("Notifying User..");
 		var options = {
 			body:b,
 			icon:i
@@ -32,13 +34,14 @@ var tiles = {
 		if (!("Notification" in window)) {
 			tiles.dev("No Notification support");
 		} else if (Notification.permission === "granted") {
-			var notif = new Notification(t,options);
-			setTimeout(notif.close.bind(notif),7500);
+			tiles.notif = new Notification(t,options);
+			setTimeout(tiles.notif.close.bind(tiles.notif),7500);
 		} else if (Notification.permission !== 'denied') {
+			tiles.dev("Requesting permssion");
 			Notification.requestPermission(function (permission) {
 				if (permission === "granted") {
-					var notif = new Notification(t,options);
-					setTimeout(notif.close.bind(notif),7500);
+					tiles.notif = new Notification(t,options);
+					setTimeout(tiles.notif.close.bind(tiles.notif),7500);
 				}
 			});
 		}
@@ -214,9 +217,7 @@ var tiles = {
 				setTimeout("tiles.AudioElement.pause()", 10);
 				setTimeout("tiles.AudioElement.play()", 20);
 			}
-			var dtNotifMsg = "Now playing: " + tiles.songName;
-			var dtNotifIco = "resources/artwork/" + tiles.songAlbum + ".jpg";
-			tiles.desktopNotify("Musec",dtNotifMsg,dtNotifIco);
+			
 			document.title = "Musec - " + tiles.songName;
 			tiles.folder.html(tiles.songName);
 			tiles.mediaStateTrigger.innerHTML = "&#10074;&#10074;";
@@ -249,6 +250,9 @@ var tiles = {
 			tiles.AudioElement.play(); // Give mobile browsers a hint
 		}
 		tiles.currentSong++;
+		var dtNotifMsg = "Now playing: " + tiles.songName;
+		var dtNotifIco = "resources/artwork/" + tiles.songAlbum + ".jpg";
+		tiles.desktopNotify("Musec",dtNotifMsg,dtNotifIco);
 	},
 	updateMediaInfo:function() {
 		if (typeof(tiles.AudioElement.duration) == "undefined" || tiles.AudioElement.duration == null || isNaN(tiles.AudioElement.duration)) {
