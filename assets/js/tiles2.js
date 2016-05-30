@@ -1,5 +1,5 @@
 var tiles = {
-	cacheVersion:10,
+	cacheVersion:11,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -22,6 +22,26 @@ var tiles = {
 		setTimeout(function(){
 			$("#sAlert").fadeOut(d);
 		},d*3);
+	},
+	desktopNotify: function(t,b,i) {
+		var options = {
+			body:b,
+			icon:i
+		};
+		
+		if (!("Notification" in window)) {
+			tiles.dev("No Notification support");
+		} else if (Notification.permission === "granted") {
+			var notif = new Notification(t,options);
+			setTimeout(notif.close.bind(notif),7500);
+		} else if (Notification.permission !== 'denied') {
+			Notification.requestPermission(function (permission) {
+				if (permission === "granted") {
+					var notif = new Notification(t,options);
+					setTimeout(notif.close.bind(notif),7500);
+				}
+			});
+		}
 	},
 	load: function(sendData,rmBlur) {
 		tiles.dev(sendData);
@@ -164,6 +184,7 @@ var tiles = {
 	nextSong: function(){
 		loc = tiles.songQueue[tiles.currentSong*2];
 		tiles.songName = tiles.songQueue[(tiles.currentSong*2)+1];
+		tiles.songAlbum = tiles.songQueue[(tiles.currentSong*2)].split("/")[2];
 		if (tiles.currentSong*2 > tiles.songQueue.length || typeof(loc) == "undefined") {
 			tiles.sAlert("Fixing","broom.svg",250);
 			tiles.currentSong = tiles.songQueue.length/2;
@@ -193,7 +214,9 @@ var tiles = {
 				setTimeout("tiles.AudioElement.pause()", 10);
 				setTimeout("tiles.AudioElement.play()", 20);
 			}
-
+			var dtNotifMsg = "Now playing: " + tiles.songName;
+			var dtNotifIco = "resources/artwork/" + tiles.songAlbum + ".jpg";
+			tiles.desktopNotify("Musec",dtNotifMsg,dtNotifIco);
 			document.title = "Musec - " + tiles.songName;
 			tiles.folder.html(tiles.songName);
 			tiles.mediaStateTrigger.innerHTML = "&#10074;&#10074;";
@@ -255,6 +278,7 @@ var tiles = {
 		if (tiles.songQueue.length == (tiles.currentSong*2)) {
 			tiles.changeMediaState();
 			tiles.sAlert("End of Queue","stop.svg",500);
+			tiles.desktopNotify("Musec","End of Queue","assets/img/Musec!3.jpg");
 		} else {
 			tiles.nextSong();
 			if ($("#queueFolder").is(":visible")) {
@@ -513,9 +537,9 @@ var tiles = {
 		tiles.queueView();
 	},
 	reloadQueueView:function(){
-		$("#queueFolder").fadeOut(tiles.queueDelay);
+		$("#queueFolder").animate({opacity:0.01},tiles.queueDelay);
 		setTimeout(function(){tiles.queueView();},tiles.queueDelay);
-		$("#queueFolder").delay(tiles.queueDelay).fadeIn(tiles.queueDelay);
+		$("#queueFolder").delay(tiles.queueDelay).animate({opacity:1},tiles.queueDelay);
 	},
 	queueView:function(){
 		tiles.bB.html("<");
@@ -759,7 +783,7 @@ $(document).ready(function(){
 		tiles.dev("FastClick Attached to document.body");
 	});
 	tiles.folder.longclick(1000,function(){tiles.togglePanel();});
-	tiles.folder.contextmenu(function(){tiles.togglePanel();});
+	tiles.folder.contextmenu(function(evn){evn.preventDefault();tiles.togglePanel();});
 	
 	tiles.mediaStateTrigger.addEventListener("click",tiles.changeMediaState,false);
 	tiles.searchBox.keyup(function(){tiles.preemptSearch();});
@@ -870,6 +894,16 @@ $(document).ready(function(){
 		}
 		document.title = "Musec!";
 	});
+	
+	if (!("Notification" in window)) {
+		tiles.dev("No Notification support");
+	} else if (Notification.permission !== 'denied') {
+		Notification.requestPermission(function (permission) {
+			if (permission === "granted") {
+				tiles.dev("Notification permission granted");
+			}
+		});
+	}
 });
 var i = 0;
 var assets = ["broom.svg","cross.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
