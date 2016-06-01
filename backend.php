@@ -45,15 +45,11 @@ if (isset($_POST)) {
 	if ($type == "f") {
 		// Folders (List directories of music)
 		$dirs = array_filter(glob('resources/music/*'), 'is_dir');
-		$data = '{"response":"lsdir","data":[';
+		$result = array("response"=>"lsdir","data"=>array());
 		foreach ($dirs as $directory) {
-			if (end($dirs) == $directory) {
-				$data .= '"' . str_replace("resources/music/","",$directory) . '"';
-			} else {
-				$data .= '"' . str_replace("resources/music/","",$directory) . '",';
-			}
+			$result["data"][] = str_replace("resources/music/","",$directory);
 		}
-		echo "$data]}";
+		echo json_encode($result);
 		
 	} elseif ($type == "s" || $type == "b") {
 		// Song (List songs in directory)
@@ -62,9 +58,9 @@ if (isset($_POST)) {
 		$_SESSION["folder"] = $dir;
 		$files = scandir("resources/music/" . $dir);
 		if ($type == "b") {
-			$data = '{"response":"tfiles","folder":"' . $dir . '","d":[';
+			$results = array("response"=>"tfiles","folder"=>$dir,"data"=>array());
 		} else {
-			$data = '{"response":"lsfiles","data":[';
+			$results = array("response"=>"lsfiles","data"=>array());
 		}
 		$count = 0;
 		foreach ($files as $file) {
@@ -72,29 +68,21 @@ if (isset($_POST)) {
 				$fileExtArr = explode(".",$file);
 				$fileExt = end($fileExtArr);
 				if (in_array($fileExt,$allowedExtensions)) {
-					if (end($files) == $file) {
-						if ($type == "b") {
-							$data .= '"' . $file . '"';
-						} else {
-							$data .= '"' . $dir . "/" . $file . '"';
-						}
+					if ($type == "b") {
+						$results["data"][] = $file;
 					} else {
-						if ($type == "b") {
-							$data .= '"' . $file . '",';
-						} else {
-							$data .= '"' . $dir . "/" . $file . '",';
-						}
+						$results["data"][] = $dir ."/". $file;
 					}
 					$count++;
 				}
 			}
 		}
 		if ($type == "b") {
-			echo "$data],\"count\":\"$count\"}";
+			$results["count"] = $count;
 		} else {
 			usleep(500000); // .5 Seconds
-			echo "$data]}";
 		}
+		echo json_encode($results);
 		
 	} elseif ($type == "l") {
 		// Lookup (Search for song in all folders)
@@ -141,7 +129,7 @@ if (isset($_POST)) {
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":11}');
+		die('{"response":"version","total":12}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = @base64_decode($_POST["e"]);
