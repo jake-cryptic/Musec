@@ -185,7 +185,7 @@ var tiles = {
 		return !ae.paused;
 	},
 	nextSong: function(){
-		loc = tiles.songQueue[tiles.currentSong*2];
+		var loc = tiles.songQueue[tiles.currentSong*2];
 		tiles.songName = tiles.songQueue[(tiles.currentSong*2)+1];
 		tiles.songAlbum = tiles.songQueue[(tiles.currentSong*2)].split("/")[2];
 		if (tiles.currentSong*2 > tiles.songQueue.length || typeof(loc) == "undefined") {
@@ -275,7 +275,7 @@ var tiles = {
 			tiles.MediaCurrentTime.innerHTML = currentMinutes + ":" + currentSeconds;
 			tiles.MediaTotalTime.innerHTML = totalMinutes + ":" + totalSeconds;
 			
-			tiles.songLoadProgress(tiles.AudioElement);
+			//tiles.songLoadProgress(tiles.AudioElement);
 		}
 	},
 	songEnd:function(){
@@ -339,29 +339,23 @@ var tiles = {
 			document.title = "Paused - " + tiles.songName;
 		}
 	},
-	songLoadProgress: function(event){
-		if (typeof(event.loaded) == "undefined" || typeof(event.total) == "undefined") {
-			tiles.songRawTime = tiles.AudioElement.currentTime;
-			if (typeof(tiles.AudioElement.duration) == "undefined") {
-				tiles.songRawDuration = 0;
-			} else {
-				tiles.songRawDuration = tiles.AudioElement.duration;
-			}
-			try {
-				tiles.songRawBuffer = tiles.AudioElement.buffered.end(tiles.AudioElement.buffered.length-1);
-			} catch(e) {
-				tiles.songRawBuffer = 0;
-			}
-			percentLoaded = Math.round((tiles.songRawTime / tiles.songRawBuffer) * 100);
-			percentPlayed = Math.round((tiles.songRawTime / tiles.songRawDuration) * 100);
-			
-			//tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "%");
-			tiles.folder.css({background:"linear-gradient(to right, white " + percentLoaded + "%, rgba(0,0,0,0.5))"});
+	songLoadProgress: function(){
+		tiles.songRawTime = tiles.AudioElement.currentTime;
+		if (typeof(tiles.AudioElement.duration) == "undefined") {
+			tiles.songRawDuration = 0;
 		} else {
-			var percent = (event.loaded / event.total) * 100;
-			tiles.folder.html(Math.round(percent) + "% loaded");
-			tiles.folder.css({background:"linear-gradient(to right, white " + percentLoaded + "%, rgba(0,0,0,0.5))"});
+			tiles.songRawDuration = tiles.AudioElement.duration;
 		}
+		try {
+			tiles.songRawBuffer = tiles.AudioElement.buffered.end(tiles.AudioElement.buffered.length-1);
+		} catch(e) {
+			tiles.songRawBuffer = 0;
+		}
+		percentLoaded = Math.round((tiles.songRawTime / tiles.songRawBuffer) * 100);
+		percentPlayed = Math.round((tiles.songRawTime / tiles.songRawDuration) * 100);
+
+		tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "%");
+		tiles.folder.css({background:"linear-gradient(to right, white " + percentLoaded + "%, rgba(0,0,0,0.5))"});
 	},
 	songBuffering:function(){
 		tiles.dev("Warning! Buffering at " + tiles.songRawBuffer);
@@ -858,7 +852,7 @@ $(document).ready(function(){
 		document.title = "Musec!";
 	});
 	tiles.sB.click(function(){
-		var sc = $("#search_container");
+		var sc = $("#search_container"), eW;
 		if (tiles.folder.is(":visible")) {
 			eW = tiles.widthCheck();
 			tiles.dev("Action Button: Search show " + eW);
