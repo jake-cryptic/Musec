@@ -63,8 +63,7 @@
 			<div id="options">
 				<h1>Musec Panel</h1>
 				<button class="oButton" onclick="tiles.togglePanel()">Close</button> |
-				<button class="oButton" onclick="tiles.fix()">Clean</button> | 
-				<button class="oButton" onclick="window.location.href='new.php?from=cPanel'">Beta</button><br /><br />
+				<button class="oButton" onclick="tiles.fix()">Clean</button><br /><br />
 				<h2>About</h2>
 				<div>
 					Musec was created by Jake :P<br />
@@ -96,6 +95,7 @@
 			function capitalise(t){return t.replace(/\w\S*/g, function(s){return s.charAt(0).toUpperCase() + s.substr(1).toLowerCase();});}
 		</script>
 		<script type="text/javascript" src="assets/js/jquery.longclick-min.js"></script>
-		<script type="text/javascript" src="assets/js/tiles3.js"></script>
+		<script type="text/javascript" src="assets/js/tiles4.js"></script>
+		<script type="text/javascript" src="assets/js/audioHelper.js"></script>
 	</body>
 </html>
