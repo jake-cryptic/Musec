@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+//error_reporting(0);
 session_start();
 
 header("Access-Control-Allow-Origin: *");
@@ -17,7 +17,9 @@ function arrayToCsv(array &$fields, $delimiter = ',', $enclosure = '"', $enclose
             $output[] = 'NULL';
             continue;
         }
-
+		if (end($fields) == $field) { 
+			$field = json_encode($field);
+		}
         // Enclose fields containing $delimiter, $enclosure or whitespace
         if ($encloseAll || preg_match("/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field) ) {
             $output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
@@ -132,14 +134,14 @@ if (isset($_POST)) {
 		die('{"response":"version","total":12}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
-			$data = @base64_decode($_POST["e"]);
-			$arr = @(array)json_decode($data);
+			$data = base64_decode($_POST["e"]);
+			$arr = (array)json_decode($data);
 			
-			$string = arrayToCsv($arr);
+			$string = @arrayToCsv($arr);
 			
-			$eLog = @fopen("errorlog.csv", "a") or die('{"response":"error","error":"Error reporting failed :("}');
-			@fwrite($eLog,$string . "\n");
-			@fclose($eLog);
+			$eLog = fopen("errorlog.csv", "a") or die('{"response":"error","error":"Error reporting failed :("}');
+			fwrite($eLog,$string . "\n");
+			fclose($eLog);
 			die('{"response":"elog","result":1}');
 		} else {
 			die('{"response":"error","error":"Error reporting failed :("}');

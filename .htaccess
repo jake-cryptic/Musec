@@ -1,3 +1,11 @@
+# Enable GZIP
+<ifmodule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/javascript text/css application/x-javascript application/javascript
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+BrowserMatch ^Mozilla/4\.0[678] no-gzip
+BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+</ifmodule>
+
 # 1 Month
 <FilesMatch "\.(svg|jpg|png|gif|mp3|m4a)$">
 Header set Cache-Control "max-age=2592000"
