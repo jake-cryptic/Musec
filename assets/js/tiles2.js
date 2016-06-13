@@ -131,7 +131,6 @@ var tiles = {
 		tiles.bB.html("<");
 		tiles.bB.prop("do","back");
 		tiles.activeView = $("#songFolder");
-		tiles.folder.css({"font-size":"1.25em"});
 		
 		if (typeof(tiles.currentMediaState) == "undefined") {
 			tiles.folder.html(tiles.cfc);
@@ -220,6 +219,7 @@ var tiles = {
 			
 			document.title = "Musec - " + tiles.songName;
 			tiles.folder.html(tiles.songName);
+			tiles.folder.css({"font-size":"1.25em"});
 			tiles.mediaStateTrigger.innerHTML = "&#10074;&#10074;";
 			
 			$("#mediacontrols").html('<input id="playbackslider" class="msicSldr" type="range" min="0" max="100" value="0" step="1"> <span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>');
@@ -355,9 +355,14 @@ var tiles = {
 		}
 		percentLoaded = Math.round((tiles.songRawTime / tiles.songRawBuffer) * 100);
 		percentPlayed = Math.round((tiles.songRawTime / tiles.songRawDuration) * 100);
+		percentTest = Math.round((tiles.songRawBuffer / tiles.songRawDuration) * 100);
 
-		tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "%");
-		tiles.folder.css({background:"linear-gradient(to right, white " + percentLoaded + "%, rgba(0,0,0,0.5))"});
+		tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "% Test: " + percentTest + "%");
+		if (isNaN(percentTest)) {
+			tiles.folder.css({background:"linear-gradient(to right, white 0%, rgba(0,0,0,0.5))"});
+		} else {
+			tiles.folder.css({background:"linear-gradient(to right, white " + percentTest + "%, rgba(0,0,0,0.5))"});
+		}
 	},
 	songBuffering:function(){
 		tiles.dev("Warning! Buffering at " + tiles.songRawBuffer);
@@ -424,6 +429,9 @@ var tiles = {
 			tiles.dev("Count on account of " + song_id);
 			tiles.cWt = undefined;
 			tiles.cWtS = undefined;
+			if (tiles.cWtI != song_id) {
+				tiles.showTileMenu(song_id);	
+			}
 		}
 	},
 	tileMenuDo:function(whatDo, folder) {
@@ -718,8 +726,11 @@ var tiles = {
 		if (localStorage.getItem("M_LSQ") != null) {
 			var q = JSON.parse(localStorage.getItem("M_LSQ"));
 			var c = confirm("Do you want to load the last queue containing " + q.length/2 + " songs");
+			
+			localStorage.removeItem("M_LSQ");
 			if (c == true) {
 				tiles.songQueue = q;
+				// Then remove queue from localStorage
 			} else {
 				return false;
 			}
@@ -776,6 +787,21 @@ var tiles = {
 	widthCheck:function(){
 		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770 && $(document).width() > 440) {eW = "73vw";} else {eW = "85vw";}
 		return eW;
+	},
+	assignKeyEvents:function(){
+		window.addEventListener("keydown",onKeyDown);
+	
+function onKeyDown(e){
+switch (e.keyCode) {
+// X
+case 88:
+var playSound = context.createBufferSource();
+playSound.buffer = electro;
+playSound.connect(context.destination);
+playSound.start(0);
+break;
+}
+}
 	}
 };
 $(document).ready(function(){
