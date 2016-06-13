@@ -11,6 +11,8 @@ var tiles = {
 	appLoadTime:Math.floor(Date.now() / 1000),
 	db:true,
 	m:false,
+	allowKeyBoardEvents:true,
+	isTypingMsg:false,
 	dev: function(log) {
 		if (tiles.db === true) { console.log(log); } //"Musec-> " + 
 	},
@@ -629,6 +631,7 @@ var tiles = {
 		}
 	},
 	preemptSearch:function(){
+		tiles.isTypingMsg = true;
 		if (tiles.lastSearchVal != tiles.searchBox.val()) { // Ignore keys such as CTRL etc
 			tiles.searchDo.html("Typing");
 			if (tiles.searchTypeEndInterval) {
@@ -676,6 +679,7 @@ var tiles = {
 	},
 	handleSearch:function(searchData){
 		console.log(searchData);
+		tiles.isTypingMsg = false;
 		
 		tiles.activeView = $("#songFolder");
 		var $srf = $("#songFolder");
@@ -788,20 +792,17 @@ var tiles = {
 		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770 && $(document).width() > 440) {eW = "73vw";} else {eW = "85vw";}
 		return eW;
 	},
-	assignKeyEvents:function(){
-		window.addEventListener("keydown",onKeyDown);
-	
-function onKeyDown(e){
-switch (e.keyCode) {
-// X
-case 88:
-var playSound = context.createBufferSource();
-playSound.buffer = electro;
-playSound.connect(context.destination);
-playSound.start(0);
-break;
-}
-}
+	keyBoardEvents:function(k){
+		if (tiles.allowKeyBoardEvents == true && tiles.m != true && tiles.isTypingMsg == false) {
+			tiles.dev("KeyPress! - " + k.keyCode);
+			switch(k.keyCode) {
+				case 32: // Space bar
+					tiles.changeMediaState();
+					break;
+				default:
+					break;
+			}
+		}
 	}
 };
 $(document).ready(function(){
@@ -847,6 +848,7 @@ $(document).ready(function(){
 			tiles.sAlert("Beta","../Musec!3.jpg",500);
 		}
 	}
+	window.addEventListener("keydown",tiles.keyBoardEvents);
 	$(window).resize(function(){
 		eW = tiles.widthCheck();
 		if (tiles.folder.is(":visible")) {
@@ -934,6 +936,8 @@ $(document).ready(function(){
 		}
 		document.title = "Musec!";
 	});
+	$("#pageCenter").click(function(){tiles.isTypingMsg = false;});
+	$("#pageBottom").click(function(){tiles.isTypingMsg = false;});
 	if (typeof(Storage) !== "undefined") {
 		window.onbeforeunload = tiles.saveCurrentQueue;
 	} else {
