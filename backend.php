@@ -131,13 +131,13 @@ if (isset($_POST)) {
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":12}');
+		die('{"response":"version","total":15}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = base64_decode($_POST["e"]);
 			$arr = (array)json_decode($data);
 			
-			$string = @arrayToCsv($arr);
+			$string = arrayToCsv($arr);
 			
 			$eLog = fopen("errorlog.csv", "a") or die('{"response":"error","error":"Error reporting failed :("}');
 			fwrite($eLog,$string . "\n");

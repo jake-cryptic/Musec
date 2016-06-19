@@ -23,8 +23,8 @@
 		<!--[if lte IE 8]>
 			<h1 style="text-align:center;font-size:2.2em;">Browser Not Supported</h1>
 			<h2 style="text-align:center;font-size:1.5em;">Please download a better browser</h2>
-			<a href="https://www.google.com/chrome/">Chrome</a> | <a href="https://mozilla.org/firefox/">Firefox</a> | <a href="https://www.opera.com/">Opera</a>
-			<div style="display:none">
+			<a href="https://www.google.com/chrome/">Chrome</a> | <a href="https://mozilla.org/firefox/">Firefox</a> | <a href="https://www.opera.com/">Opera</a><br /><br /><br />
+			<?php echo $_SERVER["HTTP_USER_AGENT"]; ?><div style="display:none">
 		<!--<![endif]-->
 		<div id="pageTop">
 			<span id="back" do="refresh" class="impButton">&#x21bb;</span>
@@ -34,6 +34,9 @@
 			<span id="folder">Please Wait</span>
 		</div>
 		<div id="pageCenter">
+			<div id="mvContainer">
+				<canvas id="musicVisualizer"></canvas>
+			</div>
 			<div id="musicFolders">
 				<h1>Loading Content...</h1>
 			</div>
@@ -65,6 +68,19 @@
 				<button class="oButton" onclick="tiles.togglePanel()">Close</button> |
 				<button class="oButton" onclick="tiles.fix()">Clean</button> | 
 				<button class="oButton" onclick="window.location.href='new.php?from=cPanel'">Beta</button><br /><br />
+				
+				<button class="settingsToggle stDisabled">Disabled</button>
+				<button class="settingsToggle stEnabled">Enabled</button>
+				
+				<h2>Preferences (Experimental)</h2>
+				<div id="appPrefs">
+					<table id="appPrefsTable"><thead><tr><th>Setting</th><th>Value</th></thead><tbody>
+					<tr><td><span class="optionName">Music Visualizer</span></td><td><button class="settingsToggle" id="_ST_MV">Unknown</button></td></tr>
+					<tr><td><span class="optionName">Visualizer FFT Size</span></td><td><select class="settingsOption" id="_ST_FS"><option value="2048">2048</option><option value="1024">1024</option><option value="512">512</option></select></td></tr>
+					<tr><td><span class="optionName">Visualizer Colour</span></td><td><select class="settingsOption" id="_ST_CR"><option value="hsl">Rainbow</option><option value="white">White</option><option value="custom">Custom</option></select></td></tr>
+					<tr><td><span class="optionName">Developer Mode</span></td><td><button class="settingsToggle" id="_ST_DV">Enabled</button></td></tr>
+					</tbody></table>
+				</div>
 				<h2>About</h2>
 				<div>
 					Musec was created by Jake :P<br />
@@ -75,27 +91,23 @@
 		
 		<!-- Scripts and Libraries -->
 		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-		<script type="text/javascript" crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-		<script type="text/javascript" src="assets/polyfills/modernizr-custom.js"></script>
+		<script type="text/javascript" src="assets/polyfills/polyfills.js.php"></script>
 		<script type="text/javascript">
-			window.onload = function(){
-				window.onerror = function (errorMsg, script, lineNumber, column, errorObj) {
-					var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};
-					var sData = JSON.stringify(eData);
-					tiles.load("t=e&e=" + btoa(sData));
-					console.log(sData);
-					alert('Error: ' + errorMsg + ' Script: ' + script + ' Line: ' + lineNumber + ' Column: ' + column + ' StackTrace: ' + errorObj);
-				};
+		window.onload = function(){
+			window.onerror = function (errorMsg, script, lineNumber, column, errorObj) {
+				var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};
+				var sData = JSON.stringify(eData);
+				tiles.load("t=e&e=" + btoa(sData));
+				console.log(sData);
+				alert('Error: ' + errorMsg + ' Script: ' + script + ' Line: ' + lineNumber + ' Column: ' + column + ' StackTrace: ' + errorObj);
 			};
-			console.log("Musec: Loading...");
-			if (typeof(jQuery) == "undefined"){document.write('<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
-			if (typeof(FastClick) == "undefined"){document.write('<script src="assets/js/fastclick.js" type="text/javascript"><\/script>');}
-			if (!Modernizr.atobbtoa){document.write('<script type="text/javascript" src="assets/polyfills/base64.min.js"><\/script>');}
-			if (!Modernizr.json){document.write('<script type="text/javascript" src="assets/polyfills/json3.min.js"><\/script>');}
-			function isNumeric(n){return !isNaN(parseFloat(n)) && isFinite(n);}
-			function capitalise(t){return t.replace(/\w\S*/g, function(s){return s.charAt(0).toUpperCase() + s.substr(1).toLowerCase();});}
+		};
+		console.log("Musec: Loading...");
+		if (typeof(jQuery) == "undefined"){document.write('<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
+		function isNumeric(n){return !isNaN(parseFloat(n)) && isFinite(n);}
+		function capitalise(t){return t.replace(/\w\S*/g, function(s){return s.charAt(0).toUpperCase() + s.substr(1).toLowerCase();});}
 		</script>
-		<script type="text/javascript" src="assets/js/jquery.longclick-min.js"></script>
-		<script type="text/javascript" src="assets/js/tiles3.js"></script>
+		<script type="text/javascript" src="assets/js/tiles5.js"></script>
+		<script type="text/javascript" src="assets/js/Visualizer.js"></script>
 	</body>
 </html>

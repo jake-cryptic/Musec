@@ -14,7 +14,7 @@ Header set Vary "Accept-Encoding"
 
 # 5 Days
 <FilesMatch "\.(js|css|log)$">
-Header set Cache-Control "max-age=0"
+Header set Cache-Control "max-age=86400"
 Header set Vary "Accept-Encoding"
 </FilesMatch>
 
