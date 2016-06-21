@@ -568,6 +568,41 @@ var tiles = {
 			tiles.reloadQueueView();
 		}
 	},
+	wipeQueue:function(part){
+		if (part == 0) {
+			if (typeof(tiles.AudioElement) != "undefined") {
+				if (tiles.checkPlayback(tiles.AudioElement)) {
+					tiles.changeMediaState();
+				}
+			}
+			tiles.AudioElement = undefined;
+			tiles.AudioCtx = undefined;
+			
+			tiles.songQueue = [];
+			localStorage.setItem("M_LSQ","{}");
+			
+			tiles.reloadQueueView();
+		} else if (part == 1) {
+			/*
+			if (tiles.songQueue.length == 0 || (tiles.currentSong) == 1) {
+				tiles.dev("Nope");
+				return false;
+			}
+			tiles.dev("R: "+(tiles.currentSong*2)+" S: ");
+			
+			var newQueue = [];
+			for (var w = (tiles.songQueue.length-1);w > tiles.currentSong;w--) {
+				newQueue.push(tiles.songQueue[w]);
+				tiles.currentSong = tiles.currentSong - 0.5;
+			}
+			tiles.songQueue = newQueue;
+			
+			tiles.reloadQueueView();
+			*/
+		} else {
+			return false;
+		}
+	},
 	goToSong:function(song_id){
 		tiles.currentSong = song_id;
 		tiles.nextSong();
@@ -582,14 +617,21 @@ var tiles = {
 		tiles.bB.html("<");
 		tiles.bB.prop("do","back");
 		
-		$rQ = $("#queueFolder");
-		$rQ.html("<table><thead><tr><!--<th>Status</th>--><th>Song</th><th>Action</th></tr></thead><tbody id=\"queue_list\"></tbody></table>");
+		var rQ = $("#queueFolder");
+		rQ.html("<table><thead><tr><th>Song</th><th>Action</th></tr></thead><tbody id=\"queue_list\"></tbody></table>");
 		
 		if (tiles.songQueue.length == 0) {
 			tiles.dev("Queue is empty!");
-			$("#queue_list").html("<tr><td colspan=\"2\">Queue is empty</td></tr>");
+			$("#queue_list").html('<tr><td colspan=\"2\"><h2>Queue is empty</h2></td></tr><tr><td colspan=\"2\"><button class="qcircle" onclick="alert(\'Not Implemented\')">Load a Playlist</button></td></tr>');
 		} else {
 			tiles.dev("Queue has " + (tiles.songQueue.length) + " values! Which means " + (tiles.songQueue.length/2) + " songs");
+			
+			var queueActions = '<button class="qcircle" onclick="alert(\'Not Implemented\')">Save Queue</button> ';
+			queueActions += '<button class="qcircle" onclick="alert(\'Not Implemented\')">Load Queue</button> ';
+			queueActions += '<button class="qcircle" onclick="tiles.wipeQueue(0);">Clear Queue</button> ';
+			//queueActions += '<button class="qcircle" onclick="tiles.wipeQueue(1);">Clear History</button>';
+			
+			$("#queue_list").html("<tr><td colspan=\"2\">" + queueActions + "</td></tr>");
 			for(var i = 0;i < ((tiles.songQueue.length-1)/2);i++) {
 				tiles.dev("Parsing queue data for song id " + i + " which is " + tiles.songQueue[(i*2)+1]);
 				
@@ -603,13 +645,13 @@ var tiles = {
 					stat = "queueSong";
 				}
 				
-				sB = "<tr class='" + stat + "'><!--<td class='clickable' onclick='tiles.goToSong(" + i + ")'>" + stat + "</td>--><td class='clickable' onclick='tiles.goToSong(" + i + ")'>" + tiles.songQueue[(i*2)+1] + "</td><td>" + queueCtrls + "</td></tr>";
+				sB = "<tr class='" + stat + "'><td class='clickable' onclick='tiles.goToSong(" + i + ")'>" + tiles.songQueue[(i*2)+1] + "</td><td>" + queueCtrls + "</td></tr>";
 				
 				$("#queue_list").append(sB);
 			}
 		}
 	},
-	showLyrics: function(song_id){
+	showLyrics:function(song_id){
 		var innerID = song_id.replace("song","song_name");
 		songName = $(innerID).html();
 		
@@ -619,7 +661,7 @@ var tiles = {
 	
 		window.open(openWindow,"_blank");
 	},
-	showError: function(edata,errorFrom,sendData) {
+	showError:function(edata,errorFrom,sendData){
 		if (errorFrom == 1) {
 			if (edata.status == 0) {
 				// Will handle connection errors
@@ -735,11 +777,11 @@ var tiles = {
 			});
 			console.log("Assigned functions to: song_" + i);
 		});
-		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770) {eW = "73vw";} else {eW = "85vw";}
+		eW = tiles.widthCheck();
 		tiles.folder.fadeIn(300,function(){tiles.folder.animate({width:eW,opacity:1},500);});
 		$("#search_container").fadeOut(300,function(){$("#search_container").animate({width:"0",opacity:0.2},500);});
 	},
-	handleCacheErrors:function(verData) {
+	handleCacheErrors:function(verData){
 		if (verData.total == tiles.cacheVersion) {
 			tiles.dev("No caching validation errors");
 		} else if (verData.total > tiles.cacheVersion) {
@@ -816,7 +858,7 @@ var tiles = {
 		}
 	},
 	widthCheck:function(){
-		if ($(document).width() <= 440) {eW = "100vw";} else if ($(document).width() < 770 && $(document).width() > 440) {eW = "73vw";} else {eW = "85vw";}
+		if ($(document).width() <= 440) {eW = "100%";} else if ($(document).width() < 770 && $(document).width() > 440) {eW = "73%";} else {eW = "85%";}
 		return eW;
 	},
 	keyBoardEvents:function(k){
@@ -985,6 +1027,16 @@ $(document).ready(function(){
 	tiles.loadLastQueue(); // Check if songQueue was previously saved
 });
 
+// Preload resources
+var i = 0;
+var assets = ["broom.svg","cross.svg","exclamation.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
+for (i = 0;i<assets.length;i++) {
+	hint = document.createElement("link");
+	hint.setAttribute("rel","prefetch");
+	hint.setAttribute("href","assets/img/i/" + assets[i]);
+	document.getElementsByTagName("head")[0].appendChild(hint);
+}
+
 var settings = {
 	AppPrefs: {},
 	saveSettings: function(){
@@ -1032,12 +1084,3 @@ var settings = {
 		}
 	}
 };
-
-var i = 0;
-var assets = ["broom.svg","cross.svg","exclamation.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
-for (i = 0;i<assets.length;i++) {
-	hint = document.createElement("link");
-	hint.setAttribute("rel","prefetch");
-	hint.setAttribute("href","assets/img/i/" + assets[i]);
-	document.getElementsByTagName("head")[0].appendChild(hint);
-}

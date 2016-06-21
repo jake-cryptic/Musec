@@ -111,22 +111,28 @@ input[type=range]::-ms-thumb {
 #back,#search {
 	display:block;
 	float:left;
-	width:4.8vw;
+	width:5%;
 	height:100%;
 	line-height:7.5vh;
 	font-size:2em;
-	border-right:0.2vw solid #000;
 	cursor:pointer;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    box-sizing:border-box;
+	border-right:0.2vw solid #000;
 }
 #queue {
 	display:block;
 	float:right;
-	width:4.8vw;
+	width:5%;
 	height:100%;
 	line-height:7.5vh;
 	font-size:2em;
-	border-left:0.2vw solid #000;
 	cursor:pointer;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+	border-left:0.2vw solid #000;
 }
 #playpause {
 	display:block;
@@ -199,7 +205,7 @@ input[type=range]::-ms-thumb {
 	font-size:2em;
 }
 #folder {
-	width:85vw;
+	width:85%;
 }
 #mediacontrols {
 	width:95vw;
@@ -266,15 +272,17 @@ input[type=range]::-ms-thumb {
 .queueCurrentSong {
 	background-color:rgba(0,0,0,0.5);
 }
-.bcircle {
+.bcircle,.qcircle {
 	background-color:rgba(255,255,255,0.9);
 	border:0;
 	border-radius:10px;
 	padding:5px;
-	margin-top:5px;
 	font-size:1em;
 	font-family:sans-serif;
 	cursor:pointer;
+}
+.bcircle {
+	margin-top:5px;
 }
 .bcircle:active {
 	-webkit-animation:bounce .3s infinite alternate;
@@ -425,10 +433,10 @@ canvas#musicVisualizer {
 		font-size:2em;
 	}
 	#queue, #back, #search {
-		width:8.75vw;
+		width:9%;
 	}
 	#folder {
-		width:73vw;
+		width:73%;
 		line-height:7.5vh;
 		font-size:1.7em;
 	}
@@ -471,7 +479,7 @@ canvas#musicVisualizer {
 	}
 	#back,#queue,#search {
 		height:50%;
-		width:33.333vw;
+		width:33.333%;
 		border:0;
 		border-bottom:1px black solid;
 	}
@@ -497,7 +505,7 @@ canvas#musicVisualizer {
 	}
 	#folder {
 		float:right;
-		width:100vw;
+		width:100%;
 		height:50%;
 		font-size:1.4em;
 	}
