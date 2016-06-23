@@ -116,9 +116,9 @@ input[type=range]::-ms-thumb {
 	line-height:7.5vh;
 	font-size:2em;
 	cursor:pointer;
-    -webkit-box-sizing:border-box;
-    -moz-box-sizing:border-box;
-    box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
 	border-right:0.2vw solid #000;
 }
 #queue {
@@ -129,9 +129,9 @@ input[type=range]::-ms-thumb {
 	line-height:7.5vh;
 	font-size:2em;
 	cursor:pointer;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 	border-left:0.2vw solid #000;
 }
 #playpause {

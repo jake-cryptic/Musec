@@ -1,9 +1,9 @@
 var vConf = {
-	w:(window.innerHeight*2),
+	w:(window.innerWidth*2),
 	h:(window.innerHeight*2),
 	smoothing:0.7,
 	fft_size:512,
-	minDec:-130, // -130, -140, -100, -200
+	minDec:-200, // -130, -140, -100, -200
 	maxDec:25 // 70, 0, 0, 70
 };
 
@@ -69,10 +69,4 @@ MusicVisualizer.prototype.draw = function() {
 	if (this.isPlaying) {
 		reqFrame(this.draw.bind(this));
 	}
-}
-
-MusicVisualizer.prototype.getFrequencyValue = function(freq) {
-	var nyquist = tiles.AudioCtx.sampleRate/2;
-	var index = Math.round(freq/nyquist * this.freqs.length);
-	return this.freqs[index];
 }

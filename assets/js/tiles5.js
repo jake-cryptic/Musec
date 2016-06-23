@@ -216,7 +216,10 @@ var tiles = {
 						tiles.AudioCtx.createDelay = tiles.AudioCtx.createDelayNode;
 					if (!tiles.AudioCtx.createScriptProcessor)
 						tiles.AudioCtx.createScriptProcessor = tiles.AudioCtx.createJavaScriptNode;
+					
+					tiles.dev("Audio Context Created!");
 				} catch(e) {
+					// Audio Context isn't supported? No problem..
 					tiles.dev(e);
 					tiles.visuSupport = false;
 				}
@@ -386,7 +389,7 @@ var tiles = {
 		percentPlayed = Math.round((tiles.songRawTime / tiles.songRawDuration) * 100);
 		percentTest = Math.round((tiles.songRawBuffer / tiles.songRawDuration) * 100);
 
-		tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "% Test: " + percentTest + "%");
+		//tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "% Test: " + percentTest + "%");
 		if (isNaN(percentTest)) {
 			tiles.folder.css({background:"linear-gradient(to right, white 0%, rgba(0,0,0,0.5))"});
 		} else {
@@ -868,6 +871,18 @@ var tiles = {
 				case 32: // Space bar
 					tiles.changeMediaState();
 					break;
+				case 81: // Letter Q
+					vConf.fft_size = 256;
+					break;
+				case 87: // Letter W
+					vConf.fft_size = 512;
+					break;
+				case 69: // Letter E
+					vConf.fft_size = 1024;
+					break;
+				case 82: // Letter R
+					vConf.fft_size = 2048;
+					break;
 				default:
 					break;
 			}
@@ -924,6 +939,8 @@ $(document).ready(function(){
 		} else {
 			$("#search_container").css({width:eW});
 		}
+		vConf.w = (window.innerWidth*2);
+		vConf.h = (window.innerHeight*2);
 		tiles.dev("Window Resize - " + $(window).width() + "x" + $(window).height());
 	});
 	$("#mvContainer").click(function(e){
