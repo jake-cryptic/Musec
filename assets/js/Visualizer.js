@@ -29,7 +29,13 @@ MusicVisualizer.prototype.togglePlayback = function() {
 	} else {
 		this.startTime = tiles.AudioCtx.currentTime;
 		console.log('Started at ', this.startOffset);
-		this.source = tiles.AudioCtx.createMediaElementSource(tiles.AudioElement);
+		if (!(tiles.AudioElement instanceof AudioNode)) {
+			this.source = (tiles.AudioElement instanceof Audio || tiles.AudioElement instanceof HTMLAudioElement)
+			? tiles.AudioCtx.createMediaElementSource(tiles.AudioElement)
+			: tiles.AudioCtx.createMediaStreamSource(tiles.AudioElement)
+		}
+		//this.source = tiles.AudioCtx.createMediaElementSource(tiles.AudioElement);
+		
 		// Connect graph
 		this.source.connect(this.analyser);
 		this.source.loop = false;
@@ -70,3 +76,9 @@ MusicVisualizer.prototype.draw = function() {
 		reqFrame(this.draw.bind(this));
 	}
 }
+
+MusicVisualizer.prototype.getFrequencyValue = function(freq) {		
+	var nyquist = tiles.AudioCtx.sampleRate/2;		
+	var index = Math.round(freq/nyquist * this.freqs.length);		
+	return this.freqs[index];		
+} 

@@ -11,6 +11,10 @@
 		<meta name="google" content="notranslate" />
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-title" content="Musec">
+		<meta name="apple-mobile-web-app-status-bar-style" content="#000">
 		
 		<!-- Links -->
 		<link rel="manifest" href="assets/manifest.json" />
@@ -66,11 +70,7 @@
 			<div id="options">
 				<h1>Musec Panel</h1>
 				<button class="oButton" onclick="tiles.togglePanel()">Close</button> |
-				<button class="oButton" onclick="tiles.fix()">Clean</button> | 
-				<button class="oButton" onclick="window.location.href='new.php?from=cPanel'">Beta</button><br /><br />
-				
-				<button class="settingsToggle stDisabled">Disabled</button>
-				<button class="settingsToggle stEnabled">Enabled</button>
+				<button class="oButton" onclick="tiles.fix()">Clean</button><br />
 				
 				<h2>Preferences (Experimental)</h2>
 				<div id="appPrefs">
@@ -78,13 +78,9 @@
 					<tr><td><span class="optionName">Music Visualizer</span></td><td><button class="settingsToggle" id="_ST_MV">Unknown</button></td></tr>
 					<tr><td><span class="optionName">Visualizer FFT Size</span></td><td><select class="settingsOption" id="_ST_FS"><option value="2048">2048</option><option value="1024">1024</option><option value="512">512</option></select></td></tr>
 					<tr><td><span class="optionName">Visualizer Colour</span></td><td><select class="settingsOption" id="_ST_CR"><option value="hsl">Rainbow</option><option value="white">White</option><option value="custom">Custom</option></select></td></tr>
-					<tr><td><span class="optionName">Developer Mode</span></td><td><button class="settingsToggle" id="_ST_DV">Enabled</button></td></tr>
+					<tr><td><span class="optionName">Developer Mode</span></td><td><button class="settingsToggle" id="_ST_DV">Disabled</button></td></tr>
+					<tr><td><span class="optionName">Artist Mode</span></td><td><button class="settingsToggle" id="_ST_AM">Disabled</button></td></tr>
 					</tbody></table>
-				</div>
-				<h2>About</h2>
-				<div>
-					Musec was created by Jake :P<br />
-					Because I was sick of not being able to find songs online when Youtube and any other decent streaming service is blocked<br />
 				</div>
 			</div>
 		</div>

@@ -6,15 +6,15 @@ BrowserMatch ^Mozilla/4\.0[678] no-gzip
 BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
 </ifmodule>
 
-# 1 Month
+# 1 Year
 <FilesMatch "\.(svg|jpg|png|gif|mp3|m4a)$">
-Header set Cache-Control "max-age=2592000"
+Header set Cache-Control "max-age=31536000"
 Header set Vary "Accept-Encoding"
 </FilesMatch>
 
-# 5 Days
+# 7 Days
 <FilesMatch "\.(js|css|log)$">
-Header set Cache-Control "max-age=86400"
+Header set Cache-Control "max-age=604800"
 Header set Vary "Accept-Encoding"
 </FilesMatch>
 

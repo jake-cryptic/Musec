@@ -234,8 +234,11 @@ var tiles = {
 			tiles.dev("Audio Element Created!");
 			
 			if (tiles.visuSupport == true) {
-				tiles.MusicVisualizerObj = new MusicVisualizer();
-				tiles.MusicVisualizerObj.togglePlayback();
+				var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+				if (!iOS){
+					tiles.MusicVisualizerObj = new MusicVisualizer();
+					tiles.MusicVisualizerObj.togglePlayback();
+				}
 			}
 		} else {
 			tiles.folder.html("Loading next song");
@@ -1071,7 +1074,8 @@ var settings = {
 					_ST_MV:"Enabled",
 					_ST_FS:512,
 					_ST_CR:"hsl",
-					_ST_DV:"Enabled"
+					_ST_DV:"Disabled",
+					_ST_AM:"Disabled"
 				};
 				settings.saveSettings();
 			}
