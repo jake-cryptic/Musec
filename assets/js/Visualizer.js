@@ -1,10 +1,11 @@
 var vConf = {
 	w:(window.innerWidth*2),
 	h:(window.innerHeight*2),
-	smoothing:0.7,
+	smoothing:0.69,
 	fft_size:512,
-	minDec:-200, // -130, -140, -100, -200
-	maxDec:25 // 70, 0, 0, 70
+	minDec:-170, // -130, -140, -100, -200
+	maxDec:35, // 70, 0, 0, 70
+	style:"hsl"
 };
 
 function MusicVisualizer() {
@@ -20,7 +21,6 @@ function MusicVisualizer() {
 	this.startTime = 0;
 	this.startOffset = 0;
 }
-
 MusicVisualizer.prototype.togglePlayback = function() {
 	if (this.isPlaying) {
 		this.source[this.source.stop ? 'stop': 'noteOff'](0);
@@ -44,7 +44,6 @@ MusicVisualizer.prototype.togglePlayback = function() {
 	}
 	this.isPlaying = !this.isPlaying;
 }
-
 MusicVisualizer.prototype.draw = function() {
 	this.analyser.smoothingTimeConstant = vConf.smoothing;
 	this.analyser.fftSize = vConf.fft_size;
@@ -66,9 +65,13 @@ MusicVisualizer.prototype.draw = function() {
 		var height = vConf.h * percent;
 		var offset = vConf.h - height - 1;
 		var barWidth = vConf.w/this.analyser.frequencyBinCount/2;
-		var hue = i/this.analyser.frequencyBinCount * 360;
-		drawContext.fillStyle = 'hsl(' + hue + ', 75%, 50%)';
-		//drawContext.fillStyle = 'rgba(255,255,255,0.9)';
+		
+		if (vConf.style == "hsl") {
+			var hue = i/this.analyser.frequencyBinCount * 360;
+			drawContext.fillStyle = 'hsl(' + hue + ', 75%, 50%)';
+		} else {
+			drawContext.fillStyle = 'rgba(255,255,255,0.9)';
+		}
 		drawContext.fillRect(i * barWidth*2.5, offset, barWidth, height);
 	}
 	
@@ -76,7 +79,6 @@ MusicVisualizer.prototype.draw = function() {
 		reqFrame(this.draw.bind(this));
 	}
 }
-
 MusicVisualizer.prototype.getFrequencyValue = function(freq) {		
 	var nyquist = tiles.AudioCtx.sampleRate/2;		
 	var index = Math.round(freq/nyquist * this.freqs.length);		

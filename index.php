@@ -70,16 +70,33 @@
 			<div id="options">
 				<h1>Musec Panel</h1>
 				<button class="oButton" onclick="tiles.togglePanel()">Close</button> |
-				<button class="oButton" onclick="tiles.fix()">Clean</button><br />
+				<button class="oButton" onclick="tiles.fix()">Clean</button> |
+				<button class="oButton" onclick="settings.resetSettings()">Reset</button><br />
 				
 				<h2>Preferences (Experimental)</h2>
 				<div id="appPrefs">
 					<table id="appPrefsTable"><thead><tr><th>Setting</th><th>Value</th></thead><tbody>
-					<tr><td><span class="optionName">Music Visualizer</span></td><td><button class="settingsToggle" id="_ST_MV">Unknown</button></td></tr>
-					<tr><td><span class="optionName">Visualizer FFT Size</span></td><td><select class="settingsOption" id="_ST_FS"><option value="2048">2048</option><option value="1024">1024</option><option value="512">512</option></select></td></tr>
-					<tr><td><span class="optionName">Visualizer Colour</span></td><td><select class="settingsOption" id="_ST_CR"><option value="hsl">Rainbow</option><option value="white">White</option><option value="custom">Custom</option></select></td></tr>
-					<tr><td><span class="optionName">Developer Mode</span></td><td><button class="settingsToggle" id="_ST_DV">Disabled</button></td></tr>
-					<tr><td><span class="optionName">Artist Mode</span></td><td><button class="settingsToggle" id="_ST_AM">Disabled</button></td></tr>
+					<tr>
+						<td><span class="optionName">Music Visualizer</span></td>
+						<td><button class="settingsToggle" id="_ST_MV">Unknown</button></td>
+					</tr>
+					<tr>
+						<td><span class="optionName">Visualizer Style</span></td>
+						<td>
+							<select class="settingsOption" id="_ST_CR">
+								<option value="hsl">Rainbow</option>
+								<option value="white">White</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><span class="optionName">Developer Mode</span></td>
+						<td><button class="settingsToggle" id="_ST_DV">Disabled</button></td>
+					</tr>
+					<tr>
+						<td><span class="optionName">Artist Mode</span></td>
+						<td><button class="settingsToggle" id="_ST_AM">Disabled</button></td>
+					</tr>
 					</tbody></table>
 				</div>
 			</div>
@@ -103,7 +120,7 @@
 		function isNumeric(n){return !isNaN(parseFloat(n)) && isFinite(n);}
 		function capitalise(t){return t.replace(/\w\S*/g, function(s){return s.charAt(0).toUpperCase() + s.substr(1).toLowerCase();});}
 		</script>
-		<script type="text/javascript" src="assets/js/tiles5.js"></script>
 		<script type="text/javascript" src="assets/js/Visualizer.js"></script>
+		<script type="text/javascript" src="assets/js/tiles5.js"></script>
 	</body>
 </html>

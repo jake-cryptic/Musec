@@ -1,4 +1,4 @@
-window.reqFrame = (function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||  function(callback){window.setTimeout(callback, 250 / 60);}; })();
+window.reqFrame = (function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||  function(callback){window.setTimeout(callback, 10 / 60);}; })();
 var tiles = {
 	cacheVersion:15,
 	backendUrl:"",
@@ -14,7 +14,9 @@ var tiles = {
 	m:false,
 	allowKeyBoardEvents:true,
 	isTypingMsg:false,
+	uMix:false,
 	visuSupport:true,
+	
 	dev: function(log) {
 		if (tiles.db === true) { console.log(log); } //"Musec-> " + 
 	},
@@ -585,7 +587,7 @@ var tiles = {
 			tiles.AudioCtx = undefined;
 			
 			tiles.songQueue = [];
-			localStorage.setItem("M_LSQ","{}");
+			localStorage.setItem("M_LSQ","");
 			
 			tiles.reloadQueueView();
 		} else if (part == 1) {
@@ -1059,6 +1061,16 @@ for (i = 0;i<assets.length;i++) {
 
 var settings = {
 	AppPrefs: {},
+	resetSettings: function(){
+		settings.AppPrefs = {
+			_ST_MV:"Enabled",
+			_ST_CR:"hsl",
+			_ST_DV:"Disabled",
+			_ST_AM:"Disabled"
+		};
+		settings.saveSettings();
+		settings.setValues();
+	},
 	saveSettings: function(){
 		var newSettings = JSON.stringify(settings.AppPrefs);
 		localStorage.setItem("AppPreferences",newSettings);
@@ -1072,7 +1084,6 @@ var settings = {
 				// If no settings found, make defaults
 				settings.AppPrefs = {
 					_ST_MV:"Enabled",
-					_ST_FS:512,
 					_ST_CR:"hsl",
 					_ST_DV:"Disabled",
 					_ST_AM:"Disabled"
@@ -1080,28 +1091,91 @@ var settings = {
 				settings.saveSettings();
 			}
 		} else {
-			$("#appPrefs").html("Requires localstorage to work");
+			$("#appPrefs").html("<h2>Requires localstorage to work</h2>");
 			return false;
 		}
 	},
 	enableSettings: function(){
 		tiles.dev("Settings Enabled");
 		settings.setValues();
+		settings.allowChange();
 	},
 	setValues: function(){
-		if (tiles.visuSupport == true) {
-			$("#_ST_MV").addClass("stEnabled");
-			$("#_ST_MV").html("Enabled");
+		var $mv = $("#_ST_MV");
+		var $dv = $("#_ST_DV");
+		var $am = $("#_ST_AM");
+		// Music Visualiser
+		if (settings.AppPrefs._ST_MV == "Enabled") {
+			tiles.visuSupport = true;
+			$mv.addClass("stEnabled");
+			$mv.removeClass("stDisabled");
+			$mv.html("Enabled");
 		} else {
-			$("#_ST_MV").addClass("stDisabled");
-			$("#_ST_MV").html("Disabled");
+			tiles.visuSupport = false;
+			$mv.addClass("stDisabled");
+			$mv.removeClass("stEnabled");
+			$mv.html("Disabled");
 		}
-		if (tiles.db == true) {
-			$("#_ST_DV").addClass("stEnabled");
-			$("#_ST_DV").html("Enabled");
+		// Visualiser Style
+		vConf.style = settings.AppPrefs._ST_CR;
+		// Dev mode
+		if (settings.AppPrefs._ST_DV == "Enabled") {
+			tiles.db = true;
+			$dv.addClass("stEnabled");
+			$dv.removeClass("stDisabled");
+			$dv.html("Enabled");
 		} else {
-			$("#_ST_DV").addClass("stDisabled");
-			$("#_ST_DV").html("Disabled");
+			tiles.db = false;
+			$dv.addClass("stDisabled");
+			$dv.removeClass("stEnabled");
+			$dv.html("Disabled");
 		}
+		// Artist mode
+		if (settings.AppPrefs._ST_AM == "Enabled") {
+			tiles.uMix = true;
+			$am.addClass("stEnabled");
+			$am.removeClass("stDisabled");
+			$am.html("Enabled");
+		} else {
+			tiles.uMix = false;
+			$am.addClass("stDisabled");
+			$am.removeClass("stEnabled");
+			$am.html("Disabled");
+		}
+	},
+	allowChange: function(){
+		$("button#_ST_MV").click(function(){
+			if ($(this).html() == "Enabled") {
+				settings.updateSetting("_ST_MV","Disabled");
+			} else {
+				settings.updateSetting("_ST_MV","Enabled");
+			}
+		});
+		$("select#_ST_CR").change(function(){
+			$("select#_ST_CR option:selected").each(function(){
+				var newOption = $(this).attr("value");
+				settings.updateSetting("_ST_CR",newOption);
+			});
+		});
+		$("button#_ST_DV").click(function(){
+			if ($(this).html() == "Enabled") {
+				settings.updateSetting("_ST_DV","Disabled");
+			} else {
+				settings.updateSetting("_ST_DV","Enabled");
+			}
+		});
+		$("button#_ST_AM").click(function(){
+			if ($(this).html() == "Enabled") {
+				settings.updateSetting("_ST_AM","Disabled");
+			} else {
+				settings.updateSetting("_ST_AM","Enabled");
+			}
+		});
+	},
+	updateSetting: function(setting,value){
+		settings.AppPrefs[setting] = value;
+		settings.saveSettings();
+		settings.setValues();
+		tiles.dev("Saved setting " + setting + " as " + value);
 	}
 };

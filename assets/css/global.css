@@ -201,14 +201,15 @@ input[type=range]::-ms-thumb {
 	display:block;
 	float:left;
 	height:100%;
-	line-height:7.5vh;
 	font-size:2em;
 }
 #folder {
 	width:85%;
+	line-height:7.5vh;
 }
 #mediacontrols {
 	width:95vw;
+	line-height:7vh;
 }
 #pageCenter::-webkit-scrollbar { 
 	display:none; 
@@ -442,7 +443,7 @@ canvas#musicVisualizer {
 	}
 	#mediacontrols {
 		width:90vw;
-		line-height:7.5vh;
+		line-height:7vh;
 		font-size:1.9em;
 	}
 	#sAlert .container {
