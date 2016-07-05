@@ -1,5 +1,5 @@
 var tiles = {
-	cacheVersion:15,
+	cacheVersion:16,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,

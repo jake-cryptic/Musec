@@ -74,14 +74,14 @@
 				<button class="oButton" onclick="settings.resetSettings()">Reset</button><br />
 				
 				<h2>Preferences (Experimental)</h2>
-				<div id="appPrefs">
+				<div id="appPrefs"><button class="rebootButton" id="rebootMusec">Restart Musec</button>
 					<table id="appPrefsTable"><thead><tr><th>Setting</th><th>Value</th></thead><tbody>
 					<tr>
-						<td><span class="optionName">Music Visualizer</span></td>
+						<td onclick="settings.whatsThis(1);"><span class="optionName">Music Visualizer</span></td>
 						<td><button class="settingsToggle" id="_ST_MV">Unknown</button></td>
 					</tr>
 					<tr>
-						<td><span class="optionName">Visualizer Style</span></td>
+						<td onclick="settings.whatsThis(2);"><span class="optionName">Visualizer Style</span></td>
 						<td>
 							<select class="settingsOption" id="_ST_CR">
 								<option value="hsl">Rainbow</option>
@@ -90,12 +90,16 @@
 						</td>
 					</tr>
 					<tr>
-						<td><span class="optionName">Developer Mode</span></td>
+						<td onclick="settings.whatsThis(3);"><span class="optionName">Developer Mode</span></td>
 						<td><button class="settingsToggle" id="_ST_DV">Disabled</button></td>
 					</tr>
 					<tr>
-						<td><span class="optionName">Artist Mode</span></td>
+						<td onclick="settings.whatsThis(4);"><span class="optionName">Artist Mode</span></td>
 						<td><button class="settingsToggle" id="_ST_AM">Disabled</button></td>
+					</tr>
+					<tr>
+						<td onclick="settings.whatsThis(5);"><span class="optionName">Timeouts</span></td>
+						<td><button class="settingsToggle" id="_ST_TO">Enabled</button></td>
 					</tr>
 					</tbody></table>
 				</div>
@@ -106,19 +110,13 @@
 		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 		<script type="text/javascript" src="assets/polyfills/polyfills.js.php"></script>
 		<script type="text/javascript">
-		window.onload = function(){
-			window.onerror = function (errorMsg, script, lineNumber, column, errorObj) {
-				var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};
-				var sData = JSON.stringify(eData);
-				tiles.load("t=e&e=" + btoa(sData));
-				console.log(sData);
-				alert('Error: ' + errorMsg + ' Script: ' + script + ' Line: ' + lineNumber + ' Column: ' + column + ' StackTrace: ' + errorObj);
-			};
-		};
+		window.onload = function(){window.onerror = function(errorMsg,script,lineNumber,column,errorObj){
+		var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};var sData = JSON.stringify(eData);tiles.load("t=e&e=" + btoa(sData));console.log(sData);
+		alert('Error: '+errorMsg+' Script: '+script+' Line: '+lineNumber+' Column: '+column+' StackTrace: '+errorObj);};};
 		console.log("Musec: Loading...");
-		if (typeof(jQuery) == "undefined"){document.write('<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
-		function isNumeric(n){return !isNaN(parseFloat(n)) && isFinite(n);}
-		function capitalise(t){return t.replace(/\w\S*/g, function(s){return s.charAt(0).toUpperCase() + s.substr(1).toLowerCase();});}
+		if(typeof(jQuery)=="undefined"){document.write('<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
+		function isNumeric(n){return !isNaN(parseFloat(n))&&isFinite(n);}
+		function capitalise(t){return t.replace(/\w\S*/g,function(s){return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();});}
 		</script>
 		<script type="text/javascript" src="assets/js/Visualizer.js"></script>
 		<script type="text/javascript" src="assets/js/tiles5.js"></script>

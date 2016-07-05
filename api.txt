@@ -28,7 +28,7 @@ API Responses:
 
 {
 	"response":"sresult",
-	"r":{
+	"data":{
 		"1":[
 			"Song Name",
 			"Song Folder"

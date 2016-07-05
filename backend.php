@@ -123,7 +123,7 @@ if (isset($_POST)) {
 			
 			if (strpos(strtolower($file),$searchTerm) !== false) {
 				$count++;
-				$results["r"][$count] = array($file,$dir);
+				$results["data"][$count] = array($file,$dir);
 			}
 		}
 		$results["count"] = $count;
@@ -131,7 +131,7 @@ if (isset($_POST)) {
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":15}');
+		die('{"response":"version","total":16}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = base64_decode($_POST["e"]);
