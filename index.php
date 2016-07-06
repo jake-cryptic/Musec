@@ -13,14 +13,19 @@
 		<meta name="keywords" content="" />
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-title" content="Musec">
+		<meta name="apple-mobile-web-app-title" content="Musec!">
 		<meta name="apple-mobile-web-app-status-bar-style" content="#000">
 		
-		<!-- Links -->
 		<link rel="manifest" href="assets/manifest.json" />
-		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" />
 		<link rel="apple-touch-icon" sizes="250x250" href="assets/img/Musec!3.jpg">
 		<link rel="icon" href="assets/img/Musec!.jpg" type="image/gif">
+		<style type="text/css">
+		body,html{min-height:100%;margin:0;padding:0;font-weight:100;font-family:sans-serif;text-align:center;}
+		#pageTop{z-index:15;position:fixed;top:0;height:7.5%;width:100%;background-color:rgba(255,255,255,0.95);}
+		#pageCenter{position:fixed;overflow-y:scroll;-webkit-overflow-scrolling:touch;top:7.5%;bottom:12.5%;width:100%;background-color:rgba(0,0,0,0.8);color:white;}
+		#pageBottom{z-index:15;position:fixed;bottom:0;height:12.5%;width:100%;background-color:rgba(255,255,255,0.95);}
+		#optionsPanel{display:none;top:0;height:100%;width:100%;position:relative;color:#fff;font-size:1.1em;}
+		</style>
 		
 	</head>
 	<body>
@@ -42,7 +47,7 @@
 				<canvas id="musicVisualizer"></canvas>
 			</div>
 			<div id="musicFolders">
-				<h1>Loading Content...</h1>
+				<h1>Loading Content...<br /><progress id="__load" value="4" max="100"></progress></h1>
 			</div>
 			<div id="songFolder">
 				<h1>Loading Songs...</h1>
@@ -106,19 +111,19 @@
 			</div>
 		</div>
 		
-		<!-- Scripts and Libraries -->
-		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-		<script type="text/javascript" src="assets/polyfills/polyfills.js.php"></script>
+		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" onload="document.getElementById('__load').value+=15" />
+		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
+		<script type="text/javascript" src="assets/polyfills/polyfills.js.php" onload="document.getElementById('__load').value+=24"></script>
 		<script type="text/javascript">
 		window.onload = function(){window.onerror = function(errorMsg,script,lineNumber,column,errorObj){
 		var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};var sData = JSON.stringify(eData);tiles.load("t=e&e=" + btoa(sData));console.log(sData);
 		alert('Error: '+errorMsg+' Script: '+script+' Line: '+lineNumber+' Column: '+column+' StackTrace: '+errorObj);};};
-		console.log("Musec: Loading...");
 		if(typeof(jQuery)=="undefined"){document.write('<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
 		function isNumeric(n){return !isNaN(parseFloat(n))&&isFinite(n);}
 		function capitalise(t){return t.replace(/\w\S*/g,function(s){return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();});}
+		window.reqFrame =(function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||  function(callback){window.setTimeout(callback, 10 / 60);}; })();
 		</script>
-		<script type="text/javascript" src="assets/js/Visualizer.js"></script>
-		<script type="text/javascript" src="assets/js/tiles5.js"></script>
+		<script type="text/javascript" src="assets/js/Visualizer.js" onload="document.getElementById('__load').innerHTML+=7"></script>
+		<script type="text/javascript" src="assets/js/tiles5.js" onload="document.getElementById('__load').innerHTML+=22" defer></script>
 	</body>
 </html>

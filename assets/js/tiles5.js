@@ -1,4 +1,3 @@
-window.reqFrame = (function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||  function(callback){window.setTimeout(callback, 10 / 60);}; })();
 var tiles = {
 	cacheVersion:16,
 	backendUrl:"",

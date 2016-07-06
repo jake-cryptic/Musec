@@ -51,41 +51,6 @@ input[type=range]::-ms-thumb {
 	cursor:pointer;
 }
 
-#pageTop {
-	z-index:15;
-	position:fixed;
-	top:0;
-	height:7.5%;
-	width:100%;
-	background-color:rgba(255,255,255,0.95);
-}
-#pageCenter {
-	position:fixed;
-	overflow-y:scroll;
-	-webkit-overflow-scrolling:touch;
-	top:7.5%;
-	bottom:12.5%;
-	width:100%;
-	background-color:rgba(0,0,0,0.8);
-	color:white;
-}
-#pageBottom {
-	z-index:15;
-	position:fixed;
-	bottom:0;
-	height:12.5%;
-	width:100%;
-	background-color:rgba(255,255,255,0.95);
-}
-#optionsPanel {
-	display:none;
-	top:0;
-	height:100%;
-	width:100%;
-	position:relative;
-	color:#fff;
-	font-size:1.1em;
-}
 #options {
 	width:95%;
 	height:auto;
@@ -364,9 +329,9 @@ table tbody td {
 	height:100%;
 	z-index:100;
 	pointer-events:none;
-    transition:opacity .75s ease-in-out;
-    -moz-transition:opacity .75s ease-in-out;
-    -webkit-transition:opacity .75s ease-in-out;
+	transition:opacity .75s ease-in-out;
+	-moz-transition:opacity .75s ease-in-out;
+	-webkit-transition:opacity .75s ease-in-out;
 	opacity:0.5;
 }
 canvas#musicVisualizer {
