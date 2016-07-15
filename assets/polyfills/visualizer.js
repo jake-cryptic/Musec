@@ -58,7 +58,7 @@ MusicVisualizer.prototype.draw = function() {
 	var drawContext = canvas.getContext('2d');
 	canvas.width = vConf.w;
 	canvas.height = vConf.h;
-  
+	
 	for (var i = 0; i < this.analyser.frequencyBinCount; i++) {
 		var value = this.freqs[i];
 		var percent = value / 512;

@@ -30,8 +30,7 @@
 	</head>
 	<body>
 		<!--[if lte IE 8]>
-			<h1 style="text-align:center;font-size:2.2em;">Browser Not Supported</h1>
-			<h2 style="text-align:center;font-size:1.5em;">Please download a better browser</h2>
+			<h1 style="text-align:center;font-size:2.2em;">Browser Not Supported</h1><h2 style="text-align:center;font-size:1.5em;">Please download a better browser</h2>
 			<a href="https://www.google.com/chrome/">Chrome</a> | <a href="https://mozilla.org/firefox/">Firefox</a> | <a href="https://www.opera.com/">Opera</a><br /><br /><br />
 			<?php echo $_SERVER["HTTP_USER_AGENT"]; ?><div style="display:none">
 		<!--<![endif]-->
@@ -39,6 +38,7 @@
 			<span id="back" do="refresh" class="impButton">&#x21bb;</span>
 			<span id="search" class="impButton">&#x1f50e;</span>
 			<span id="queue" do="showQ" class="impButton">&#9776;</span>
+			<span id="down" do="showF" class="impButton">&#9660;</span>
 			<div id="search_container"><input type="text" id="search_box" placeholder="Search for a song" /><button id="do_search">Search All</button></div>
 			<span id="folder">Please Wait</span>
 		</div>
@@ -49,12 +49,9 @@
 			<div id="musicFolders">
 				<h1>Loading Content...<br /><progress id="__load" value="4" max="100"></progress></h1>
 			</div>
-			<div id="songFolder">
-				<h1>Loading Songs...</h1>
-			</div>
-			<div id="queueFolder">
-				<h1>Just a second...</h1>
-			</div>
+			<div id="songFolder"></div>
+			<div id="queueFolder"></div>
+			<div id="offlineFolder"></div>
 		</div>
 		<div id="pageBottom">
 			<span id="playpause" class="disabled impButton">&#9658;</span>
@@ -106,14 +103,22 @@
 						<td onclick="settings.whatsThis(5);"><span class="optionName">Timeouts</span></td>
 						<td><button class="settingsToggle" id="_ST_TO">Enabled</button></td>
 					</tr>
+					<tr>
+						<td onclick="settings.whatsThis(6);"><span class="optionName">Keyboard Events</span></td>
+						<td><button class="settingsToggle" id="_ST_KE">Enabled</button></td>
+					</tr>
 					</tbody></table>
 				</div>
 			</div>
 		</div>
 		
-		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" onload="document.getElementById('__load').value+=15" />
-		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
-		<script type="text/javascript" src="assets/polyfills/polyfills.js.php" onload="document.getElementById('__load').value+=24"></script>
+		<?php
+		if (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'Opera') !== false) {
+			echo '<link rel="stylesheet" type="text/css" href="assets/css/global.webkit.css" media="screen" onload="document.getElementById(\'__load\').value+=15" />';
+		} else {
+			echo '<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" onload="document.getElementById(\'__load\').value+=15" />';
+		}
+		?>
 		<script type="text/javascript">
 		window.onload = function(){window.onerror = function(errorMsg,script,lineNumber,column,errorObj){
 		var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};var sData = JSON.stringify(eData);tiles.load("t=e&e=" + btoa(sData));console.log(sData);
@@ -123,7 +128,9 @@
 		function capitalise(t){return t.replace(/\w\S*/g,function(s){return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();});}
 		window.reqFrame =(function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||  function(callback){window.setTimeout(callback, 10 / 60);}; })();
 		</script>
-		<script type="text/javascript" src="assets/js/Visualizer.js" onload="document.getElementById('__load').innerHTML+=7"></script>
+		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
+		<script type="text/javascript" src="assets/polyfills/polyfills.js.php" onload="document.getElementById('__load').value+=31"></script>
+		<script type="text/javascript" src="assets/js/OfflineUse.js" onload="document.getElementById('__load').innerHTML+=22" defer></script>
 		<script type="text/javascript" src="assets/js/tiles5.js" onload="document.getElementById('__load').innerHTML+=22" defer></script>
 	</body>
 </html>

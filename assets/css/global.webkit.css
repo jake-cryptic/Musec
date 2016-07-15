@@ -65,7 +65,7 @@ input[type=range]::-ms-thumb {
 	font-size:1.1em;
 }
 
-#songFolder, #queueFolder, #offlineFolder, #down {
+#songFolder, #queueFolder, #offlineFolder {
 	pointer-events:auto;
 	display:none;
 }
@@ -86,7 +86,7 @@ input[type=range]::-ms-thumb {
 	box-sizing:border-box;
 	border-right:0.2vw solid #000;
 }
-#queue {
+#queue,#down {
 	display:block;
 	float:right;
 	width:5%;
@@ -169,12 +169,12 @@ input[type=range]::-ms-thumb {
 	font-size:2em;
 }
 #folder {
-	width:85%;
+	width:80%;
 	line-height:7.5vh;
 }
 #mediacontrols {
 	width:95vw;
-	line-height:6.5vh;
+	line-height:7vh;
 }
 #pageCenter::-webkit-scrollbar { 
 	display:none; 
@@ -406,11 +406,11 @@ canvas#musicVisualizer {
 		line-height:12.5vh;
 		font-size:2em;
 	}
-	#queue, #back, #search {
+	#queue, #back, #search, #down {
 		width:9%;
 	}
 	#folder {
-		width:73%;
+		width:64%;
 		line-height:7.5vh;
 		font-size:1.7em;
 	}
@@ -451,9 +451,9 @@ canvas#musicVisualizer {
 		font-size:1em;
 		padding:0 2.5vw;
 	}
-	#back,#queue,#search {
+	#back,#queue,#search,#down {
 		height:50%;
-		width:33.333%;
+		width:25%;
 		border:0;
 		border-bottom:1px black solid;
 	}
@@ -497,9 +497,9 @@ canvas#musicVisualizer {
 	#search_box {
 		line-height:1.25em;
 	}
-	#back,#queue,#search {
+	#back,#queue,#search,#down {
 		height:7.5vh;
-		width:33.333vw;
+		width:25%;
 		border:0;
 		border-bottom:1px black solid;
 	}
