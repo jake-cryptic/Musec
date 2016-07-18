@@ -17,6 +17,8 @@ var tiles = {
 	idleTimeout:true,
 	visuSupport:true,
 	idleTime:0,
+	supportsFS: /Chrome|Opera|BB10/.test(navigator.userAgent),
+	fsHasQuota:true,
 	
 	dev:function(log){
 		if (tiles.db === true) { console.log(log); } //"Musec-> " + 
@@ -197,7 +199,11 @@ var tiles = {
 		var s3 = songName.substring(2,3);
 		
 		if (isNumeric(s1) && isNumeric(s2) && !isNumeric(s3)) {
-			newSongName = songName.substring(2);
+			if (s3 == "." || s3 == " ") {
+				newSongName = songName.substring(3);
+			} else {
+				newSongName = songName.substring(2);
+			}
 			tiles.dev("Song " + songName + " has a song int, cleaned to: " + newSongName);
 		} else {
 			tiles.dev(s1 + " & " + s2 + " of string " + songName);
@@ -471,8 +477,7 @@ var tiles = {
 		newContent += " <button class='bcircle' onclick='tiles.alterQueue(\"add\",\"" + song_id + "\");'>Add to queue</button>";
 		//newContent += " <button class='bcircle' onclick='tiles.showLyrics(\"" + song_id + "\");'>Lyrics</button></td>";
 		newContent += " <button class='bcircle' onclick='tiles.alterQueue(\"playnow\",\"" + song_id + "\");tiles.nextSong();'>Play Now</button></td>";
-		var supportsFS = /Chrome|Opera/.test(navigator.userAgent);
-		if (supportsFS){
+		if (tiles.supportsFS){
 			newContent += " <button class='bcircle' onclick='tiles.makeAvailableOffline(\"" + song_id + "\");'>Download</button></td>";
 		}
 
@@ -710,6 +715,11 @@ var tiles = {
 			}
 		}
 	},
+	reloadOfflineView:function(){
+		$("#offlineFolder").animate({opacity:0.25},tiles.queueDelay);
+		setTimeout(function(){tiles.offlineView();},tiles.queueDelay);
+		$("#offlineFolder").delay(tiles.queueDelay).animate({opacity:1},tiles.queueDelay);
+	},
 	offlineView:function(){
 		tiles.bB.html("<");
 		tiles.bB.prop("do","back");
@@ -717,10 +727,20 @@ var tiles = {
 		var oF = $("#offlineFolder");
 		oF.html("<table><thead><tr><th>Album</th><th>Song</th><th>Action</th></tr></thead><tbody id=\"offlineSongs\"></tbody></table>");
 		
-		if (MusecOffline.Store == null || typeof(MusecOffline.Store) == "undefined") {
+		if (MusecOffline.Store == null || typeof(MusecOffline.Store) == "undefined" || !tiles.supportsFS){
+			$("#offlineSongs").html("<tr><td colspan=\"3\">Your browser doesn't support downloading songs for offline use, at this time only Chrome and Opera support it.</td></tr>");
 			return false;
 		} else {
+			if (tiles.fsHasQuota == false) {
+				$("#offlineSongs").html("<tr><td colspan=\"3\">You have not allowed offline storage. Please allow this website to write to your hard drive if you wish to use this feature.</td></tr>");
+				return;
+			}
 			$("#offlineSongs").html("<tr><td colspan=\"3\" id=\"dlSongCount\"></td></tr>");
+			MusecOffline.Store.usedAndRemaining(function (s_used,s_remain) {
+				var s_total = (s_used+s_remain);
+				var progressElement = "<progress id=\"uArPbar\" min=\"0\" max=\"" + s_total + "\" value=\"" + s_used + "\"></progress>";
+				$("#dlSongCount").append(progressElement);
+			});
 			var songs = [];
 			MusecOffline.Store.getDir("/audio", {create: true}, function(){
 				MusecOffline.Store.ls("/audio", function(arr) {
@@ -738,9 +758,10 @@ var tiles = {
 							cleanAlbum = capitalise(arr[i].name.split(".")[0].replace(/_/g," "))
 							cleanName = arr[i].name.split(".").slice(1, -1);
 							sB += "<tr><td class='clickable' onclick='tiles.playOfflineSong(\"" + btoa(arr[i].name) + "\")'>" + cleanAlbum + "</td>";
-							sB += "<td class='clickable' onclick='tiles.playOfflineSong(\"" + btoa(arr[i].name) + "\")'>" + cleanName + "</td><td></td></tr>";
+							sB += "<td class='clickable' onclick='tiles.playOfflineSong(\"" + btoa(arr[i].name) + "\")'>" + cleanName + "</td>";
+							sB += "<td><span class='clickable' onclick='tiles.deleteOfflineSong(\"" + arr[i].name + "\")'>Delete</span></td></tr>";
 						}
-						$("#dlSongCount").html("<h2>Downloaded: " + i + "</h2>");
+						$("#dlSongCount").prepend("<h2>Downloaded: " + i + "</h2>");
 						$("#offlineSongs").append(sB);
 					}
 				});
@@ -758,6 +779,12 @@ var tiles = {
 		
 			tiles.nextSong({"l":url,"n":name,"a":alb});
 		});
+	},
+	deleteOfflineSong:function(osn){
+		console.log(osn);
+		MusecOffline.Store.deleteFile("audio/" + osn);
+		MusecOffline.editIndex(osn);
+		tiles.reloadOfflineView();
 	},
 	showLyrics:function(song_id){
 		var innerID = song_id.replace("song","song_name");

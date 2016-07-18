@@ -26,11 +26,25 @@ var MusecOffline = {
 			MusecOffline.Store = new window.ChromeStore();
 			MusecOffline.Store.init(MusecOffline.conf.fsSize, function(cstore){
 				console.log("Chromestore initialized");
+				//if (typeof(grantedBytes) == "undefined" || grantedBytes == 0) {
+				//	tiles.fsHasQuota = false;
+				//}
 			});
 			return true;
 		} catch(e) {
-			alert("Your device browser doesn't support this");
-			return false;
+			try {
+				window.requestFileSystem(PERSISTENT, MusecOffline.conf.fsSize, function(myFs) {
+					fs = myFs;
+					cwd = fs.root;
+					console.log('<p>Opened <em>' + fs.name, + '</em></p>');
+				}, function(e) {
+					console.log(e);
+				});
+			} catch(e) {
+				tiles.dev("Filesystem API not supported");
+				//alert("Your device browser doesn't support this");
+				return false;
+			}
 		}
 	},
 	autoStore:function(file){
@@ -80,5 +94,19 @@ var MusecOffline = {
 		MusecOffline.DB.push(item);
 		MusecOffline.updateDB();
 		return false;
+	},
+	editIndex:function(item){
+		MusecOffline.createIndex();
+		var removeIndex = "";
+		for (var i = 0;i < MusecOffline.DB.length;++i) {
+			if (MusecOffline.DB[i].fsloc == item){
+				removeIndex = i;
+				break;
+			}
+		}
+		MusecOffline.DB.splice(removeIndex,1);
+		console.log(item);
+		console.log(MusecOffline.DB);
+		MusecOffline.updateDB();
 	}
 };
