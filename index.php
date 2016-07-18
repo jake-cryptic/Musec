@@ -112,7 +112,7 @@
 			</div>
 		</div>
 		
-		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" onload="document.getElementById(\'__load\').value+=15" />
+		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" onload="document.getElementById('__load').value+=15" />
 		<script type="text/javascript">
 		window.onload = function(){window.onerror = function(errorMsg,script,lineNumber,column,errorObj){
 		var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};var sData = JSON.stringify(eData);tiles.load("t=e&e=" + btoa(sData));console.log(sData);
