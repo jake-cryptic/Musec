@@ -112,25 +112,19 @@
 			</div>
 		</div>
 		
-		<?php
-		if (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'Opera') !== false) {
-			echo '<link rel="stylesheet" type="text/css" href="assets/css/global.webkit.css" media="screen" onload="document.getElementById(\'__load\').value+=15" />';
-		} else {
-			echo '<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" onload="document.getElementById(\'__load\').value+=15" />';
-		}
-		?>
+		<link rel="stylesheet" type="text/css" href="assets/css/global.css" media="screen" onload="document.getElementById(\'__load\').value+=15" />
 		<script type="text/javascript">
 		window.onload = function(){window.onerror = function(errorMsg,script,lineNumber,column,errorObj){
 		var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};var sData = JSON.stringify(eData);tiles.load("t=e&e=" + btoa(sData));console.log(sData);
 		alert('Error: '+errorMsg+' Script: '+script+' Line: '+lineNumber+' Column: '+column+' StackTrace: '+errorObj);};};
-		if(typeof(jQuery)=="undefined"){document.write('<script src="assets/js/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
+		if(typeof(jQuery)=="undefined"){document.write('<script src="assets/js_libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
 		function isNumeric(n){return !isNaN(parseFloat(n))&&isFinite(n);}
 		function capitalise(t){return t.replace(/\w\S*/g,function(s){return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();});}
 		window.reqFrame =(function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||  function(callback){window.setTimeout(callback, 10 / 60);}; })();
+		function isCordova(){return (window.cordova || window.PhoneGap || window.phonegap) && /ios|iphone|ipod|ipad|android/i.test(navigator.userAgent);}
 		</script>
 		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
-		<script type="text/javascript" src="assets/polyfills/polyfills.js.php" onload="document.getElementById('__load').value+=31"></script>
-		<script type="text/javascript" src="assets/js/OfflineUse.js" onload="document.getElementById('__load').innerHTML+=22" defer></script>
-		<script type="text/javascript" src="assets/js/tiles5.js" onload="document.getElementById('__load').innerHTML+=22" defer></script>
+		<script type="text/javascript" src="assets/js_libs/libs.js.php" onload="document.getElementById('__load').value+=42"></script>
+		<script type="text/javascript" src="assets/js/Musec.js" onload="document.getElementById('__load').innerHTML+=33" defer></script>
 	</body>
 </html>

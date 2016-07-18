@@ -1,6 +1,5 @@
 <?php
-// 0 - Me, 1 - Danny, 2 - Joel, 3 - Becky
-$betaKeysIssued = ["Bacon","Game","NotBacon","Ghost"];
+$betaKeysIssued = ["Bacon","Game","NotBacon"];
 
 if (isset($_COOKIE["beta"]) && $_COOKIE["beta"] > time()) {
 	require("index.php");
@@ -51,14 +50,10 @@ if (isset($_POST["potential"])) {
 		</div>
 
 		<!-- Scripts and Libraries -->
-		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-		<script type="text/javascript" src="assets/polyfills/modernizr-custom.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+		<script type="text/javascript" src="assets/js_libs/libs.js.php"></script>
 		<script type="text/javascript">
-			if (typeof(jQuery) == "undefined"){document.write('<script src="assets/libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
-			if (typeof(FastClick) == "undefined"){document.write('<script src="assets/js/fastclick.js" type="text/javascript"><\/script>');}
-			if (!Modernizr.atobbtoa){document.write('<script type="text/javascript" src="assets/polyfills/base64.min.js"><\/script>');}
-			if (!Modernizr.json){document.write('<script type="text/javascript" src="assets/polyfills/json3.min.js"><\/script>');}
+			if (typeof(jQuery) == "undefined"){document.write('<script src="assets/js_libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
 			FastClick.attach(document.body);
 			var i = 0;
 			var assets = ["broom.svg","cross.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
@@ -69,6 +64,5 @@ if (isset($_POST["potential"])) {
 				document.getElementsByTagName("head")[0].appendChild(hint);
 			}
 		</script>
-		<script type="text/javascript" src="assets/js/jquery.longclick-min.js"></script>
 	</body>
 </html>
