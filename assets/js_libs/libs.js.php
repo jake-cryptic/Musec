@@ -8,6 +8,8 @@ $files = [
 	"base64.min.js",
 	"fastclick.js",
 	"chromestore.min.js",
+	"tinycolor.js",
+	"colorthief.js",
 	"json3.min.js",
 	"jquery.longclick-min.js",
 	"notification.js",
@@ -16,7 +18,7 @@ $files = [
 ];
 
 foreach($files as $file) {
-	$f = @file_get_contents($file);
+	$f = @file_get_contents("libs/" . $file);
 	$t = preg_replace('/\t+/', '', $f);
 	
 	echo "$t\n\n";

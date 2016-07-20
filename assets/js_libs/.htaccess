@@ -1,0 +1,19 @@
+# Enable GZIP
+<ifmodule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/javascript text/css application/x-javascript application/javascript text/php application/php
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+BrowserMatch ^Mozilla/4\.0[678] no-gzip
+BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+</ifmodule>
+
+
+# 7 Days
+<FilesMatch "\.(js|css|log|php)$">
+Header set Cache-Control "max-age=604800"
+Header set Vary "Accept-Encoding"
+</FilesMatch>
+
+# NEVER CACHE - notice the extra directives
+<FilesMatch "\.(html|htm)$">
+Header set Cache-Control "max-age=0, private, no-store, no-cache, must-revalidate"
+</FilesMatch>

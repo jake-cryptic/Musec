@@ -56,7 +56,7 @@ if (isset($_POST["potential"])) {
 			if (typeof(jQuery) == "undefined"){document.write('<script src="assets/js_libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
 			FastClick.attach(document.body);
 			var i = 0;
-			var assets = ["broom.svg","cross.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
+			var assets = ["broom.svg","cross.svg","exclamation.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
 			for (i = 0;i<assets.length;i++) {
 				hint = document.createElement("link");
 				hint.setAttribute("rel","prefetch");

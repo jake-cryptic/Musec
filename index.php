@@ -75,11 +75,11 @@
 				<button class="oButton" onclick="tiles.fix()">Clean</button> |
 				<button class="oButton" onclick="settings.resetSettings()">Reset</button><br />
 				
-				<h2>Preferences (Experimental)</h2>
+				<h2>Preferences</h2>
 				<div id="appPrefs"><button class="rebootButton" id="rebootMusec">Restart Musec</button>
 					<table id="appPrefsTable"><thead><tr><th>Setting</th><th>Value</th></thead><tbody>
 					<tr>
-						<td onclick="settings.whatsThis(1);"><span class="optionName">Music Visualizer</span></td>
+						<td onclick="settings.whatsThis(1);"><span class="optionName">Music Visualizer*</span></td>
 						<td><button class="settingsToggle" id="_ST_MV">Unknown</button></td>
 					</tr>
 					<tr>
@@ -107,6 +107,11 @@
 						<td onclick="settings.whatsThis(6);"><span class="optionName">Keyboard Events</span></td>
 						<td><button class="settingsToggle" id="_ST_KE">Enabled</button></td>
 					</tr>
+					<tr>
+						<td onclick="settings.whatsThis(7);"><span class="optionName">Colour Splash*</span></td>
+						<td><button class="settingsToggle" id="_ST_CS">Disabled</button></td>
+					</tr>
+					<tr><td colspan="2">* Experimental - These features must be used with caution</td></tr>
 					</tbody></table>
 				</div>
 			</div>

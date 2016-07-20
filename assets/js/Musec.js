@@ -20,6 +20,7 @@ var tiles = {
 	idleTime:0,
 	supportsFS: /Chrome|Opera|BB10/.test(navigator.userAgent),
 	fsHasQuota:true,
+	colorThief:undefined, // Library used for colour detection in images
 	
 	dev:function(log){
 		if (tiles.db === true) { console.log(log); } //"Musec-> " + 
@@ -103,6 +104,23 @@ var tiles = {
 	},
 	loadSongs:function(folder){
 		var folderName = $("#tile_id_" + folder).prop("folder");
+		
+		if (typeof(tiles.colorThief) != "undefined" && tiles.enableColourSplash != false) {
+			var imgSrc = $("#tile_id_" + folder + "_bg").css("background-image");
+			var bg_url = /^url\((['"]?)(.*)\1\)$/.exec(imgSrc);
+			bg_url = bg_url ? bg_url[2] : "";
+			
+			try {
+				var theImage = new Image();
+				theImage.src = bg_url;
+				tiles.cfa = tiles.colorThief.getPalette(theImage,5);
+				tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
+			} catch(e) {
+				tiles.cfp = undefined;
+			}
+		} else {
+			tiles.cfp = undefined;
+		}
 
 		tiles.dev("Tile number " + folder + " is " + folderName);
 		$("#tile_id_" + folder + "_bg").addClass("blur");
@@ -150,16 +168,15 @@ var tiles = {
 			document.title = "Musec - " + tiles.songName;
 		}
 		
-		if (folderData.data.length == 0) {
-			$sf.html("<h2>Couldn't find any music in this directory</h2>"); return;
-		}
-		
 		if (responseType == 1) {
+			if (folderData.data.length == 0) {
+				$sf.html("<h2>Couldn't find any music in this directory</h2>"); return;
+			}
 			$sf.html("<table><thead><tr><th>Song</th></tr></thead><tbody id=\"song_list\"></tbody></table>");
 		
 			for (i=0;i<folderData.data.length;i++) {
 				var file = folderData.data[i].split('/').pop();
-				var x = tiles.removeSongNumbers(file.replace(".m4a", "").replace(".mp3", ""));
+				var x = tiles.removeTrackNumbers(file.replace(".m4a", "").replace(".mp3", ""));
 				var temp = '<tr song="' + btoa(folderData.data[i]) + '" id="song_' + i + '" class="song_longclick"><td id="song_inner_' + i + '"><span id="song_name_' + i + '" class="__song_AllowSearch">' + x + '</span></td></tr>';
 				$("#song_list").append(temp);
 			}
@@ -168,7 +185,7 @@ var tiles = {
 			$sf.html("<table><thead><tr><th>Search Results</th></tr></thead><tbody id=\"search_r_lst\"><tr><td><h2>Found " + folderData.count + " result(s)</h2></td></tr></tbody></table>");
 			for(var i = 1;i < (folderData.count+1);i++) {
 				var file = folderData.data[i][0];
-				var x = tiles.removeSongNumbers(file.replace(".m4a", "").replace(".mp3", ""));
+				var x = tiles.removeTrackNumbers(file.replace(".m4a", "").replace(".mp3", ""));
 				var temp = '<tr song="' + btoa("/" + folderData.data[i][1] + "/" + folderData.data[i][0]) + '" id="song_' + (i-1) + '" class="song_longclick"><td id="song_inner_' + (i-1) + '"><span id="song_name_' + (i-1) + '" class="__song_AllowSearch">' + x + '</span></td></tr>';
 				$("#search_r_lst").append(temp);
 				tiles.dev(i + "/" + Object.keys(folderData.data).length + "-> " + folderData.data[i][1] + "/" + folderData.data[i][0]);
@@ -193,8 +210,39 @@ var tiles = {
 				tiles.nextSong();
 			});
 		});
+		
+		if (typeof(tiles.cfp) != "undefined") {
+			var colourArray = [];
+			var colourArray2 = [];
+			var totalsArray = [];
+			for (var i = 0;i<tiles.cfp.length;i++) {
+				var r = tiles.cfp[i][0];
+				var g = tiles.cfp[i][1];
+				var b = tiles.cfp[i][2];
+				
+				var totStr = r + g + b;
+				var colStr = r.toString() + "," + g.toString() + "," + b.toString();
+				colourArray.splice(tiles.cfp[i].boomRank,0,colStr);
+				colourArray2.push(colStr);
+				totalsArray.push(totStr);
+				
+				//$sf.append("<div class='' style='background-color:rgba(" + r + "," + g + "," + b + ",1)'> </div>");
+			}
+			console.log(colourArray);
+			console.log(colourArray2);
+			console.log(totalsArray);
+			
+			// Set values
+			$("#pageTop").css({background:"rgb(" + colourArray[1] + ")"});
+			$("#pageTop").css({color:"rgb(" + colourArray[0] + ")"});
+			$("#pageCenter").css({background:"rgb(" + colourArray[0] + ")"});
+			$(".song_longclick").css({background:"rgb(" + colourArray[2] + ")"});
+			$(".song_longclick").css({color:"#fff"});
+			$("#pageBottom").css({background:"rgb(" + colourArray[1] + ")"});
+			$("#pageBottom").css({color:"rgb(" + colourArray[0] + ")"});
+		}
 	},
-	removeSongNumbers:function(songName){
+	removeTrackNumbers:function(songName){
 		var s1 = songName.substring(0,1);
 		var s2 = songName.substring(1,2);
 		var s3 = songName.substring(2,3);
@@ -533,7 +581,7 @@ var tiles = {
 			tiles.dev(dataArray);
 			
 			for(var i = 0;i < (dataArray.count);i++) {
-				x = tiles.removeSongNumbers(dataArray.data[i].replace(".m4a", "").replace(".mp3", ""));
+				x = tiles.removeTrackNumbers(dataArray.data[i].replace(".m4a", "").replace(".mp3", ""));
 				loc = "resources/music/" + dataArray.folder + "/" + dataArray.data[i];
 				
 				tiles.songQueue.push(loc);
@@ -559,7 +607,7 @@ var tiles = {
 			}
 			
 			loc = $(songID).attr("song");
-			songname = tiles.removeSongNumbers(atob(loc).split('/').pop().replace(".m4a", "").replace(".mp3", ""));
+			songname = tiles.removeTrackNumbers(atob(loc).split('/').pop().replace(".m4a", "").replace(".mp3", ""));
 			tiles.dev("Song " + songname + " added to queue");
 			loc = "resources/music" + atob(loc);
 			
@@ -574,7 +622,7 @@ var tiles = {
 			}
 			
 			loc = $(songID).attr("song");
-			songname = tiles.removeSongNumbers(atob(loc).split('/').pop().replace(".m4a", "").replace(".mp3", ""));
+			songname = tiles.removeTrackNumbers(atob(loc).split('/').pop().replace(".m4a", "").replace(".mp3", ""));
 			tiles.dev("Song " + songname + " playing now");
 			loc = "resources/music" + atob(loc);
 			
@@ -590,7 +638,7 @@ var tiles = {
 			}
 			
 			loc = $(songID).attr("song");
-			songname = tiles.removeSongNumbers(atob(loc).split('/').pop().replace(".m4a", "").replace(".mp3", ""));
+			songname = tiles.removeTrackNumbers(atob(loc).split('/').pop().replace(".m4a", "").replace(".mp3", ""));
 			tiles.dev("Song " + songname + " playing next");
 			loc = "resources/music" + atob(loc);
 			
@@ -662,7 +710,7 @@ var tiles = {
 			return;
 		}
 		var data = atob($(song_id).attr("song"));
-		var name = tiles.removeSongNumbers(data.split('/').pop().replace(".m4a", "").replace(".mp3", ""));
+		var name = tiles.removeTrackNumbers(data.split('/').pop().replace(".m4a", "").replace(".mp3", ""));
 		var albm = data.split("/")[1];
 		var loca = "resources/music" + data;
 		tiles.dev("Downloading: " + name + "; Album: " + albm + "; fl: " + loca);
@@ -1032,7 +1080,7 @@ var MusecOffline = {
 		return data;
 	},
 	makeOffline:function(url,nm){
-		console.log("Retrieving data from " + url);
+		tiles.dev("Retrieving data from " + url);
 		MusecOffline.Store.getData(url, function(data){
 			console.log("Bytes Received from " + url + ": " + data.byteLength);
 			MusecOffline.Store.getDir("audio",{create: true}, function(){
@@ -1044,7 +1092,7 @@ var MusecOffline = {
 		try {
 			MusecOffline.Store = new window.ChromeStore();
 			MusecOffline.Store.init(MusecOffline.conf.fsSize, function(cstore){
-				console.log("Chromestore initialized");
+				tiles.dev("Chromestore initialized");
 				//if (typeof(grantedBytes) == "undefined" || grantedBytes == 0) {
 				//	tiles.fsHasQuota = false;
 				//}
@@ -1124,8 +1172,8 @@ var MusecOffline = {
 			}
 		}
 		MusecOffline.DB.splice(removeIndex,1);
-		console.log(item);
-		console.log(MusecOffline.DB);
+		tiles.dev(item);
+		tiles.dev(MusecOffline.DB);
 		MusecOffline.updateDB();
 	}
 };
@@ -1315,6 +1363,10 @@ $(document).ready(function(){
 	
 	MusecOffline.makeFilesystem();
 	
+	if (tiles.enableColourSplash == true) {
+		tiles.colorThief = new ColorThief();
+	}
+	
 	tiles.idleTimerInt = setInterval(tiles.idleTimer,1000);
 	$(document).mousemove(function(e){
 		tiles.idleTime = 0;
@@ -1336,7 +1388,7 @@ for (i = 0;i<assets.length;i++) {
 
 var settings = {
 	AppPrefs: {},
-	resetSettings: function(){
+	resetSettings:function(){
 		settings.AppPrefs = {
 			_ST_MV:"Enabled",
 			_ST_CR:"hsl",
@@ -1344,15 +1396,16 @@ var settings = {
 			_ST_AM:"Disabled",
 			_ST_TO:"Disabled",
 			_ST_KE:"Enabled",
+			_ST_CS:"Disabled"
 		};
 		settings.saveSettings();
 		settings.setValues();
 	},
-	saveSettings: function(){
+	saveSettings:function(){
 		var newSettings = JSON.stringify(settings.AppPrefs);
 		localStorage.setItem("AppPreferences",newSettings);
 	},
-	loadSettings: function(){
+	loadSettings:function(){
 		if (typeof(Storage) !== "undefined") {
 			if (localStorage.getItem("AppPreferences") != null) {
 				tiles.dev("Settings found!");
@@ -1365,7 +1418,8 @@ var settings = {
 					_ST_DV:"Enabled",
 					_ST_AM:"Disabled",
 					_ST_TO:"Disabled",
-					_ST_KE:"Enabled"
+					_ST_KE:"Enabled",
+					_ST_CS:"Disabled"
 				};
 				settings.saveSettings();
 			}
@@ -1374,12 +1428,12 @@ var settings = {
 			return false;
 		}
 	},
-	enableSettings: function(){
+	enableSettings:function(){
 		tiles.dev("Settings Enabled");
 		settings.setValues();
 		settings.allowChange();
 	},
-	toggleButton: function(g,s){
+	toggleButton:function(g,s){
 		if (s == true) {
 			g.addClass("stEnabled");
 			g.removeClass("stDisabled");
@@ -1390,12 +1444,14 @@ var settings = {
 			g.html("Disabled");
 		}
 	},
-	setValues: function(){
+	setValues:function(){
 		var $mv = $("#_ST_MV");
 		var $dv = $("#_ST_DV");
 		var $am = $("#_ST_AM");
 		var $to = $("#_ST_TO");
 		var $ke = $("#_ST_KE");
+		var $cs = $("#_ST_CS");
+		
 		// Music Visualiser
 		if (settings.AppPrefs._ST_MV == "Enabled") {
 			tiles.visuSupport = true;
@@ -1438,8 +1494,19 @@ var settings = {
 			tiles.allowKeyBoardEvents = false;
 			settings.toggleButton($ke,false);
 		}
+		// Colour Splash
+		if (settings.AppPrefs._ST_CS == "Enabled") {
+			tiles.enableColourSplash = true;
+			settings.toggleButton($cs,true);
+			if (typeof(tiles.colorThief) == "undefined") {
+				tiles.colorThief = new ColorThief();
+			}
+		} else {
+			tiles.enableColourSplash = false;
+			settings.toggleButton($cs,false);
+		}
 	},
-	allowChange: function(){
+	allowChange:function(){
 		$("button#_ST_MV").click(function(){
 			if ($(this).html() == "Enabled") {
 				settings.updateSetting("_ST_MV","Disabled",true);
@@ -1481,15 +1548,22 @@ var settings = {
 				settings.updateSetting("_ST_KE","Enabled",false);
 			}
 		});
+		$("button#_ST_CS").click(function(){
+			if ($(this).html() == "Enabled") {
+				settings.updateSetting("_ST_CS","Disabled",false);
+			} else {
+				settings.updateSetting("_ST_CS","Enabled",false);
+			}
+		});
 	},
-	updateSetting: function(setting,value,reboot){
+	updateSetting:function(setting,value,reboot){
 		settings.AppPrefs[setting] = value;
 		settings.saveSettings();
 		settings.setValues();
 		settings.requiresRestart(reboot);
 		tiles.dev("Saved setting " + setting + " as " + value);
 	},
-	requiresRestart: function(does){
+	requiresRestart:function(does){
 		if (does) {
 			$("#rebootMusec").show();
 			$("#rebootMusec").click(function(){
@@ -1516,6 +1590,9 @@ var settings = {
 				break;
 			case 6:
 				alert("Keyboard Events:\nAllow keyboard short cuts.");
+				break;
+			case 7:
+				alert("Colour Splash:\nMusic folders change depending on the album artwork.");
 				break;
 			default:
 				alert("Unknown");
