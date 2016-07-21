@@ -235,6 +235,10 @@ input[type=range]::-ms-thumb {
 .song_longclick {
 	cursor:pointer;
 }
+.song_lc_name {
+	width:100%;
+	word-wrap:break-word;
+}
 .queueCurrentSong {
 	background-color:rgba(0,0,0,0.5);
 }
@@ -247,8 +251,8 @@ input[type=range]::-ms-thumb {
 	font-family:sans-serif;
 	cursor:pointer;
 }
-.bcircle {
-	margin-top:5px;
+.bcircle,.fullWidthButton {
+	margin-top:10px;
 }
 .bcircle:active {
 	-webkit-animation:bounce .3s infinite alternate;
@@ -377,6 +381,15 @@ canvas#musicVisualizer {
 }
 .stEnabled,.stDisabled:hover {
 	background-color:#04B404;
+}
+.fullWidthButton {
+	width:33.333%;
+	background-color:rgba(255,255,255,1);
+	border:0;
+	font-size:1em;
+	font-family:sans-serif;
+	cursor:pointer;
+	padding:7.5px 0;
 }
 
 @media screen and (max-width: 1120px) { 
@@ -514,5 +527,12 @@ canvas#musicVisualizer {
 	#pageCenter {
 		top:17.5vh;
 		height:68%;
+	}
+	#pageBottom {
+		display:block;
+		height:15.5%;
+	}
+	#playpause {
+		line-height:15.5vh;
 	}
 }
