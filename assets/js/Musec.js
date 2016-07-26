@@ -476,6 +476,9 @@ var tiles = {
 		}
 	},
 	songLoadProgress:function(){
+		if (typeof(tiles.AudioElement) == "undefined") {
+			return;
+		}
 		tiles.songRawTime = tiles.AudioElement.currentTime;
 		if (typeof(tiles.AudioElement.duration) == "undefined") {
 			tiles.songRawDuration = 0;
