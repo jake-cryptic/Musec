@@ -1,6 +1,6 @@
-/* Musec - Build 18 */
+/* Musec - Build 19 */
 var tiles = {
-	cacheVersion:18,
+	cacheVersion:19,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -9,6 +9,7 @@ var tiles = {
 	connAttempt:0,
 	cfn:undefined,
 	lastSearchVal:"",
+	allowThumbMove:true,
 	appLoadTime:Math.floor(Date.now() / 1000),
 	db:true,
 	m:false,
@@ -235,6 +236,7 @@ var tiles = {
 			
 			// Set values
 			tiles.progressColor = ["rgb(" + colourArray[2] + ")","rgb(" + colourArray[1] + ")"];
+			vConf.colorSplashStyle = "rgb(" + colourArray[1] + ")";
 			$("#pageTop").css({background:"rgb(" + colourArray[1] + ")"});
 			$("#pageTop").css({color:"rgb(" + colourArray[0] + ")"});
 			$("#pageCenter").css({background:"rgb(" + colourArray[0] + ")"});
@@ -242,6 +244,8 @@ var tiles = {
 			$(".song_longclick").css({color:"#fff"});
 			$("#pageBottom").css({background:"rgb(" + colourArray[1] + ")"});
 			$("#pageBottom").css({color:"rgb(" + colourArray[0] + ")"});
+			
+			tiles.songLoadProgress(); // Fix bug of colour mismatch
 		}
 	},
 	removeTrackNumbers:function(songName){
@@ -351,10 +355,10 @@ var tiles = {
 			tiles.MediaTotalTime = document.getElementById("mediaTtime");
 			
 			tiles.PlayBackSlider.addEventListener("change",tiles.songSeek,false);
-			tiles.PlayBackSlider.addEventListener("mousedown",function(){tiles.AudioElement.pause();},false);
-			tiles.PlayBackSlider.addEventListener("touchstart",function(){tiles.AudioElement.pause();},false);
-			tiles.PlayBackSlider.addEventListener("mouseup",function(){tiles.AudioElement.play();},false);
-			tiles.PlayBackSlider.addEventListener("touchend",function(){tiles.AudioElement.play();},false);
+			tiles.PlayBackSlider.addEventListener("mousedown",function(){tiles.allowThumbMove = false;},false);
+			tiles.PlayBackSlider.addEventListener("touchstart",function(){tiles.allowThumbMove = false;},false);
+			tiles.PlayBackSlider.addEventListener("mouseup",function(){tiles.allowThumbMove = true;},false);
+			tiles.PlayBackSlider.addEventListener("touchend",function(){tiles.allowThumbMove = true;},false);
 			
 			tiles.AudioElement.addEventListener("timeupdate",tiles.updateMediaInfo,false);
 			
@@ -385,8 +389,9 @@ var tiles = {
 			tiles.MediaCurrentTime.innerHTML = "00:00";
 			tiles.MediaTotalTime.innerHTML = "00:00";
 		} else {
-			tiles.PlayBackSlider.value = (tiles.AudioElement.currentTime * (100 / tiles.AudioElement.duration));
-			
+			if (tiles.allowThumbMove == true) {
+				tiles.PlayBackSlider.value = (tiles.AudioElement.currentTime * (100 / tiles.AudioElement.duration));
+			}
 			var currentMinutes = Math.floor(tiles.AudioElement.currentTime / 60);
 			var currentSeconds = Math.floor(tiles.AudioElement.currentTime - currentMinutes * 60);
 			var totalMinutes = Math.floor(tiles.AudioElement.duration / 60);
@@ -1374,8 +1379,6 @@ $(document).ready(function(){
 			}
 		});
 	}
-	tiles.loadLastQueue(); // Check if songQueue was previously saved
-	
 	MusecOffline.makeFilesystem();
 	
 	if (tiles.enableColourSplash == true) {
@@ -1389,11 +1392,13 @@ $(document).ready(function(){
 	$(document).keypress(function(e){
 		tiles.idleTime = 0;
 	});
+	
+	setTimeout(tiles.loadLastQueue(),50); // Allow things to load
 });
 
 // Preload resources
 var i = 0;
-var assets = ["broom.svg","cross.svg","exclamation.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
+var assets = ["broom.svg","cross.svg","down.svg","exclamation.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
 for (i = 0;i<assets.length;i++) {
 	hint = document.createElement("link");
 	hint.setAttribute("rel","prefetch");
@@ -1532,6 +1537,9 @@ var settings = {
 		$("select#_ST_CR").change(function(){
 			$("select#_ST_CR option:selected").each(function(){
 				var newOption = $(this).attr("value");
+				if (newOption == "splash") {
+					settings.forceEnable("_ST_CS","Colour Splash has been enabled, if you disable it this feature won't work");
+				}
 				settings.updateSetting("_ST_CR",newOption,false);
 			});
 		});
@@ -1566,6 +1574,9 @@ var settings = {
 		$("button#_ST_CS").click(function(){
 			if ($(this).html() == "Enabled") {
 				settings.updateSetting("_ST_CS","Disabled",false);
+				if (settings.AppPrefs["_ST_CR"] == "splash") {
+					settings.forceChange("_ST_CR","hsl","Since you disabled Colour Splash, visualiser style has been reverted to default.");
+				}
 			} else {
 				settings.updateSetting("_ST_CS","Enabled",false);
 			}
@@ -1577,6 +1588,20 @@ var settings = {
 		settings.setValues();
 		settings.requiresRestart(reboot);
 		tiles.dev("Saved setting " + setting + " as " + value);
+	},
+	forceEnable:function(setting,message){
+		if (settings.AppPrefs[setting] != "Enabled") {
+			settings.AppPrefs[setting] = "Enabled";
+			settings.saveSettings();
+			settings.setValues();
+			alert(message);
+		}
+	},
+	forceChange:function(setting,value,message){
+		settings.AppPrefs[setting] = value;
+		settings.saveSettings();
+		settings.setValues();
+		alert(message);
 	},
 	requiresRestart:function(does){
 		if (does) {

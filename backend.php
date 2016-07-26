@@ -56,7 +56,6 @@ if (isset($_POST)) {
 	} elseif ($type == "s" || $type == "b") {
 		// Song (List songs in directory)
 		$allowedExtensions = ["mp3","m4a"];
-		
 		$_SESSION["folder"] = $dir;
 		$files = scandir("resources/music/" . $dir);
 		if ($type == "b") {
@@ -84,8 +83,8 @@ if (isset($_POST)) {
 		} else {
 			usleep(500000); // .5 Seconds
 		}
+		//print_r($results);
 		echo json_encode($results);
-		
 	} elseif ($type == "l") {
 		// Lookup (Search for song in all folders)
 		$forbiddenSearches = ["mp3","m4a"];
@@ -131,7 +130,7 @@ if (isset($_POST)) {
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":18}');
+		die('{"response":"version","total":19}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = base64_decode($_POST["e"]);

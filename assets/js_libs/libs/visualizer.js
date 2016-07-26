@@ -5,7 +5,8 @@ var vConf = {
 	fft_size:512,
 	minDec:-170, // -130, -140, -100, -200
 	maxDec:35, // 70, 0, 0, 70
-	style:"hsl"
+	style:"hsl",
+	colorSplashStyle:undefined
 };
 
 function MusicVisualizer() {
@@ -48,7 +49,6 @@ MusicVisualizer.prototype.draw = function() {
 	this.analyser.smoothingTimeConstant = vConf.smoothing;
 	this.analyser.fftSize = vConf.fft_size;
 
-	// Get the frequency data from the currently playing music
 	this.analyser.getByteFrequencyData(this.freqs);
 	this.analyser.getByteTimeDomainData(this.times);
 
@@ -69,6 +69,12 @@ MusicVisualizer.prototype.draw = function() {
 		if (vConf.style == "hsl") {
 			var hue = i/this.analyser.frequencyBinCount * 360;
 			drawContext.fillStyle = 'hsl(' + hue + ', 75%, 50%)';
+		} else if (vConf.style == "splash") {
+			if (typeof(vConf.colorSplashStyle) != "undefined") {
+				drawContext.fillStyle = vConf.colorSplashStyle;
+			} else {
+				drawContext.fillStyle = 'rgba(255,255,255,0.9)';
+			}
 		} else {
 			drawContext.fillStyle = 'rgba(255,255,255,0.9)';
 		}

@@ -83,11 +83,12 @@
 						<td><button class="settingsToggle" id="_ST_MV">Unknown</button></td>
 					</tr>
 					<tr>
-						<td onclick="settings.whatsThis(2);"><span class="optionName">Visualizer Style</span></td>
+						<td onclick="settings.whatsThis(2);"><span class="optionName">Visualizer Style*</span></td>
 						<td>
 							<select class="settingsOption" id="_ST_CR">
 								<option value="hsl">Rainbow</option>
 								<option value="white">White</option>
+								<option value="splash">Colour Splash</option>
 							</select>
 						</td>
 					</tr>
