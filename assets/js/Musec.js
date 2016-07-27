@@ -161,7 +161,7 @@ var tiles = {
 		$sf.show();
 		tiles.bB.html("<");
 		tiles.bB.prop("do","back");
-		tiles.activeView = $sf;
+		tiles.activeView = $("#songFolder");
 		
 		if (typeof(tiles.currentMediaState) == "undefined") {
 			tiles.folder.html(tiles.cfc);
@@ -196,6 +196,7 @@ var tiles = {
 			var eW = tiles.widthCheck();
 			tiles.folder.fadeIn(300,function(){tiles.folder.animate({width:eW,opacity:1},500);});
 			$("#search_container").fadeOut(300,function(){$("#search_container").animate({width:"0",opacity:0.2},500);});
+			tiles.folder.html("Search Results");
 		}
 		
 		$(".song_longclick").each(function(x){
@@ -326,11 +327,8 @@ var tiles = {
 			tiles.dev("Audio Element Created!");
 			
 			if (tiles.visuSupport == true) {
-				var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-				if (!iOS){
-					tiles.MusicVisualizerObj = new MusicVisualizer();
-					tiles.MusicVisualizerObj.togglePlayback();
-				}
+				tiles.MusicVisualizerObj = new MusicVisualizer();
+				tiles.MusicVisualizerObj.togglePlayback();
 			}
 		} else {
 			tiles.folder.html("Loading next song");
@@ -941,7 +939,7 @@ var tiles = {
 		}
 	},
 	doSearch:function(){
-		if (tiles.searchBox.val() == "" || tiles.searchBox.val().length < 2) {
+		if (tiles.searchBox.val() == "" || tiles.searchBox.val().length == 1) {
 			tiles.sAlert("Invalid","exclamation.svg",400);
 		} else {
 			var searchPattern = /([0-9A-Za-z .])/;
@@ -951,7 +949,9 @@ var tiles = {
 				
 				tiles.activeView.fadeOut(500);
 				tiles.load("t=l&s=" + btoa(tiles.searchBox.val()),true);
-				tiles.activeView.fadeIn(500);
+				if ($("#songFolder").is(":visible")) {
+					tiles.activeView.fadeIn(500);
+				}
 			} else {
 				alert("Illegal characters!");
 			}
@@ -1411,9 +1411,10 @@ for (i = 0;i<assets.length;i++) {
 
 var settings = {
 	AppPrefs: {},
+	isiOS: /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream,
 	resetSettings:function(){
 		settings.AppPrefs = {
-			_ST_MV:"Enabled",
+			_ST_MV:"Disabled",
 			_ST_CR:"hsl",
 			_ST_DV:"Enabled",
 			_ST_AM:"Disabled",
@@ -1421,6 +1422,9 @@ var settings = {
 			_ST_KE:"Enabled",
 			_ST_CS:"Disabled"
 		};
+		if (!settings.isiOS) {
+			settings.AppPrefs._ST_MV = "Enabled";
+		}
 		settings.saveSettings();
 		settings.setValues();
 	},
@@ -1436,7 +1440,7 @@ var settings = {
 			} else {
 				// If no settings found, make defaults
 				settings.AppPrefs = {
-					_ST_MV:"Enabled",
+					_ST_MV:"Disabled",
 					_ST_CR:"hsl",
 					_ST_DV:"Enabled",
 					_ST_AM:"Disabled",
@@ -1444,6 +1448,9 @@ var settings = {
 					_ST_KE:"Enabled",
 					_ST_CS:"Disabled"
 				};
+				if (!settings.isiOS) {
+					settings.AppPrefs._ST_MV = "Enabled";
+				}
 				settings.saveSettings();
 			}
 		} else {
