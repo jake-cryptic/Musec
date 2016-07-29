@@ -1,6 +1,6 @@
-/* Musec - Build 19 */
+/* Musec - Build 20 */
 var tiles = {
-	cacheVersion:19,
+	cacheVersion:20,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -163,10 +163,8 @@ var tiles = {
 		tiles.bB.prop("do","back");
 		tiles.activeView = $("#songFolder");
 		
-		if (typeof(tiles.currentMediaState) == "undefined") {
-			tiles.folder.html(tiles.cfc);
-		} else {
-			tiles.folder.html(tiles.cfc);
+		tiles.folder.html(tiles.cfc);
+		if (typeof(tiles.currentMediaState) != "undefined") {
 			document.title = "Musec - " + tiles.songName;
 		}
 		
@@ -806,9 +804,11 @@ var tiles = {
 				return;
 			}
 			$("#offlineSongs").html("<tr><td colspan=\"3\" id=\"dlSongCount\"></td></tr>");
-			MusecOffline.Store.usedAndRemaining(function (s_used,s_remain) {
+			MusecOffline.Store.usedAndRemaining(function(s_used,s_remain) {
 				var s_total = (s_used+s_remain);
-				var progressElement = "<progress id=\"uArPbar\" min=\"0\" max=\"" + s_total + "\" value=\"" + s_used + "\"></progress>";
+				console.log(s_total);
+				var progressElement = "<progress id=\"uArPbar\" min=\"0\" max=\"" + s_total + "\" value=\"" + s_used + "\"></progress><br /><br />";
+				progressElement += "Used " + (s_used/1048576).toFixed(2) + "MB of " + (s_total/1048576).toFixed(2) + "MB - <span onclick=\"tiles.addMoreOfflineStorage();\" class=\"actionLink\">Add more</span>";
 				$("#dlSongCount").append(progressElement);
 			});
 			var songs = [];
@@ -855,6 +855,9 @@ var tiles = {
 		MusecOffline.Store.deleteFile("audio/" + osn);
 		MusecOffline.editIndex(osn);
 		tiles.reloadOfflineView();
+	},
+	addMoreOfflineStorage:function(){
+		alert("Feature not available yet.");
 	},
 	showLyrics:function(song_id){
 		var innerID = song_id.replace("song","song_name");
@@ -1097,19 +1100,30 @@ var MusecOffline = {
 	},
 	listAll:function(){
 		var data = [];
-		
-		
 		console.log(data);
 		return data;
 	},
 	makeOffline:function(url,nm){
 		tiles.dev("Retrieving data from " + url);
+		MusecOffline.showDownloadProgress("show",0);
+		
 		MusecOffline.Store.getData(url, function(data){
 			console.log("Bytes Received from " + url + ": " + data.byteLength);
 			MusecOffline.Store.getDir("audio",{create: true}, function(){
 				MusecOffline.Store.write("audio/" + nm,"audio/mp3",data,{create: true});
+				tiles.sAlert("Downloaded","down.svg",200);
 			});
 		});
+	},
+	showDownloadProgress:function(whatDo,progress){
+		if (whatDo == "update") {
+			$("#offlineDlProgress").html(progress + "%");
+		} else {
+			$("#sAlertImg").attr("src","assets/img/i/down.svg");
+			$("#sAlertTxt").html("<span id='offlineDlProgress'>Downloading</span>");
+			
+			$("#sAlert").fadeIn(200);
+		}
 	},
 	makeFilesystem:function(){
 		try {
@@ -1268,6 +1282,8 @@ $(document).ready(function(){
 			$("#offlineFolder").hide();
 		} else {
 			tiles.cfn = undefined;
+			tiles.cfa = undefined;
+			tiles.cfp = undefined;
 			tiles.qB.prop("do","showQ");
 			tiles.bB.prop("do","refresh");
 			tiles.activeView = $("#musicFolders");

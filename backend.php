@@ -130,7 +130,7 @@ if (isset($_POST)) {
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":19}');
+		die('{"response":"version","total":20}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = base64_decode($_POST["e"]);
