@@ -808,7 +808,10 @@ var tiles = {
 				var s_total = (s_used+s_remain);
 				console.log(s_total);
 				var progressElement = "<progress id=\"uArPbar\" min=\"0\" max=\"" + s_total + "\" value=\"" + s_used + "\"></progress><br /><br />";
-				progressElement += "Used " + (s_used/1048576).toFixed(2) + "MB of " + (s_total/1048576).toFixed(2) + "MB - <span onclick=\"tiles.addMoreOfflineStorage();\" class=\"actionLink\">Add more</span>";
+				progressElement += "Used " + (s_used/1048576).toFixed(2) + "MB of " + (s_remain/1048576).toFixed(2) + "MB";
+				if (s_remain != 500*(1048576)) {
+					progressElement += " - <span onclick=\"tiles.addMoreOfflineStorage();\" class=\"actionLink\">Increase</span>";
+				}
 				$("#dlSongCount").append(progressElement);
 			});
 			var songs = [];
@@ -857,7 +860,19 @@ var tiles = {
 		tiles.reloadOfflineView();
 	},
 	addMoreOfflineStorage:function(){
-		alert("Feature not available yet.");
+		var fsSize = 100*(1048576);		// 100MB
+		var newFsSize = 500*(1048576);	// 500MB
+		webkitStorageInfo.requestQuota(
+			webkitStorageInfo.PERSISTENT,
+			newFsSize,
+			function(bytes) {
+				alert("Offline file storage size is now: " + bytes/1048576 + " MB");
+			},
+			function(e) {
+				alert("Error allocating quota: " + e);
+			}
+		);
+		tiles.reloadOfflineView();
 	},
 	showLyrics:function(song_id){
 		var innerID = song_id.replace("song","song_name");
