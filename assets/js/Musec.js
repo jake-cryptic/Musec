@@ -44,19 +44,26 @@ var tiles = {
 			icon:i
 		};
 		
-		if (!("Notification" in window)) {
-			tiles.dev("No Notification support");
-		} else if (Notification.permission === "granted") {
-			tiles.notif = new Notification(t,options);
-			setTimeout(tiles.notif.close.bind(tiles.notif),7500);
-		} else if (Notification.permission !== 'denied') {
-			tiles.dev("Requesting permssion");
-			Notification.requestPermission(function (permission) {
-				if (permission === "granted") {
-					tiles.notif = new Notification(t,options);
-					setTimeout(tiles.notif.close.bind(tiles.notif),7500);
-				}
-			});
+		try {
+			if (!("Notification" in window)) {
+				tiles.dev("No Notification support");
+			} else if (Notification.permission === "granted") {
+				tiles.notif = new Notification(t,options);
+				setTimeout(tiles.notif.close.bind(tiles.notif),7500);
+			} else if (Notification.permission !== 'denied') {
+				tiles.dev("Requesting permssion");
+				Notification.requestPermission(function (permission) {
+					if (permission === "granted") {
+						tiles.notif = new Notification(t,options);
+						setTimeout(tiles.notif.close.bind(tiles.notif),7500);
+					}
+				});
+			}
+		} catch(e) {
+			if (e.name != "TypeError") {
+				throw new Error(e);
+			}
+			return false;
 		}
 	},
 	load:function(sendData,rmBlur){
@@ -296,6 +303,16 @@ var tiles = {
 		}
 		
 		tiles.dev("playSong called with loc: " + loc);
+		
+		if (settings.isiOS && tiles.visuSupport == true && tiles.m == true) {
+			if (typeof(tiles.AudioElement) != "undefined") {
+				$("#folder").html("Unsetting");
+				tiles.AudioElement.pause();
+				tiles.AudioElement = undefined;
+				tiles.AudioCtx = undefined;
+				tiles.MusicVisualizerObj = undefined;
+			}
+		}
 		
 		if (typeof(tiles.AudioElement) == "undefined") {
 			tiles.folder.html("Loading Song");
