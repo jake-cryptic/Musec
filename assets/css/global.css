@@ -511,21 +511,19 @@ canvas#musicVisualizer {
 		line-height:1.25em;
 	}
 	#back,#queue,#search,#down {
-		height:7.5vh;
 		width:25%;
 		border:0;
 		border-bottom:1px black solid;
 	}
 	#folder {
-		height:10vh;
-		line-height:10vh;
+		height:50%;
 		font-size:1.25em;
 	}
 	#pageTop {
 		height:17.5%;
 	}
 	#pageCenter {
-		top:17.5vh;
+		top:17.5%;
 		height:68%;
 	}
 	#pageBottom {

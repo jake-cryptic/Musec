@@ -20,7 +20,6 @@ function arrayToCsv(array &$fields, $delimiter = ',', $enclosure = '"', $enclose
 		if (end($fields) == $field) { 
 			$field = json_encode($field);
 		}
-        // Enclose fields containing $delimiter, $enclosure or whitespace
         if ($encloseAll || preg_match("/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field) ) {
             $output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
         } else {
@@ -51,6 +50,7 @@ if (isset($_POST)) {
 		foreach ($dirs as $directory) {
 			$result["data"][] = str_replace("resources/music/","",$directory);
 		}
+		usleep(200000); // .2 Seconds
 		echo json_encode($result);
 		
 	} elseif ($type == "s" || $type == "b") {
@@ -81,7 +81,7 @@ if (isset($_POST)) {
 		if ($type == "b") {
 			$results["count"] = $count;
 		} else {
-			usleep(500000); // .5 Seconds
+			usleep(450000); // .45 Seconds
 		}
 		//print_r($results);
 		echo json_encode($results);
@@ -130,7 +130,7 @@ if (isset($_POST)) {
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":20}');
+		die('{"response":"version","total":21}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = base64_decode($_POST["e"]);

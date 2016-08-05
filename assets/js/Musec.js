@@ -1,6 +1,6 @@
-/* Musec - Build 20 */
+/* Musec - Build 21 */
 var tiles = {
-	cacheVersion:20,
+	cacheVersion:21,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -120,9 +120,9 @@ var tiles = {
 			bg_url = bg_url ? bg_url[2] : "";
 			
 			try {
-				var theImage = new Image();
-				theImage.src = bg_url;
-				tiles.cfa = tiles.colorThief.getPalette(theImage,5);
+				tiles.cfi = new Image();
+				tiles.cfi.src = bg_url;
+				tiles.cfa = tiles.colorThief.getPalette(tiles.cfi,5);
 				tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
 			} catch(e) {
 				tiles.cfp = undefined;
@@ -157,7 +157,7 @@ var tiles = {
 			}
 			$(".tile_longclick").each(function(x){
 				$("#tile_id_" + x + "_bg").contextmenu(function(evn){evn.preventDefault();tiles.showTileMenu(x);});
-				$("#tile_id_" + x + "_bg").longclick(300,function(){tiles.showTileMenu(x);});
+				$("#tile_id_" + x + "_bg").longclick(250,function(){tiles.showTileMenu(x);});
 				$("#tile_id_" + x + "_bg").click(function(){tiles.loadSongs(x);});
 			});
 		}
@@ -219,6 +219,20 @@ var tiles = {
 			});
 		});
 		
+		if (typeof(tiles.cfp) == "undefined"){
+			try{
+				tiles.cfa = tiles.colorThief.getPalette(tiles.cfi,5);
+				tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
+			} catch(e){
+				if (tiles.enableColourSplash == true){
+					if (typeof(tiles.cfi) != "undefined"){
+						tiles.dev("ColorThief failed");
+					}
+				}
+				tiles.cfp = undefined;
+			}
+		}
+		
 		if (typeof(tiles.cfp) != "undefined") {
 			var colourArray = [];
 			var colourArray2 = [];
@@ -251,7 +265,11 @@ var tiles = {
 			$("#pageBottom").css({background:"rgb(" + colourArray[1] + ")"});
 			$("#pageBottom").css({color:"rgb(" + colourArray[0] + ")"});
 			
-			tiles.songLoadProgress(); // Fix bug of colour mismatch
+			if (typeof(tiles.AudioElement) == "undefined"){
+				$("#folder").css({background:"rgb(" + colourArray[1] + ")"});
+			} else {
+				tiles.songLoadProgress();
+			}
 		}
 	},
 	removeTrackNumbers:function(songName){
@@ -397,6 +415,9 @@ var tiles = {
 		tiles.desktopNotify("Musec",dtNotifMsg,dtNotifIco);
 	},
 	updateMediaInfo:function(){
+		if (typeof(tiles.AudioElement) == "undefined"){
+			return;
+		}
 		if (typeof(tiles.AudioElement.duration) == "undefined" || tiles.AudioElement.duration == null || isNaN(tiles.AudioElement.duration)) {
 			tiles.dev("It seems that duration isn't playing nice... Poly fill");
 			tiles.MediaCurrentTime.innerHTML = "00:00";
@@ -453,12 +474,16 @@ var tiles = {
 		tiles.AudioElement.currentTime = (tiles.AudioElement.duration * (tiles.PlayBackSlider.value / 100));
 	},
 	changeMediaState:function(){
+		if (typeof(tiles.AudioElement) == "undefined"){
+			return;
+		}
+		
 		tiles.dev("Changing state..");
-		if (typeof(tiles.currentMediaState) == "undefined") {
+		if (typeof(tiles.currentMediaState) == "undefined"){
 			tiles.dev("changeMediaState->Path->1");
 			if (tiles.songQueue.length != 0) {
 				tiles.dev("changeMediaState->Path->1->1");
-				if (tiles.currentSong >= tiles.songQueue.length) {
+				if (tiles.currentSong >= tiles.songQueue.length){
 					tiles.dev("changeMediaState->Path->1->1->1");
 					tiles.currentSong = 0;
 					tiles.nextSong();
@@ -468,7 +493,7 @@ var tiles = {
 				}
 			} else {
 				tiles.dev("changeMediaState->Path->1->2");
-				if (typeof(tiles.AudioElement) != "undefined") {
+				if (typeof(tiles.AudioElement) != "undefined"){
 					tiles.AudioElement.pause();
 					tiles.currentMediaState = false;
 					document.title = "Paused - " + tiles.songName;
@@ -624,7 +649,6 @@ var tiles = {
 				tiles.songQueue.push(x);
 			}
 			tiles.sAlert(i + " Added","plus.svg",200);
-			//alert("Added all songs from " + capitalise(dataArray.folder.replace(/_/g," ")) + " to queue");
 		}
 	},
 	alterQueue:function(whatDo,songID){
@@ -683,23 +707,17 @@ var tiles = {
 			
 			tiles.sAlert("Playing Next","play.svg",250);
 		} else if (whatDo == "delete") {
-			var yeah = confirm("Are you sure you wish to delete " + tiles.songQueue[(songID*2)+1] + "?");
-			if (yeah == true) {
-				tiles.dev(tiles.songQueue);
-				spliceAt = songID*2;
-				tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)]);
-				
-				tiles.songQueue.splice(spliceAt,2);
-				if (tiles.currentSong > songID) {
-					tiles.currentSong -= 1;
-				}
-				tiles.dev(tiles.songQueue);
-				tiles.reloadQueueView();
-				tiles.sAlert("Removed","cross.svg",300);
-			} else {
-				tiles.dev("Deletion cancelled");
-				tiles.sAlert("Cancelled","cross.svg",250);
+			tiles.dev(tiles.songQueue);
+			spliceAt = songID*2;
+			tiles.dev("Altering queue: " + whatDo + " songID " + songID + " songName " + tiles.songQueue[(songID*2)]);
+			
+			tiles.songQueue.splice(spliceAt,2);
+			if (tiles.currentSong > songID) {
+				tiles.currentSong -= 1;
 			}
+			tiles.dev(tiles.songQueue);
+			tiles.reloadQueueView();
+			tiles.sAlert("Removed","cross.svg",275);
 		} else {
 			alert("Error: Not implemented");
 			tiles.reloadQueueView();
@@ -707,35 +725,57 @@ var tiles = {
 	},
 	wipeQueue:function(part){
 		if (part == 0) {
-			if (typeof(tiles.AudioElement) != "undefined") {
-				if (tiles.checkPlayback(tiles.AudioElement)) {
-					tiles.changeMediaState();
-				}
+			if (typeof(tiles.AudioElement) != "undefined"){
+				tiles.AudioElement.pause();
 			}
-			tiles.AudioElement = undefined;
-			tiles.AudioCtx = undefined;
-			
-			tiles.songQueue = [];
-			localStorage.setItem("M_LSQ","");
-			
-			tiles.reloadQueueView();
+			var yeah = confirm("Are you sure you wish to continue?");
+			if (yeah == true) {
+				if (tiles.enableColourSplash != true) {
+					var coloursProgess = ["rgb(0,0,0)","white"];
+				} else {
+					var coloursProgess = tiles.progressColor;
+				}
+				tiles.folder.css({background:coloursProgess[1]});
+				tiles.mediaStateTrigger.innerHTML = "&#9658;";
+				
+				$("#mediacontrols").html('No Music Playing');
+				tiles.AudioElement = undefined;
+				tiles.AudioCtx = undefined;
+				
+				tiles.songQueue = [];
+				tiles.currentSong = 0;
+				localStorage.removeItem("M_LSQ");
+				tiles.songName = "";
+				tiles.songAlbum = "";
+				tiles.currentMediaState = undefined;
+				tiles.folder.html("Music");
+				
+				tiles.reloadQueueView();
+				tiles.sAlert("Cleared","cross.svg",275);
+			} else {
+				if (typeof(tiles.AudioElement) != "undefined") {
+					tiles.AudioElement.play();
+				}
+				return;
+			}
 		} else if (part == 1) {
-			/*
-			if (tiles.songQueue.length == 0 || (tiles.currentSong) == 1) {
+			if (tiles.songQueue.length == 0 || tiles.currentSong == 1 || tiles.currentSong == 0) {
 				tiles.dev("Nope");
 				return false;
 			}
-			tiles.dev("R: "+(tiles.currentSong*2)+" S: ");
 			
 			var newQueue = [];
-			for (var w = (tiles.songQueue.length-1);w > tiles.currentSong;w--) {
-				newQueue.push(tiles.songQueue[w]);
-				tiles.currentSong = tiles.currentSong - 0.5;
+			
+			for (var i = (tiles.currentSong*2)-2;i < tiles.songQueue.length;i++){
+				newQueue.push(tiles.songQueue[i]);
 			}
+			tiles.dev(tiles.songQueue);
+			tiles.dev(newQueue);
+			
 			tiles.songQueue = newQueue;
+			tiles.currentSong = 1;
 			
 			tiles.reloadQueueView();
-			*/
 		} else {
 			return false;
 		}
@@ -775,10 +815,10 @@ var tiles = {
 		} else {
 			tiles.dev("Queue has " + (tiles.songQueue.length) + " values! Which means " + (tiles.songQueue.length/2) + " songs");
 			
-			var queueActions = '<button class="qcircle" onclick="alert(\'Not Implemented\')">Save Queue</button> ';
-			queueActions += '<button class="qcircle" onclick="alert(\'Not Implemented\')">Load Queue</button> ';
-			queueActions += '<button class="qcircle" onclick="tiles.wipeQueue(0);">Clear Queue</button> ';
-			//queueActions += '<button class="qcircle" onclick="tiles.wipeQueue(1);">Clear History</button>';
+			//var queueActions = '<button class="qcircle" onclick="alert(\'Not Implemented\')">Save Queue</button> ';
+			//queueActions += '<button class="qcircle" onclick="alert(\'Not Implemented\')">Load Queue</button> ';
+			var queueActions = '<button class="qcircle" onclick="tiles.wipeQueue(0);">Clear Queue</button> ';
+			queueActions += '<button class="qcircle" onclick="tiles.wipeQueue(1);">Clear History</button>';
 			
 			$("#queue_list").html("<tr><td colspan=\"2\">" + queueActions + "</td></tr>");
 			for(var i = 0;i < ((tiles.songQueue.length-1)/2);i++) {
@@ -817,7 +857,7 @@ var tiles = {
 			return false;
 		} else {
 			if (tiles.fsHasQuota == false) {
-				$("#offlineSongs").html("<tr><td colspan=\"3\">You have not allowed offline storage. Please allow this website to write to your hard drive if you wish to use this feature.</td></tr>");
+				$("#offlineSongs").html("<tr><td colspan=\"3\">You have not allowed offline storage. Please allow this website to write to your hard drive if you wish to use this feature.<br /><button class='bcircle' onclick='MusecOffline.makeFilesystem();'>Allow Access</button></td></tr>");
 				return;
 			}
 			$("#offlineSongs").html("<tr><td colspan=\"3\" id=\"dlSongCount\"></td></tr>");
@@ -832,30 +872,37 @@ var tiles = {
 				$("#dlSongCount").append(progressElement);
 			});
 			var songs = [];
-			MusecOffline.Store.getDir("/audio", {create: true}, function(){
-				MusecOffline.Store.ls("/audio", function(arr) {
-					var length = arr.length;
-					
-					if (typeof(arr) == "undefined" || length == 0) {
-						$("#offlineSongs").html('<tr><td colspan=\"3\"><h2>No Downloaded Music</h2></td></tr>');
-					} else {
-						var sB = "", cleanName = "";
+			try {
+				MusecOffline.Store.getDir("/audio", {create: true}, function(){
+					MusecOffline.Store.ls("/audio", function(arr) {
+						var length = arr.length;
 						
-						for(var i = 0;i < length;i++){
-							console.log("Found: ",arr[i].name);
+						if (typeof(arr) == "undefined" || length == 0) {
+							$("#offlineSongs").html('<tr><td colspan=\"3\"><h2>No Downloaded Music</h2></td></tr>');
+						} else {
+							var sB = "", cleanName = "";
 							
-							tiles.isPlayingOfflineSong = true;
-							cleanAlbum = capitalise(arr[i].name.split(".")[0].replace(/_/g," "))
-							cleanName = arr[i].name.split(".").slice(1, -1);
-							sB += "<tr><td class='clickable' onclick='tiles.playOfflineSong(\"" + btoa(arr[i].name) + "\")'>" + cleanAlbum + "</td>";
-							sB += "<td class='clickable' onclick='tiles.playOfflineSong(\"" + btoa(arr[i].name) + "\")'>" + cleanName + "</td>";
-							sB += "<td><span class='clickable' onclick='tiles.deleteOfflineSong(\"" + arr[i].name + "\")'>Delete</span></td></tr>";
+							for(var i = 0;i < length;i++){
+								console.log("Found: ",arr[i].name);
+								
+								tiles.isPlayingOfflineSong = true;
+								cleanAlbum = capitalise(arr[i].name.split(".")[0].replace(/_/g," "))
+								cleanName = arr[i].name.split(".").slice(1, -1);
+								sB += "<tr><td class='clickable' onclick='tiles.playOfflineSong(\"" + btoa(arr[i].name) + "\")'>" + cleanAlbum + "</td>";
+								sB += "<td class='clickable' onclick='tiles.playOfflineSong(\"" + btoa(arr[i].name) + "\")'>" + cleanName + "</td>";
+								sB += "<td><span class='clickable' onclick='tiles.deleteOfflineSong(\"" + arr[i].name + "\")'>Delete</span></td></tr>";
+							}
+							$("#dlSongCount").prepend("<h2>Downloaded: " + i + "</h2>");
+							$("#offlineSongs").append(sB);
 						}
-						$("#dlSongCount").prepend("<h2>Downloaded: " + i + "</h2>");
-						$("#offlineSongs").append(sB);
-					}
+					});
 				});
-			});
+			} catch(e) {
+				if (e.name == "TypeError") {
+					$("#offlineSongs").html("<tr><td colspan=\"3\">You have not allowed offline storage. Please allow this website to write to your hard drive if you wish to use this feature.<br /><button class='bcircle' onclick='MusecOffline.makeFilesystem();tiles.reloadOfflineView();'>Allow Access</button></td></tr>");
+					tiles.fsHasQuota = false;
+				}
+			}
 		}
 	},
 	playOfflineSong:function(osn){
@@ -987,6 +1034,8 @@ var tiles = {
 				if ($("#songFolder").is(":visible")) {
 					tiles.activeView.fadeIn(500);
 				}
+				$("#queueFolder").hide();
+				$("#offlineFolder").hide();
 			} else {
 				alert("Illegal characters!");
 			}
@@ -1014,7 +1063,6 @@ var tiles = {
 			localStorage.removeItem("M_LSQ");
 			if (c == true) {
 				tiles.songQueue = q;
-				// Then remove queue from localStorage
 			} else {
 				return false;
 			}
@@ -1165,6 +1213,9 @@ var MusecOffline = {
 				//if (typeof(grantedBytes) == "undefined" || grantedBytes == 0) {
 				//	tiles.fsHasQuota = false;
 				//}
+				if (tiles.fsHasQuota == false) {
+					tiles.reloadOfflineView();
+				}
 			});
 			return true;
 		} catch(e) {
