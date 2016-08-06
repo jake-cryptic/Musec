@@ -266,7 +266,7 @@ var tiles = {
 			$("#pageBottom").css({color:"rgb(" + colourArray[0] + ")"});
 			
 			if (typeof(tiles.AudioElement) == "undefined"){
-				$("#folder").css({background:"rgb(" + colourArray[1] + ")"});
+				//$("#folder").css({background:"rgb(" + colourArray[1] + ")"});
 			} else {
 				tiles.songLoadProgress();
 			}
@@ -439,7 +439,9 @@ var tiles = {
 			tiles.MediaCurrentTime.innerHTML = currentMinutes + ":" + currentSeconds;
 			tiles.MediaTotalTime.innerHTML = totalMinutes + ":" + totalSeconds;
 			
-			//tiles.songLoadProgress(tiles.AudioElement);
+			if (currentSeconds % 3 == 0 || currentSeconds == totalSeconds) {
+				tiles.songLoadProgress(tiles.AudioElement);
+			}
 		}
 	},
 	songEnd:function(){
@@ -514,10 +516,6 @@ var tiles = {
 		}
 	},
 	songLoadProgress:function(){
-		if (typeof(tiles.AudioElement) == "undefined") {
-			return;
-		}
-		tiles.songRawTime = tiles.AudioElement.currentTime;
 		if (typeof(tiles.AudioElement.duration) == "undefined") {
 			tiles.songRawDuration = 0;
 		} else {
@@ -528,21 +526,18 @@ var tiles = {
 		} catch(e) {
 			tiles.songRawBuffer = 0;
 		}
-		percentLoaded = Math.round((tiles.songRawTime / tiles.songRawBuffer) * 100);
-		percentPlayed = Math.round((tiles.songRawTime / tiles.songRawDuration) * 100);
-		percentTest = Math.round((tiles.songRawBuffer / tiles.songRawDuration) * 100);
+		percentRounded = Math.round((tiles.songRawBuffer / tiles.songRawDuration) * 100);
 
-		//tiles.dev("Progress-> RawBuff(" + tiles.songRawBuffer + ") - RawDur(" + tiles.songRawDuration + ") - RawTim(" + tiles.songRawTime + "); Loaded: " + percentLoaded + "% Played: " + percentPlayed + "% Test: " + percentTest + "%");
 		if (tiles.enableColourSplash != true) {
 			var coloursProgess = ["rgb(0,0,0)","white"];
 		} else {
 			var coloursProgess = tiles.progressColor;
 		}
-		
-		if (isNaN(percentTest)) {
+		tiles.dev("Progress-> (" + percentRounded + ") --> Rawbuff(" + tiles.songRawBuffer + ") / RawDur(" + tiles.songRawDuration + ")");
+		if (isNaN(percentRounded)) {
 			tiles.folder.css({background:"linear-gradient(to right, " + coloursProgess[1] + " 0%, " + coloursProgess[0]});
 		} else {
-			tiles.folder.css({background:"linear-gradient(to right, " + coloursProgess[1] + " " + percentTest + "%, " + coloursProgess[0]});
+			tiles.folder.css({background:"linear-gradient(to right, " + coloursProgess[1] + " " + percentRounded + "%, " + coloursProgess[0]});
 		}
 	},
 	songBuffering:function(){
