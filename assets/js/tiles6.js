@@ -1,7 +1,7 @@
 /* Musec - Build 23 */
 var tiles = {
 	cacheVersion:23,
-	backendUrl:window.defaultPath,
+	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
 	queueDelay:250, // milliseconds
@@ -29,7 +29,7 @@ var tiles = {
 	},
 	sAlert:function(m,i,d){
 		tiles.dev("Alerted: '" + m + "' for " + (d*3) + "ms with image " + i);
-		$("#sAlertImg").attr("src",window.defaultPath + "assets/img/i/" + i);
+		$("#sAlertImg").attr("src","assets/img/i/" + i);
 		$("#sAlertTxt").html(m);
 		
 		$("#sAlert").fadeIn(d);
@@ -41,7 +41,7 @@ var tiles = {
 		tiles.dev("Notifying User..");
 		var options = {
 			body:b,
-			icon:window.defaultPath + i
+			icon:i
 		};
 		
 		try {
@@ -66,53 +66,7 @@ var tiles = {
 			return false;
 		}
 	},
-	setHistoryState:function(data){
-		if (!(window.history&&window.history.pushState)){
-			tiles.dev("History API not supported");
-			return false;
-		}
-		
-		tiles.dev("(History)->Set(" + data.response + ")");
-		if (data.response == "lsfiles"){
-			var uid = window.defaultPath + "album/" + data.data[0].split('/')[1];
-			if (history.state == uid) return;
-			history.pushState(uid,null,uid);
-		} else if (data.response == "sresult") {
-			var uid = window.defaultPath + "search/" + data.term;
-			if (history.state == uid) return;
-			history.pushState(uid,null,uid);
-		} else if (data.response == "SETDEFAULT") {
-			var uid = window.defaultPath;
-			if (history.state == "default") return;
-			history.pushState("default",null,uid);
-		} else {
-			tiles.dev("(History)->StateChangeCancelled");
-			return;
-		}
-	},
-	handleHistoryState:function(event){
-		tiles.dev("(History)->Handle(" + event.state + ")");
-		if (event.state == null) {
-			tiles.bB.click();
-			return;
-		}
-		if (event.state == "default") {
-			tiles.bB.click();
-		}
-		
-		var stateArray = event.state.split("/");
-		var action = stateArray[stateArray.length-2];
-		var thing = stateArray[stateArray.length-1];
-		tiles.dev("HistHandle->" + action + " - " + thing);
-		
-		if (action == "album") {
-			tiles.loadSongs(thing,2);
-		}
-		if (action == "search") {
-			tiles.doSearch(thing);
-		}
-	},
-	load:function(sendData,callback){
+	load:function(sendData,rmBlur){
 		tiles.dev(sendData);
 		if (navigator.onLine) {
 			$.ajax({
@@ -120,8 +74,8 @@ var tiles = {
 				type:"POST",
 				data:sendData,
 				success:function(r){
-					if (callback){
-						callback();
+					if (rmBlur === true){
+						$(".tile_bg").removeClass("blur");
 					}
 					
 					try {
@@ -157,28 +111,13 @@ var tiles = {
 			alert("You don't seem to be online.");
 		}
 	},
-	loadSongs:function(folder,method){
-		if (method == 1){
-			var folderName = $("#tile_id_" + folder).prop("folder");
-		} else {
-			var folderName = folder;
-			$("#sAlertImg").attr("src",window.defaultPath + "assets/img/i/loader.gif");
-			$("#sAlertTxt").html("Loading");
-			$("#sAlert").fadeIn(100);
-		}
-		
-		tiles.cfn = folderName;
-		tiles.cfd = folderName;
-		tiles.cfc = capitalise(folderName.replace(/_/g," ")); // Replace all _'s
+	loadSongs:function(folder){
+		var folderName = $("#tile_id_" + folder).prop("folder");
 		
 		if (typeof(tiles.colorThief) != "undefined" && tiles.enableColourSplash != false) {
-			if (method == 1) {
-				var imgSrc = $("#tile_id_" + folder + "_bg").css("background-image");
-				var bg_url = /^url\((['"]?)(.*)\1\)$/.exec(imgSrc);
-				bg_url = bg_url ? bg_url[2] : "";
-			} else {
-				bg_url = window.defaultPath + "resources/artwork/" + folder + ".jpg";
-			}
+			var imgSrc = $("#tile_id_" + folder + "_bg").css("background-image");
+			var bg_url = /^url\((['"]?)(.*)\1\)$/.exec(imgSrc);
+			bg_url = bg_url ? bg_url[2] : "";
 			
 			try {
 				tiles.cfi = new Image();
@@ -191,15 +130,14 @@ var tiles = {
 		} else {
 			tiles.cfp = undefined;
 		}
-		
-		if (method == 1) {
-			tiles.dev("Tile number " + folder + " is " + folderName);
-			$("#tile_id_" + folder + "_bg").addClass("blur");
-		} else {
-			tiles.dev("Entering folder-> " + folderName);
-		}
 
-		tiles.load("t=s&d=" + btoa("/" + folderName),function(){$(".tile_bg").removeClass("blur");$("#sAlert").fadeOut(200);});
+		tiles.dev("Tile number " + folder + " is " + folderName);
+		$("#tile_id_" + folder + "_bg").addClass("blur");
+
+		tiles.load("t=s&d=" + btoa("/" + folderName),true);
+		tiles.cfn = folderName;
+		tiles.cfd = folderName;
+		tiles.cfc = capitalise(folderName.replace(/_/g," ")); // Replace all _'s
 	},
 	showFolder:function(folderData){
 		$("#musicFolders").html("");
@@ -220,7 +158,7 @@ var tiles = {
 			$(".tile_longclick").each(function(x){
 				$("#tile_id_" + x + "_bg").contextmenu(function(evn){evn.preventDefault();tiles.showTileMenu(x);});
 				$("#tile_id_" + x + "_bg").longclick(250,function(){tiles.showTileMenu(x);});
-				$("#tile_id_" + x + "_bg").click(function(){tiles.loadSongs(x,1);});
+				$("#tile_id_" + x + "_bg").click(function(){tiles.loadSongs(x);});
 			});
 		}
 	},
@@ -237,14 +175,12 @@ var tiles = {
 			document.title = "Musec - " + tiles.songName;
 		}
 		
-		tiles.setHistoryState(folderData);
-		
 		if (responseType == 1) {
 			if (folderData.data.length == 0) {
 				$sf.html("<h2>Couldn't find any music in this directory</h2>"); return;
 			}
 			$sf.html("<table><thead><tr><th>Song</th></tr></thead><tbody id=\"song_list\"></tbody></table>");
-			
+		
 			for (i=0;i<folderData.data.length;i++) {
 				var file = folderData.data[i].split('/').pop();
 				var x = tiles.removeTrackNumbers(file.replace(".m4a", "").replace(".mp3", ""));
@@ -273,7 +209,7 @@ var tiles = {
 				evn.preventDefault();
 				tiles.showSongMenu("#song_" + x);
 			});
-			$(this).longclick(300,function(){
+			$(this).longclick(500,function(){
 				tiles.showSongMenu("#song_" + x);
 			});
 			$(this).click(function(){
@@ -288,11 +224,10 @@ var tiles = {
 				tiles.cfa = tiles.colorThief.getPalette(tiles.cfi,5);
 				tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
 			} catch(e){
-				if (tiles.enableColourSplash == true && responseType == 1){
-					tiles.dev("--- REASON TO BELIEVE ColorThief FAILED");
-					tiles.dev(tiles.cfi);
-					tiles.dev(tiles.cfa);
-					throw new Error("ColorThief failed :(");
+				if (tiles.enableColourSplash == true){
+					if (typeof(tiles.cfi) != "undefined"){
+						tiles.dev("ColorThief failed");
+					}
 				}
 				tiles.cfp = undefined;
 			}
@@ -402,7 +337,7 @@ var tiles = {
 			try {
 				tiles.AudioElement = new Audio();
 				try {
-					tiles.AudioCtx = createAudioContext(48000);
+					tiles.AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 					
 					if (!tiles.AudioCtx.createGain)
 						tiles.AudioCtx.createGain = tiles.AudioCtx.createGainNode;
@@ -456,8 +391,6 @@ var tiles = {
 			tiles.PlayBackSlider.addEventListener("mouseup",function(){tiles.allowThumbMove = true;},false);
 			tiles.PlayBackSlider.addEventListener("touchend",function(){tiles.allowThumbMove = true;},false);
 			
-			tiles.AudioElement.addEventListener("play",function(){tiles.changeMediaState(true)},false)
-			tiles.AudioElement.addEventListener("pause",function(){tiles.changeMediaState(false)},false)
 			tiles.AudioElement.addEventListener("timeupdate",tiles.updateMediaInfo,false);
 			
 			tiles.currentMediaState = true;
@@ -476,9 +409,7 @@ var tiles = {
 		if (tiles.m == true) {
 			tiles.AudioElement.play(); // Give mobile browsers a hint
 		}
-		if (!tiles.isPlayingOfflineSong) {
-			tiles.currentSong++;
-		}
+		tiles.currentSong++;
 		var dtNotifMsg = "Now playing: " + tiles.songName;
 		var dtNotifIco = "resources/artwork/" + tiles.songAlbum + ".jpg";
 		tiles.desktopNotify("Musec",dtNotifMsg,dtNotifIco);
@@ -509,19 +440,19 @@ var tiles = {
 			tiles.MediaTotalTime.innerHTML = totalMinutes + ":" + totalSeconds;
 			
 			if (currentSeconds % 3 == 0 || currentSeconds == totalSeconds) {
-				tiles.songLoadProgress();
+				tiles.songLoadProgress(tiles.AudioElement);
 			}
 		}
 	},
 	songEnd:function(){
 		if (tiles.isPlayingOfflineSong == true) {
-			tiles.changeMediaState(false);
+			tiles.changeMediaState();
 			tiles.sAlert("End","stop.svg",300);
 			tiles.desktopNotify("Musec","Song Finished","assets/img/Musec!3.jpg");
 			return;
 		}
 		if (tiles.songQueue.length == (tiles.currentSong*2)) {
-			tiles.changeMediaState(false);
+			tiles.changeMediaState();
 			tiles.sAlert("End of Queue","stop.svg",500);
 			tiles.desktopNotify("Musec","End of Queue","assets/img/Musec!3.jpg");
 		} else {
@@ -534,7 +465,7 @@ var tiles = {
 					setTimeout(function(){
 						tiles.AudioElement.pause();
 						setTimeout(function(){
-							tiles.AudioElement.play();
+							tiles.AudioElement.pause();
 						},500);
 					},500);
 				}
@@ -544,33 +475,40 @@ var tiles = {
 	songSeek:function(){
 		tiles.AudioElement.currentTime = (tiles.AudioElement.duration * (tiles.PlayBackSlider.value / 100));
 	},
-	toggleMediaState:function(){
-		if (typeof(tiles.AudioElement) == "undefined") {
-			if (tiles.songQueue.length != (tiles.currentSong*2)){
-				tiles.nextSong();
-			} else {
-				return;
-			}
-		}
-		if (tiles.currentMediaState == true) {
-			tiles.changeMediaState(false);
-		} else {
-			tiles.changeMediaState(true);
-		}
-	},
-	changeMediaState:function(state){
-		if (typeof(tiles.AudioElement) == "undefined") {
+	changeMediaState:function(){
+		if (typeof(tiles.AudioElement) == "undefined"){
 			return;
 		}
-		tiles.dev("Changing media state...");
-		if (state == true){
-			// Play
+		
+		tiles.dev("Changing state..");
+		if (typeof(tiles.currentMediaState) == "undefined"){
+			tiles.dev("changeMediaState->Path->1");
+			if (tiles.songQueue.length != 0) {
+				tiles.dev("changeMediaState->Path->1->1");
+				if (tiles.currentSong >= tiles.songQueue.length){
+					tiles.dev("changeMediaState->Path->1->1->1");
+					tiles.currentSong = 0;
+					tiles.nextSong();
+				} else {
+					tiles.dev("changeMediaState->Path->1->1->2");
+					tiles.nextSong();
+				}
+			} else {
+				tiles.dev("changeMediaState->Path->1->2");
+				if (typeof(tiles.AudioElement) != "undefined"){
+					tiles.AudioElement.pause();
+					tiles.currentMediaState = false;
+					document.title = "Paused - " + tiles.songName;
+				}
+			}
+		} else if (tiles.currentMediaState == false) {
+			tiles.dev("changeMediaState->Path->2");
 			tiles.currentMediaState = true;
 			tiles.AudioElement.play();
 			tiles.mediaStateTrigger.innerHTML = "&#10074;&#10074;";
 			document.title = "Musec - " + tiles.songName;
 		} else {
-			// Pause
+			tiles.dev("changeMediaState->Path->3");
 			tiles.currentMediaState = false;
 			tiles.AudioElement.pause();
 			tiles.mediaStateTrigger.innerHTML = "&#9658;";
@@ -589,15 +527,13 @@ var tiles = {
 			tiles.songRawBuffer = 0;
 		}
 		percentRounded = Math.round((tiles.songRawBuffer / tiles.songRawDuration) * 100);
-		
+
 		if (tiles.enableColourSplash != true) {
 			var coloursProgess = ["rgb(0,0,0)","white"];
 		} else {
 			var coloursProgess = tiles.progressColor;
 		}
-		if (percentRounded != 100) {
-			tiles.dev("Progress-> (" + percentRounded + ") --> Rawbuff(" + tiles.songRawBuffer + ") / RawDur(" + tiles.songRawDuration + ")");
-		}
+		tiles.dev("Progress-> (" + percentRounded + ") --> Rawbuff(" + tiles.songRawBuffer + ") / RawDur(" + tiles.songRawDuration + ")");
 		if (isNaN(percentRounded)) {
 			tiles.folder.css({background:"linear-gradient(to right, " + coloursProgess[1] + " 0%, " + coloursProgess[0]});
 		} else {
@@ -686,7 +622,7 @@ var tiles = {
 	},
 	tileMenuDo:function(whatDo,folder){
 		if (whatDo == "atq") {
-			tiles.load("t=b&d=" + btoa(folder));
+			tiles.load("t=b&d=" + btoa(folder),false);
 		} else if (whatDo == "fav") {
 			tiles.sAlert("Unavailable","sad.svg",500);
 		} else {
@@ -1020,7 +956,7 @@ var tiles = {
 					var reconInt = setInterval(function(){
 						if ((cSec-1) == 0) {
 							tiles.activeView.html("<h1>Connection Error (" + tiles.connAttempt + ")</h1><h2>Attempting Connection...</h2>");
-							tiles.load(sendData,function(){$(".tile_bg").removeClass("blur");});
+							tiles.load(sendData,true);
 							clearInterval(reconInt);
 						} else {
 							if ((cSec-1) == 1) {
@@ -1079,25 +1015,17 @@ var tiles = {
 			tiles.dev("Regular preempt");
 		}
 	},
-	doSearch:function(manualSearch){
-		if (typeof(manualSearch) == "string") {
-			var searchTerm = manualSearch;
-			$("#sAlertImg").attr("src",window.defaultPath + "assets/img/i/loader.gif");
-			$("#sAlertTxt").html("Loading");
-			$("#sAlert").fadeIn(100);
-		} else {
-			var searchTerm = tiles.searchBox.val();
-		}
-		if (searchTerm == "" || searchTerm.length == 1) {
+	doSearch:function(){
+		if (tiles.searchBox.val() == "" || tiles.searchBox.val().length == 1) {
 			tiles.sAlert("Invalid","exclamation.svg",400);
 		} else {
 			var searchPattern = /([0-9A-Za-z .])/;
-			if (searchPattern.test(searchTerm)) {
+			if (searchPattern.test(tiles.searchBox.val())) {
 				tiles.lastMenuSong = undefined;
 				tiles.lastSongMenu = undefined;
 				
 				tiles.activeView.fadeOut(500);
-				tiles.load("t=l&s=" + btoa(searchTerm),function(){$(".tile_bg").removeClass("blur");$("#sAlert").fadeOut(200);});
+				tiles.load("t=l&s=" + btoa(tiles.searchBox.val()),true);
 				if ($("#songFolder").is(":visible")) {
 					tiles.activeView.fadeIn(500);
 				}
@@ -1158,8 +1086,8 @@ var tiles = {
 			tiles.songQueue = [];
 			tiles.activeView = $("#musicFolders");
 			
-			tiles.load("t=f&d=" + btoa("/"));
-			tiles.load("t=v");
+			tiles.load("t=f&d=" + btoa("/"),true);
+			tiles.load("t=v",true);
 			
 			tiles.folder.html("Music");
 			tiles.bB.prop("do","refresh");
@@ -1197,7 +1125,7 @@ var tiles = {
 					tiles.bB.click();
 					break;
 				case 32: // Space bar
-					tiles.toggleMediaState();
+					tiles.changeMediaState();
 					break;
 				case 81: // Letter Q
 					vConf.fft_size = 256;
@@ -1365,8 +1293,8 @@ var MusecOffline = {
 	}
 };
 $(document).ready(function(){
-	tiles.load("t=v");
-	tiles.load("t=f&d=" + btoa("/"));
+	tiles.load("t=v",true);
+	tiles.load("t=f&d=" + btoa("/"),true);
 	tiles.mediaStateTrigger = document.getElementById("playpause");
 	tiles.qB = $("#queue");
 	tiles.dB = $("#down");
@@ -1391,7 +1319,7 @@ $(document).ready(function(){
 	tiles.folder.longclick(250,function(){tiles.togglePanel();});
 	tiles.folder.contextmenu(function(evn){evn.preventDefault();tiles.togglePanel();});
 	
-	tiles.mediaStateTrigger.addEventListener("click",tiles.toggleMediaState,false);
+	tiles.mediaStateTrigger.addEventListener("click",tiles.changeMediaState,false);
 	tiles.searchBox.keyup(function(){tiles.preemptSearch();});
 	tiles.searchBox.keypress(function(k){if(k.which == 13){tiles.doSearch();}}); // Enter to do search
 	tiles.searchDo.click(function(){tiles.doSearch();});
@@ -1408,7 +1336,6 @@ $(document).ready(function(){
 	if (tiles.m === true) {
 		tiles.sAlert("Beta","../Musec!3.jpg",275);
 	}
-	window.addEventListener("popstate",tiles.handleHistoryState);
 	window.addEventListener("keydown",tiles.keyBoardEvents);
 	$(window).resize(function(){
 		eW = tiles.widthCheck();
@@ -1427,7 +1354,7 @@ $(document).ready(function(){
 	tiles.bB.click(function(){
 		tiles.dev("Action Button: " + tiles.bB.prop("do"));
 		if (tiles.bB.prop("do") == "refresh") {
-			tiles.load("t=f&d=" + btoa("/"),function(){$(".tile_bg").removeClass("blur");});
+			tiles.load("t=f&d=" + btoa("/"),true);
 			tiles.sAlert("Refreshed","refresh.svg",400);
 			$("#queueFolder").hide();
 			$("#offlineFolder").hide();
@@ -1444,7 +1371,6 @@ $(document).ready(function(){
 			$("#songFolder").hide();
 			$("#queueFolder").hide();
 			$("#offlineFolder").hide();
-			tiles.setHistoryState({response:"SETDEFAULT"});
 		}
 		if (typeof(tiles.lastSongMenu) != "undefined") {
 			tiles.dev("Updating lastSongMenu value");
@@ -1569,11 +1495,11 @@ $(document).ready(function(){
 
 // Preload resources
 var i = 0;
-var assets = ["broom.svg","cross.svg","down.svg","exclamation.svg","loader.gif","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
+var assets = ["broom.svg","cross.svg","down.svg","exclamation.svg","play.svg","plus.svg","refresh.svg","sad.svg","stop.svg"];
 for (i = 0;i<assets.length;i++) {
 	hint = document.createElement("link");
 	hint.setAttribute("rel","prefetch");
-	hint.setAttribute("href",window.defaultPath + "assets/img/i/" + assets[i]);
+	hint.setAttribute("href","assets/img/i/" + assets[i]);
 	document.getElementsByTagName("head")[0].appendChild(hint);
 }
 

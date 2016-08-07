@@ -14,7 +14,8 @@ $files = [
 	"jquery.longclick-min.js",
 	"notification.js",
 	"pointer_events.js",
-	"visualizer.js"
+	"visualizer.js",
+	"safe-audio-context.js"
 ];
 
 foreach($files as $file) {

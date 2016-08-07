@@ -126,11 +126,12 @@ if (isset($_POST)) {
 			}
 		}
 		$results["count"] = $count;
+		$results["term"] = $searchTerm;
 		echo @json_encode($results);
 		
 	} elseif ($type == "v") {
 		// Version (Returns cache version)
-		die('{"response":"version","total":22}');
+		die('{"response":"version","total":23}');
 	} elseif ($type == "e") {
 		if (isset($_POST["e"])) {
 			$data = base64_decode($_POST["e"]);
