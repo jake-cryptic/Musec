@@ -1,6 +1,6 @@
-/* Musec - Build 21 */
+/* Musec - Build 22 */
 var tiles = {
-	cacheVersion:21,
+	cacheVersion:22,
 	backendUrl:"",
 	songQueue:[],
 	currentSong:0,
@@ -463,9 +463,9 @@ var tiles = {
 			if (tiles.m == true) {
 				if (!tiles.checkPlayback(tiles.AudioElement)) {
 					setTimeout(function(){
-						tiles.changeMediaState();
+						tiles.AudioElement.pause();
 						setTimeout(function(){
-							tiles.changeMediaState();
+							tiles.AudioElement.pause();
 						},500);
 					},500);
 				}
@@ -1514,7 +1514,7 @@ var settings = {
 			_ST_AM:"Disabled",
 			_ST_TO:"Disabled",
 			_ST_KE:"Enabled",
-			_ST_CS:"Disabled"
+			_ST_CS:"Enabled"
 		};
 		if (!settings.isiOS) {
 			settings.AppPrefs._ST_MV = "Enabled";
@@ -1540,7 +1540,7 @@ var settings = {
 					_ST_AM:"Disabled",
 					_ST_TO:"Disabled",
 					_ST_KE:"Enabled",
-					_ST_CS:"Disabled"
+					_ST_CS:"Enabled"
 				};
 				if (!settings.isiOS) {
 					settings.AppPrefs._ST_MV = "Enabled";

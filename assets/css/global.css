@@ -424,7 +424,7 @@ canvas#musicVisualizer {
 	}
 	#folder {
 		width:64%;
-		line-height:7.5vh;
+		line-height:8vh;
 		font-size:1.7em;
 	}
 	#mediacontrols {
@@ -518,6 +518,7 @@ canvas#musicVisualizer {
 	#folder {
 		height:50%;
 		font-size:1.25em;
+		line-height:8.5vh;
 	}
 	#pageTop {
 		height:17.5%;
