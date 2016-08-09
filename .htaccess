@@ -27,7 +27,8 @@ Header set Cache-Control "max-age=0, private, no-store, no-cache, must-revalidat
 <IfModule mod_rewrite.c>  
 RewriteEngine on
 RewriteRule ^album/([A-Za-z0-9-_]+)?$ index.php?react=album&album=$1 [NC,L]
-RewriteRule ^search/([A-Za-z0-9-_]+)?$ index.php?react=search&term=$1 [NC,L]
+RewriteRule ^search/([A-Za-z0-9-_\ ]+)?$ index.php?react=search&term=$1 [NC,L]
+RewriteRule ^play/([A-Za-z0-9-_]+)/([A-Za-z0-9-_\ ]+)?$ index.php?react=play&album=$1&song=$2 [NC,L]
 </IfModule>
 
 # Modify headers

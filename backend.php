@@ -61,7 +61,7 @@ if (isset($_POST)) {
 		if ($type == "b") {
 			$results = array("response"=>"tfiles","folder"=>$dir,"data"=>array());
 		} else {
-			$results = array("response"=>"lsfiles","data"=>array());
+			$results = array("response"=>"lsfiles","folder"=>substr($dir,1),"data"=>array());
 		}
 		$count = 0;
 		foreach ($files as $file) {

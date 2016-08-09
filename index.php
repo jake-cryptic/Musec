@@ -20,6 +20,13 @@ if (isset($_GET["react"])){
 			$runCode = 'tiles.handleHistoryState({state:"search/' . $_GET["term"] . '"});';
 		}
 	}
+	if ($_GET["react"] == "play" && isset($_GET["album"]) && isset($_GET["song"])) {
+		if (!empty($_GET["album"]) && preg_match('/([0-9A-Za-z _-])/',$_GET["album"]) && !empty($_GET["song"]) && preg_match('/([0-9A-Za-z .])/',$_GET["song"])) {
+			if (file_exists("resources/music/" . $_GET["album"] . "/" . $_GET["song"] . ".mp3")) {
+				$runCode = 'tiles.handleHistoryState({state:"play/' . $_GET["album"] . '/' . $_GET["song"] . '"});';
+			}
+		}
+	}
 }
 
 if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.php"); die(); } else { session_start(); } 

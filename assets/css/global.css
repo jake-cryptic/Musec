@@ -242,7 +242,7 @@ input[type=range]::-ms-thumb {
 .queueCurrentSong {
 	background-color:rgba(0,0,0,0.5);
 }
-.bcircle,.qcircle {
+.bcircle,.qcircle,.acircle {
 	background-color:rgba(255,255,255,0.9);
 	border:0;
 	border-radius:10px;
@@ -250,6 +250,9 @@ input[type=range]::-ms-thumb {
 	font-size:1em;
 	font-family:sans-serif;
 	cursor:pointer;
+}
+.acircle{
+	font-size:0.7em;
 }
 .bcircle,.fullWidthButton {
 	margin-top:10px;

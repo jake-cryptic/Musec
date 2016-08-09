@@ -101,8 +101,8 @@ var tiles = {
 		}
 		
 		var stateArray = event.state.split("/");
-		var action = stateArray[stateArray.length-2];
-		var thing = stateArray[stateArray.length-1];
+		var action = stateArray[0];
+		var thing = stateArray[1];
 		tiles.dev("HistHandle->" + action + " - " + thing);
 		
 		if (action == "album") {
@@ -110,6 +110,15 @@ var tiles = {
 		}
 		if (action == "search") {
 			tiles.doSearch(thing);
+		}
+		if (action == "play") {
+			var otherThing = stateArray[2];
+			var params = {
+				"l":window.defaultPath + "resources/music/" + thing + "/" + otherThing + ".mp3",
+				"n":tiles.removeTrackNumbers(otherThing),
+				"a":capitalise(thing.replace(/_/g," "))
+			};
+			tiles.nextSong(params);
 		}
 	},
 	load:function(sendData,callback){
@@ -243,7 +252,8 @@ var tiles = {
 			if (folderData.data.length == 0) {
 				$sf.html("<h2>Couldn't find any music in this directory</h2>"); return;
 			}
-			$sf.html("<table><thead><tr><th>Song</th></tr></thead><tbody id=\"song_list\"></tbody></table>");
+			var folderButtons = '<button onclick="tiles.tileMenuDo(\'atq\',\'' + folderData.folder + '\');" class="acircle">Add all to Queue</button>';
+			$sf.html("<table><thead><tr><th>" + folderButtons + "</th></tr></thead><tbody id=\"song_list\"></tbody></table>");
 			
 			for (i=0;i<folderData.data.length;i++) {
 				var file = folderData.data[i].split('/').pop();
@@ -253,7 +263,7 @@ var tiles = {
 			}
 		} else {
 			tiles.isTyping = false;
-			$sf.html("<table><thead><tr><th>Search Results</th></tr></thead><tbody id=\"search_r_lst\"><tr><td><h2>Found " + folderData.count + " result(s)</h2></td></tr></tbody></table>");
+			$sf.html("<table><tbody id=\"search_r_lst\"><tr><td><h2>Found " + folderData.count + " result(s) for the term '" + folderData.term + "'</h2></td></tr></tbody></table>");
 			for(var i = 1;i < (folderData.count+1);i++) {
 				var file = folderData.data[i][0];
 				var x = tiles.removeTrackNumbers(file.replace(".m4a", "").replace(".mp3", ""));

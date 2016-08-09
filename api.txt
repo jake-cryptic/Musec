@@ -13,7 +13,8 @@ API Responses:
 	"data":[
 		"song1",
 		"song2"
-	]
+	],
+	"folder":"Folder you requested"
 }
 
 {
@@ -34,7 +35,8 @@ API Responses:
 			"Song Folder"
 		]
 	},
-	"count":"1"
+	"count":"1",
+	"term":"What you searched for"
 }
 
 {
