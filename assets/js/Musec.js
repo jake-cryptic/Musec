@@ -456,8 +456,6 @@ var tiles = {
 			tiles.PlayBackSlider.addEventListener("mouseup",function(){tiles.allowThumbMove = true;},false);
 			tiles.PlayBackSlider.addEventListener("touchend",function(){tiles.allowThumbMove = true;},false);
 			
-			tiles.AudioElement.addEventListener("play",function(){tiles.changeMediaState(true)},false)
-			tiles.AudioElement.addEventListener("pause",function(){tiles.changeMediaState(false)},false)
 			tiles.AudioElement.addEventListener("timeupdate",tiles.updateMediaInfo,false);
 			
 			tiles.currentMediaState = true;
@@ -470,7 +468,10 @@ var tiles = {
 		tiles.AudioElement.addEventListener("ended",tiles.songEnd,false);
 		tiles.AudioElement.addEventListener("progress",tiles.songLoadProgress,false);
 		tiles.AudioElement.addEventListener("waiting",tiles.songBuffering,false);
+		tiles.AudioElement.addEventListener("play",function(){tiles.changeMediaState(true);},false);
+		tiles.AudioElement.addEventListener("pause",function(){tiles.changeMediaState(false);},false);
 		
+		tiles.AudioElement.src = "";
 		tiles.AudioElement.src = loc;
 		tiles.dev("SRV:" + loc);
 		if (tiles.m == true) {
@@ -515,16 +516,21 @@ var tiles = {
 	},
 	songEnd:function(){
 		if (tiles.isPlayingOfflineSong == true) {
-			tiles.changeMediaState(false);
+			tiles.AudioElement.pause();
 			tiles.sAlert("End","stop.svg",300);
 			tiles.desktopNotify("Musec","Song Finished","assets/img/Musec!3.jpg");
 			return;
 		}
 		if (tiles.songQueue.length == (tiles.currentSong*2)) {
-			tiles.changeMediaState(false);
+			tiles.AudioElement.pause();
 			tiles.sAlert("End of Queue","stop.svg",500);
 			tiles.desktopNotify("Musec","End of Queue","assets/img/Musec!3.jpg");
 		} else {
+			if (tiles.currentSong % 25 == 0) {
+				console.log("Reset AudioElement after 25 uses");
+				tiles.AudioElement = undefined;
+			}
+			tiles.AudioElement.removeEventListener("ended",tiles.songEnd);
 			tiles.nextSong();
 			if ($("#queueFolder").is(":visible")) {
 				tiles.reloadQueueView();
@@ -553,32 +559,34 @@ var tiles = {
 			}
 		}
 		if (tiles.currentMediaState == true) {
-			tiles.changeMediaState(false);
+			//tiles.changeMediaState(false);
+			tiles.AudioElement.pause();
 		} else {
-			tiles.changeMediaState(true);
+			//tiles.changeMediaState(true);
+			tiles.AudioElement.play();
+			console.log("CalledFromToggle");
 		}
 	},
 	changeMediaState:function(state){
 		if (typeof(tiles.AudioElement) == "undefined") {
 			return;
 		}
-		tiles.dev("Changing media state...");
+		console.log("Changing media state...");
 		if (state == true){
 			// Play
 			tiles.currentMediaState = true;
-			tiles.AudioElement.play();
 			tiles.mediaStateTrigger.innerHTML = "&#10074;&#10074;";
 			document.title = "Musec - " + tiles.songName;
 		} else {
 			// Pause
 			tiles.currentMediaState = false;
-			tiles.AudioElement.pause();
 			tiles.mediaStateTrigger.innerHTML = "&#9658;";
 			document.title = "Paused - " + tiles.songName;
 		}
+		return true;
 	},
 	songLoadProgress:function(){
-		if (typeof(tiles.AudioElement.duration) == "undefined") {
+		if (typeof(tiles.AudioElement) == "undefined" || typeof(tiles.AudioElement.duration) == "undefined") {
 			tiles.songRawDuration = 0;
 		} else {
 			tiles.songRawDuration = tiles.AudioElement.duration;

@@ -1,12 +1,11 @@
-<?php 
-if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.php"); die(); } else { session_start(); } 
+<?php
+header("X-Content-Type-Options: nosniff");
 
 function getBase($path) {
 	$pArr = explode("/",$path);
 	array_pop($pArr);
 	return implode("/",$pArr);
 }
-
 $_BASE = getBase($_SERVER["PHP_SELF"]);
 
 $runCode = 'console.log("No History API actions must be taken");';
@@ -22,6 +21,8 @@ if (isset($_GET["react"])){
 		}
 	}
 }
+
+if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.php"); die(); } else { session_start(); } 
 ?>
 <!DOCTYPE HTML>
 <html lang="en" dir="ltr">
@@ -154,7 +155,7 @@ if (isset($_GET["react"])){
 		function isCordova(){return (window.cordova || window.PhoneGap || window.phonegap) && /ios|iphone|ipod|ipad|android/i.test(navigator.userAgent);}
 		var defaultPath = "<?php echo $_BASE; ?>/";
 		</script>
-		<script type="text/javascript" crossorigin="anonymous" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
+		<script type="text/javascript" crossorigin="anonymous" integrity="sha256-ihAoc6M/JPfrIiIeayPE9xjin4UWjsx2mjW/rtmxLM4=" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
 		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js_libs/libs.js.php" onload="document.getElementById('__load').value+=42"></script>
 		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js/Musec.js" onload="document.getElementById('__load').innerHTML+=33" defer></script>
 	</body>

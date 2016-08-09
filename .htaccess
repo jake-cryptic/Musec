@@ -29,3 +29,7 @@ RewriteEngine on
 RewriteRule ^album/([A-Za-z0-9-_]+)?$ index.php?react=album&album=$1 [NC,L]
 RewriteRule ^search/([A-Za-z0-9-_]+)?$ index.php?react=search&term=$1 [NC,L]
 </IfModule>
+
+# Modify headers
+Header unset X-Powered-By
+Header set X-Frame-Options "Deny"
