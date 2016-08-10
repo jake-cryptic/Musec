@@ -116,7 +116,7 @@ var tiles = {
 			var params = {
 				"l":window.defaultPath + "resources/music/" + thing + "/" + otherThing + ".mp3",
 				"n":tiles.removeTrackNumbers(otherThing),
-				"a":capitalise(thing.replace(/_/g," "))
+				"a":thing
 			};
 			tiles.nextSong(params);
 		}

@@ -67,11 +67,11 @@ if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.
 			<?php echo $_SERVER["HTTP_USER_AGENT"]; ?><div style="display:none">
 		<!--<![endif]-->
 		<div id="pageTop">
-			<span id="back" do="refresh" class="impButton">&#x21bb;</span>
-			<span id="search" class="impButton">&#x1f50e;</span>
-			<span id="queue" do="showQ" class="impButton">&#9776;</span>
-			<span id="down" do="showF" class="impButton">&#9660;</span>
-			<div id="search_container"><input type="text" id="search_box" placeholder="Search for a song" /><button id="do_search">Search All</button></div>
+			<span id="back" do="refresh" class="impButton" aria-label="Back/Refresh">&#x21bb;</span>
+			<span id="search" class="impButton" aria-label="Open/Close search bar">&#x1f50e;</span>
+			<span id="queue" do="showQ" class="impButton" aria-label="Show/Hide queue tab">&#9776;</span>
+			<span id="down" do="showF" class="impButton" aria-label="Show/Hide offline media tab">&#9660;</span>
+			<div id="search_container"><input type="text" id="search_box" placeholder="Search for a song" /><button id="do_search" aria-label="Search button">Search All</button></div>
 			<span id="folder">Please Wait</span>
 		</div>
 		<div id="pageCenter">
@@ -86,7 +86,7 @@ if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.
 			<div id="offlineFolder"></div>
 		</div>
 		<div id="pageBottom">
-			<span id="playpause" class="disabled impButton">&#9658;</span>
+			<span id="playpause" class="disabled impButton" aria-label="Play/Pause button">&#9658;</span>
 			<span id="mediacontrols">No Music Playing</span>
 		</div>
 		
@@ -107,12 +107,12 @@ if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.
 				<button class="oButton" onclick="tiles.fix()">Clean</button> |
 				<button class="oButton" onclick="settings.resetSettings()">Reset</button><br />
 				
-				<h2>Preferences</h2>
+				<h2 aria-label="Change musec settings">Preferences</h2>
 				<div id="appPrefs"><button class="rebootButton" id="rebootMusec">Restart Musec</button>
 					<table id="appPrefsTable"><thead><tr><th>Setting</th><th>Value</th></thead><tbody>
 					<tr>
 						<td onclick="settings.whatsThis(1);"><span class="optionName">Music Visualizer*</span></td>
-						<td><button class="settingsToggle" id="_ST_MV">Unknown</button></td>
+						<td><button class="settingsToggle" id="_ST_MV" aria-label="Music Visualiser Toggle">Unknown</button></td>
 					</tr>
 					<tr>
 						<td onclick="settings.whatsThis(2);"><span class="optionName">Visualizer Style*</span></td>
@@ -126,23 +126,23 @@ if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.
 					</tr>
 					<tr>
 						<td onclick="settings.whatsThis(3);"><span class="optionName">Developer Mode</span></td>
-						<td><button class="settingsToggle" id="_ST_DV">Disabled</button></td>
+						<td><button class="settingsToggle" id="_ST_DV" aria-label="Developer Mode Toggle">Disabled</button></td>
 					</tr>
 					<tr>
 						<td onclick="settings.whatsThis(4);"><span class="optionName">Artist Mode</span></td>
-						<td><button class="settingsToggle" id="_ST_AM">Disabled</button></td>
+						<td><button class="settingsToggle" id="_ST_AM" aria-label="Artist Mode Toggle">Disabled</button></td>
 					</tr>
 					<tr>
 						<td onclick="settings.whatsThis(5);"><span class="optionName">Timeouts</span></td>
-						<td><button class="settingsToggle" id="_ST_TO">Enabled</button></td>
+						<td><button class="settingsToggle" id="_ST_TO" aria-label="Timouts Toggle">Enabled</button></td>
 					</tr>
 					<tr>
 						<td onclick="settings.whatsThis(6);"><span class="optionName">Keyboard Events</span></td>
-						<td><button class="settingsToggle" id="_ST_KE">Enabled</button></td>
+						<td><button class="settingsToggle" id="_ST_KE" aria-label="Keyboard Events Toggle">Enabled</button></td>
 					</tr>
 					<tr>
 						<td onclick="settings.whatsThis(7);"><span class="optionName">Colour Splash*</span></td>
-						<td><button class="settingsToggle" id="_ST_CS">Disabled</button></td>
+						<td><button class="settingsToggle" id="_ST_CS" aria-label="Colour Splash Toggle">Disabled</button></td>
 					</tr>
 					<tr><td colspan="2">* Experimental - These features must be used with caution</td></tr>
 					</tbody></table>
@@ -158,7 +158,7 @@ if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.
 		if(typeof(jQuery)=="undefined"){document.write('<script src="<?php echo $_BASE; ?>/assets/js_libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
 		function isNumeric(n){return !isNaN(parseFloat(n))&&isFinite(n);}
 		function capitalise(t){return t.replace(/\w\S*/g,function(s){return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();});}
-		window.reqFrame =(function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||  function(callback){window.setTimeout(callback, 10 / 60);}; })();
+		window.reqFrame =(function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback){window.setTimeout(callback, 10 / 60);};})();
 		function isCordova(){return (window.cordova || window.PhoneGap || window.phonegap) && /ios|iphone|ipod|ipad|android/i.test(navigator.userAgent);}
 		var defaultPath = "<?php echo $_BASE; ?>/";
 		</script>
