@@ -97,26 +97,35 @@ var tiles = {
 			return;
 		}
 		if (event.state == "default") {
-			tiles.bB.click();
+			if (tiles.bB.prop("do") == "back"){
+				tiles.bB.click();
+			}
+			return;
 		}
 		
 		var stateArray = event.state.split("/");
-		var action = stateArray[0];
-		var thing = stateArray[1];
-		tiles.dev("HistHandle->" + action + " - " + thing);
+		tiles.dev(stateArray);
+		var item = stateArray[stateArray.length-1];
 		
+		if (stateArray[stateArray.length-2] != "album" && stateArray[stateArray.length-2] != "search") {
+			var action = stateArray[stateArray.length-3];
+		} else {
+			var action = stateArray[stateArray.length-2];
+		}
+		
+		tiles.dev("HistHandle->" + action + " - " + item);
 		if (action == "album") {
-			tiles.loadSongs(thing,2);
+			tiles.loadSongs(item,2);
 		}
 		if (action == "search") {
-			tiles.doSearch(thing);
+			tiles.doSearch(item);
 		}
 		if (action == "play") {
-			var otherThing = stateArray[2];
+			var album = stateArray[stateArray.length-2];
 			var params = {
-				"l":window.defaultPath + "resources/music/" + thing + "/" + otherThing + ".mp3",
-				"n":tiles.removeTrackNumbers(otherThing),
-				"a":thing
+				"l":window.defaultPath + "resources/music/" + album + "/" + item + ".mp3",
+				"n":tiles.removeTrackNumbers(item),
+				"a":album
 			};
 			tiles.nextSong(params);
 		}
@@ -455,7 +464,7 @@ var tiles = {
 			tiles.folder.css({"font-size":"1.25em"});
 			tiles.mediaStateTrigger.innerHTML = "&#10074;&#10074;";
 			
-			$("#mediacontrols").html('<input id="playbackslider" class="msicSldr" type="range" min="0" max="100" value="0" step="1"> <span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>');
+			$("#mediacontrols").html('<input id="playbackslider" class="msicSldr" type="range" min="0" max="100" value="0" step="0.01"> <span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>');
 			tiles.PlayBackSlider = document.getElementById("playbackslider");
 			tiles.MediaCurrentTime = document.getElementById("mediaCtime");
 			tiles.MediaTotalTime = document.getElementById("mediaTtime");
@@ -536,11 +545,11 @@ var tiles = {
 			tiles.sAlert("End of Queue","stop.svg",500);
 			tiles.desktopNotify("Musec","End of Queue","assets/img/Musec!3.jpg");
 		} else {
+			tiles.AudioElement.removeEventListener("ended",tiles.songEnd);
 			if (tiles.currentSong % 25 == 0) {
 				console.log("Reset AudioElement after 25 uses");
 				tiles.AudioElement = undefined;
 			}
-			tiles.AudioElement.removeEventListener("ended",tiles.songEnd);
 			tiles.nextSong();
 			if ($("#queueFolder").is(":visible")) {
 				tiles.reloadQueueView();
@@ -684,7 +693,7 @@ var tiles = {
 			$("#tile_id_" + song_id + "_bg").addClass("blur");
 
 			tmp = '<div class="tile_table"><div class="tileTrow tileTitle">' + title + '</div>';
-			tmp += '<div class="tileTrow tileAct" onclick="tiles.showTileMenu(\'' + song_id + '\');tiles.loadSongs(\'' + song_id + '\');">Open Folder</div>';
+			tmp += '<div class="tileTrow tileAct" onclick="tiles.showTileMenu(\'' + song_id + '\');tiles.loadSongs(\'' + song_id + '\',1);">Open Folder</div>';
 			tmp += '<div class="tileTrow tileAct" onclick="tiles.tileMenuDo(\'atq\',\'' + $("#tile_id_" + song_id).prop("folder") + '\')">Add all to queue</div>';
 			tmp += '<div class="tileTrow tileAct" onclick="tiles.tileMenuDo(\'fav\',\'' + $("#tile_id_" + song_id).prop("folder") + '\')">Add to favourites</div></div>';
 			tiles.cWt.html(tmp);
@@ -1284,7 +1293,7 @@ var MusecOffline = {
 		if (whatDo == "update") {
 			$("#offlineDlProgress").html(progress + "%");
 		} else {
-			$("#sAlertImg").attr("src","assets/img/i/down.svg");
+			$("#sAlertImg").attr("src",window.defaultPath + "assets/img/i/down.svg");
 			$("#sAlertTxt").html("<span id='offlineDlProgress'>Downloading</span>");
 			
 			$("#sAlert").fadeIn(200);
@@ -1324,14 +1333,14 @@ var MusecOffline = {
 		var fsSupport = MusecOffline.makeFilesystem();
 		if (!fsSupport) return false;
 		
-		
 		var fsL = file[1] + "." + file[0] + "." + file[2].split(".").pop();
 		var indexItem = {
 			name:file[0],
 			album:file[1],
-			loc:file[2],
+			loc:window.defaultPath + file[2],
 			fsloc:fsL
 		};
+		tiles.dev(indexItem);
 		tiles.dev("[MusecOffline]: Will now download and store file...");
 		
 		var inIndex = MusecOffline.indexSong(indexItem);
