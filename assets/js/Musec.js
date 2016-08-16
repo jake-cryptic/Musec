@@ -203,6 +203,7 @@ var tiles = {
 				tiles.cfi.src = bg_url;
 				tiles.cfa = tiles.colorThief.getPalette(tiles.cfi,5);
 				tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
+				tiles.dev("ColorThief CP - 1");
 			} catch(e) {
 				tiles.cfp = undefined;
 			}
@@ -306,6 +307,7 @@ var tiles = {
 			try{
 				tiles.cfa = tiles.colorThief.getPalette(tiles.cfi,5);
 				tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
+				tiles.dev("ColorThief CP - 2");
 			} catch(e){
 				if (tiles.enableColourSplash == true && responseType == 1){
 					tiles.dev("--- REASON TO BELIEVE ColorThief FAILED");
@@ -318,6 +320,7 @@ var tiles = {
 		}
 		
 		if (typeof(tiles.cfp) != "undefined") {
+			tiles.dev("ColorThief CP - 3");
 			var colourArray = [];
 			var colourArray2 = [];
 			var totalsArray = [];
@@ -343,6 +346,7 @@ var tiles = {
 			vConf.colorSplashStyle = "rgb(" + colourArray[1] + ")";
 			$("#pageTop").css({background:"rgb(" + colourArray[1] + ")"});
 			$("#pageTop").css({color:"rgb(" + colourArray[0] + ")"});
+			$("#folder").css({background:"rgb(" + colourArray[1] + ")"});
 			$("#pageCenter").css({background:"rgb(" + colourArray[0] + ")"});
 			$(".song_longclick").css({background:"rgb(" + colourArray[2] + ")"});
 			$(".song_longclick").css({color:"#fff"});
@@ -816,7 +820,7 @@ var tiles = {
 			}
 			var yeah = confirm("Are you sure you wish to continue?");
 			if (yeah == true) {
-				if (tiles.enableColourSplash != true) {
+				if (typeof(tiles.colorThief) == "undefined" && tiles.enableColourSplash != true) {
 					var coloursProgess = ["rgb(0,0,0)","white"];
 				} else {
 					var coloursProgess = tiles.progressColor;
