@@ -156,12 +156,15 @@ if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.
 		var eData = {msg:errorMsg,url:script,ln:lineNumber,col:column,st:errorObj};var sData = JSON.stringify(eData);tiles.load("t=e&e=" + btoa(sData));console.log(sData);
 		alert('Error: '+errorMsg+' Script: '+script+' Line: '+lineNumber+' Column: '+column+' StackTrace: '+errorObj);};};
 		if(typeof(jQuery)=="undefined"){document.write('<script src="<?php echo $_BASE; ?>/assets/js_libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');}
+		Array.prototype.swap = function(x,y){var b = this[x];this[x] = this[y];this[y] = b;return this;}
+		Array.prototype.newSwap = function(a,b){this[a] = this.splice(b,1,this[a])[0];return this;}
 		function isNumeric(n){return !isNaN(parseFloat(n))&&isFinite(n);}
 		function capitalise(t){return t.replace(/\w\S*/g,function(s){return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();});}
 		window.reqFrame =(function(){return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback){window.setTimeout(callback, 10 / 60);};})();
 		function isCordova(){return (window.cordova || window.PhoneGap || window.phonegap) && /ios|iphone|ipod|ipad|android/i.test(navigator.userAgent);}
 		var defaultPath = "<?php echo $_BASE; ?>/";
 		</script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js" integrity="sha384-cGoVZug22kU0KaYbL6jI8BRsGIAXIYe00lYKPHCwEqD9gwUjxaOBG3X/4mjG6xau" crossorigin="anonymous"></script>
 		<script type="text/javascript" crossorigin="anonymous" integrity="sha256-ihAoc6M/JPfrIiIeayPE9xjin4UWjsx2mjW/rtmxLM4=" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
 		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js_libs/libs.js.php" onload="document.getElementById('__load').value+=42"></script>
 		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js/Musec.js" onload="document.getElementById('__load').innerHTML+=33" defer></script>

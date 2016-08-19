@@ -267,6 +267,10 @@ input[type=range]::-ms-thumb {
 	-moz-animation-iteration-count:2;
 	animation-iteration-count:2;
 }
+.qro_button {
+	cursor:move;
+	cursor:-webkit-grabbing;
+}
 @-webkit-keyframes bounce { to { transform:scale(0.8); } }
 @-o-keyframes bounce { to { transform:scale(0.8); } }
 @-moz-keyframes bounce { to { transform:scale(0.8); } }

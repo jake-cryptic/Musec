@@ -337,9 +337,9 @@ var tiles = {
 				
 				//$sf.append("<div class='' style='background-color:rgba(" + r + "," + g + "," + b + ",1)'> </div>");
 			}
-			console.log(colourArray);
-			console.log(colourArray2);
-			console.log(totalsArray);
+			tiles.dev(colourArray);
+			tiles.dev(colourArray2);
+			tiles.dev(totalsArray);
 			
 			// Set values
 			tiles.progressColor = ["rgb(" + colourArray[2] + ")","rgb(" + colourArray[1] + ")"];
@@ -551,7 +551,7 @@ var tiles = {
 		} else {
 			tiles.AudioElement.removeEventListener("ended",tiles.songEnd);
 			if (tiles.currentSong % 25 == 0) {
-				console.log("Reset AudioElement after 25 uses");
+				tiles.dev("Reset AudioElement after 25 uses");
 				tiles.AudioElement = undefined;
 			}
 			tiles.nextSong();
@@ -582,19 +582,17 @@ var tiles = {
 			}
 		}
 		if (tiles.currentMediaState == true) {
-			//tiles.changeMediaState(false);
 			tiles.AudioElement.pause();
 		} else {
-			//tiles.changeMediaState(true);
 			tiles.AudioElement.play();
-			console.log("CalledFromToggle");
+			tiles.dev("CalledFromToggle");
 		}
 	},
 	changeMediaState:function(state){
 		if (typeof(tiles.AudioElement) == "undefined") {
 			return;
 		}
-		console.log("Changing media state...");
+		tiles.dev("Changing media state...");
 		if (state == true){
 			// Play
 			tiles.currentMediaState = true;
@@ -674,7 +672,6 @@ var tiles = {
 		} else {
 			newContent += "<br /><button class='bcircle' onclick='tiles.alterQueue(\"playnext\",\"" + song_id + "\");'>Play Next</button>";
 			newContent += " <button class='bcircle' onclick='tiles.alterQueue(\"add\",\"" + song_id + "\");'>Add to queue</button>";
-			//newContent += " <button class='bcircle' onclick='tiles.showLyrics(\"" + song_id + "\");'>Lyrics</button></td>";
 			newContent += " <button class='bcircle' onclick='tiles.alterQueue(\"playnow\",\"" + song_id + "\");tiles.nextSong();'>Play Now</button></td>";
 		}
 		if (tiles.supportsFS){
@@ -808,6 +805,22 @@ var tiles = {
 			tiles.dev(tiles.songQueue);
 			tiles.reloadQueueView();
 			tiles.sAlert("Removed","cross.svg",275);
+		} else if (whatDo == "rearrange") {
+			if (typeof(songID) != "object") return;
+			if (songID[0] == songID[1]) return;
+			
+			tiles.dev("Altering queue: " + whatDo + " moving songID " + songID[0] + " to " + songID[1]);
+			tiles.dev(tiles.songQueue);
+			
+			var initalIndex = ((songID[0]-1)*2), newIndex = ((songID[1]-1)*2);
+			var pushData = [tiles.songQueue[initalIndex],tiles.songQueue[initalIndex+1]];
+			
+			tiles.songQueue.splice(initalIndex,2);
+			
+			tiles.songQueue.splice(newIndex,0,pushData[0]);
+			tiles.songQueue.splice(newIndex+1,0,pushData[1]);
+			
+			tiles.dev(tiles.songQueue);
 		} else {
 			alert("Error: Not implemented");
 			tiles.reloadQueueView();
@@ -916,7 +929,7 @@ var tiles = {
 				
 				// Move up, Play next, Play now, Remove, Move down, Repeat?
 				queueCtrls = "<span class='clickable' onclick=\"tiles.alterQueue('delete'," + i + ")\">Remove</span>";
-				//queueCtrls += "<span class='clickable' onclick=\"tiles.alterQueue('moveup'," + i + ")\">Move up</span>";
+				queueAltr = "<span class='clickable qro_button' id=\"qro_' + i + '\">☰</span>";
 				
 				if (tiles.currentSong-1 == i) {
 					stat = "queueCurrentSong";
@@ -924,10 +937,18 @@ var tiles = {
 					stat = "queueSong";
 				}
 				
-				sB = "<tr class='" + stat + "'><td class='clickable' onclick='tiles.goToSong(" + i + ")'>" + tiles.songQueue[(i*2)+1] + "</td><td>" + queueCtrls + "</td></tr>";
+				sB = "<tr class='" + stat + " draggable_qro'><td class='clickable qro_button' onclick='tiles.goToSong(" + i + ")'>" + tiles.songQueue[(i*2)+1] + "</td><td>" + queueCtrls + "</td></tr>";
 				
 				$("#queue_list").append(sB);
 			}
+			Sortable.create(document.getElementById("queue_list"), {
+				draggable: ".draggable_qro",
+				handle: ".qro_button",
+				onSort:function(event){
+					tiles.dev("QueueSort->End->" + event);
+					tiles.alterQueue("rearrange",[event.oldIndex,event.newIndex]);
+				}
+			});
 		}
 	},
 	reloadOfflineView:function(){
@@ -953,7 +974,7 @@ var tiles = {
 			$("#offlineSongs").html("<tr><td colspan=\"3\" id=\"dlSongCount\"></td></tr>");
 			MusecOffline.Store.usedAndRemaining(function(s_used,s_remain) {
 				var s_total = (s_used+s_remain);
-				console.log(s_total);
+				tiles.dev(s_total);
 				var progressElement = "<progress id=\"uArPbar\" min=\"0\" max=\"" + s_total + "\" value=\"" + s_used + "\"></progress><br /><br />";
 				progressElement += "Used " + (s_used/1048576).toFixed(2) + "MB of " + (s_remain/1048576).toFixed(2) + "MB";
 				if (s_remain != 500*(1048576)) {
@@ -1027,16 +1048,6 @@ var tiles = {
 			}
 		);
 		tiles.reloadOfflineView();
-	},
-	showLyrics:function(song_id){
-		var innerID = song_id.replace("song","song_name");
-		songName = $(innerID).html();
-		
-		tiles.dev("Getting lyrics for " + songName);
-		
-		openWindow = "http://www.lyricsfreak.com/search.php?a=search&type=song&q=" + songName;
-	
-		window.open(openWindow,"_blank");
 	},
 	showError:function(edata,errorFrom,sendData){
 		if (errorFrom == 1) {
