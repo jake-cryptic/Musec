@@ -809,7 +809,7 @@ var tiles = {
 			if (typeof(songID) != "object") return;
 			if (songID[0] == songID[1]) return;
 			
-			tiles.dev("Altering queue: " + whatDo + " moving songID " + songID[0] + " to " + songID[1]);
+			tiles.dev("Altering queue: " + whatDo + " moving songID " + songID[0] + "/" + tiles.currentSong + " to " + songID[1]);
 			tiles.dev(tiles.songQueue);
 			
 			var initalIndex = ((songID[0]-1)*2), newIndex = ((songID[1]-1)*2);
@@ -820,7 +820,12 @@ var tiles = {
 			tiles.songQueue.splice(newIndex,0,pushData[0]);
 			tiles.songQueue.splice(newIndex+1,0,pushData[1]);
 			
+			if (tiles.currentSong == songID[0]){
+				tiles.currentSong = songID[1];
+			}
+			
 			tiles.dev(tiles.songQueue);
+			tiles.reloadQueueView();
 		} else {
 			alert("Error: Not implemented");
 			tiles.reloadQueueView();
