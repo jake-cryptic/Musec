@@ -29,7 +29,7 @@ if (isset($_GET["react"])){
 	}
 }
 
-if (!isset($_COOKIE["beta"]) || $_COOKIE["beta"] < time()) { require("betalogin.php"); die(); } else { session_start(); } 
+if (!isset($_COOKIE["MusecAccess"]) || $_COOKIE["MusecAccess"] < time()) { require("access.php"); die(); } else { session_start(); } 
 ?>
 <!DOCTYPE HTML>
 <html lang="en" dir="ltr">

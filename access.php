@@ -1,9 +1,9 @@
 <?php
 header("X-Content-Type-Options: nosniff");
 
-$betaKeysIssued = ["Bacon","Game","NotBacon"];
+$betaKeysIssued = ["IsBacon","MaybeBacon","NotBacon"];
 
-if (isset($_COOKIE["beta"]) && $_COOKIE["beta"] > time()) {
+if (isset($_COOKIE["MusecAccess"]) && $_COOKIE["MusecAccess"] > time()) {
 	require("index.php");
 	die();
 } else {
@@ -19,18 +19,19 @@ if (!function_exists("getBase")) {
 }
 $_BASE = getBase($_SERVER["PHP_SELF"]);
 
-if (isset($_POST["potential"])) {
-	$p = trim($_POST["potential"]);
-	if (in_array($p,$betaKeysIssued)) {
-		$domain = ($_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : false;
-		setcookie("beta",time()+1814400,time()+1814400,"/",$domain,false,true); // 3 Weeks
-		setcookie("beta_key",$p,time()+2419200,"/",$domain,false,true); // 4 Weeks
-		$cont = "<h1>Beta login</h1><h2 class='s'>Success, click here to continue</h2><script>document.body.addEventListener(\"click\",function(){location.href='index.php';},false);</script>";
+if (!isset($cont)){
+	if (isset($_POST["potential"])) {
+		$p = trim($_POST["potential"]);
+		if (in_array($p,$betaKeysIssued)) {
+			$domain = ($_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : false;
+			setcookie("MusecAccess",time()+1814400,time()+1814400,"/",$domain,false,true); // 3 Weeks
+			$cont = "<h1>Login</h1><h2 class='s'>Success, click here to continue</h2><script>document.body.addEventListener(\"click\",function(){location.href='index.php';},false);</script>";
+		} else {
+			$cont = "<h1>Login</h1><h2 class='e'>Key invalid</h2>";
+		}
 	} else {
-		$cont = "<h1>Beta login</h1><h2 class='e'>Beta key invalid</h2>";
+		$cont = "<h1>Login</h1><h2 class='n'>Enter login information</h2>";
 	}
-} else {
-	$cont = "<h1>Beta login</h1><h2 class='n'>Enter login information</h2>";
 }
 ?>
 <!DOCTYPE HTML>
@@ -38,12 +39,12 @@ if (isset($_POST["potential"])) {
 	<head>
 
 		<!-- Title and Metadata -->
-		<title>Musec! Beta</title>
+		<title>Musec!</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<meta name="author" content="Jake Mcneill" />
 		<meta name="google" content="notranslate" />
-		<meta name="description" content="Please login" />
+		<meta name="description" content="Please login before continuing" />
 
 		<!-- Styles and Graphics -->
 		<style type="text/css">h1,h2{width:100%;margin:15px 0;padding:7.5px 0;}.s{background-color:rgba(0,150,0,0.8);}.n{background-color:rgba(230,130,0,0.8);}.e{background-color:rgba(200,0,0,0.8);}body{color:#fff;background-color:rgba(0,0,0,0.8);}div.container{font-size:1.1em;font-family:sans-serif;font-weight:100;margin:5% 12.5%;width:75%;text-align:center}input[type=text]{display:inline-block;width:72.5%;height:1.5em;padding:6px 2.5%;font-size:14px;line-height:1em;color:#555;background-color:#fff;border:1px solid #000;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}input[type=submit]{background-color:rgba(0,0,0,.5);color:#fff!important;transition:background-color .2s ease-in-out;border:0;border-radius:0;cursor:pointer;display:inline-block;font-family:Helvetica,sans-serif;font-weight:500;height:2.6em;line-height:2.75em;padding:0 1vw;text-align:center;text-decoration:none;text-transform:uppercase;white-space:nowrap}input[type=submit]:hover{background-color:rgba(0,0,0,.9)}</style>
@@ -55,13 +56,14 @@ if (isset($_POST["potential"])) {
 		<!--[if lte IE 8]><h1 style="text-align:center;font-size:2.2em;">Browser Not Supported</h1><h2 style="text-align:center;font-size:1.5em;">Please download a better browser</h2><a href="https://www.google.com/chrome/">Chrome</a> | <a href="https://mozilla.org/firefox/">Firefox</a> | <a href="https://www.opera.com/">Opera</a><div style="display:none"><!--<![endif]-->
 		<div class="container">
 			<?php echo $cont; ?>
-			<form action="<?php echo $_BASE; ?>/betalogin.php" name="beta_form" id="beta_form" method="post">
+			<form action="<?php echo $_BASE; ?>/access.php" name="beta_form" id="beta_form" method="post">
 				<input type="text" placeholder="Beta Key" name="potential" id="potential" /><br /><br />
 				<input type="submit" value="Login" name="do" id="do" />
 			</form>
 		</div>
 
 		<!-- Scripts and Libraries -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js" integrity="sha384-cGoVZug22kU0KaYbL6jI8BRsGIAXIYe00lYKPHCwEqD9gwUjxaOBG3X/4mjG6xau" crossorigin="anonymous"></script>
 		<script type="text/javascript" crossorigin="anonymous" integrity="sha256-ihAoc6M/JPfrIiIeayPE9xjin4UWjsx2mjW/rtmxLM4=" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js_libs/libs.js.php"></script>
 		<script type="text/javascript">
