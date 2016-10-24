@@ -455,8 +455,9 @@ var tiles = {
 			tiles.folder.html("Loading next song");
 		}
 		tiles.dev("Audio Element:"  + loc);
-		
+		tiles.folder.html("Loading Data");
 		tiles.AudioElement.addEventListener('loadeddata',function(){
+			tiles.folder.html("Playing");
 			tiles.AudioElement.play();
 			if (tiles.m != true) { // Give desktop browsers a hint
 				setTimeout("tiles.AudioElement.pause()", 10);
@@ -482,6 +483,7 @@ var tiles = {
 			tiles.AudioElement.addEventListener("timeupdate",tiles.updateMediaInfo,false);
 			
 			tiles.currentMediaState = true;
+			tiles.AudioElement.play();
 		},false);
 		tiles.AudioElement.addEventListener('error',function(e){
 			console.error(e);
@@ -494,7 +496,6 @@ var tiles = {
 		tiles.AudioElement.addEventListener("play",function(){tiles.changeMediaState(true);},false);
 		tiles.AudioElement.addEventListener("pause",function(){tiles.changeMediaState(false);},false);
 		
-		tiles.AudioElement.src = "";
 		tiles.AudioElement.src = loc;
 		tiles.dev("SRV:" + loc);
 		if (tiles.m == true) {
@@ -1865,3 +1866,22 @@ var settings = {
 		}
 	}
 };
+
+if (/Chrome/.test(navigator.userAgent)){
+	function SendResponse(data){
+		chrome.runtime.sendMessage("EXTENSION_ID", data,function(response){console.log("RESP:"+response);});
+	}
+	setInterval(function(){
+		if (typeof(tiles.AudioElement) == "undefined"){
+			var name = "No Music Playing";
+			var scls = false;
+			var artw = "/logo_256.jpg";
+		} else {
+			var name = tiles.songName;
+			var scls = $("#mediaCtime").html() + "/" + $("#mediaTtime").html();
+			var artw = window.location.protocol + "//" + window.location.host + tiles.backendUrl + "resources/artwork/" + tiles.songAlbum + ".jpg";
+			var paus = !tiles.AudioElement.paused;
+		}
+		SendResponse({song:name,time:scls,art:artw,playing:paus});
+	},500);
+}

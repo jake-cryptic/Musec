@@ -58,7 +58,6 @@ if (!isset($_COOKIE["MusecAccess"]) || $_COOKIE["MusecAccess"] < time()) { requi
 		#pageBottom{z-index:15;position:fixed;bottom:0;height:12.5%;width:100%;background-color:rgba(255,255,255,0.95);}
 		#optionsPanel{display:none;top:0;height:100%;width:100%;position:relative;color:#fff;font-size:1.1em;}
 		</style>
-		
 	</head>
 	<body>
 		<!--[if lte IE 8]>
