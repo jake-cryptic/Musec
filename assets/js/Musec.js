@@ -1286,39 +1286,6 @@ var tiles = {
 				$("#mvContainer").css({opacity:0.5});
 			});
 		}
-	},
-	ext:{
-		Listen:function(){
-			var f = chrome.runtime.connect("mjfpmchbcjmomgfbjcfaknigbdjcgjih");
-			f.onMessage(function(freq) {
-				console.assert(freq.name == "MusecFrequency");
-				freq.onMessage.addListener(function(m) {
-					// Do
-					if (m.d == "query") {
-						// Query
-						if (m.q == "NowPlaying"){
-							if (typeof(tiles.AudioElement.paused) == "undefined" || tiles.AudioElement.paused == true){
-								
-							} else {
-								freq.postMessage({data:tiles.songName});
-							}
-						} else if (m.q == "") {
-							
-						}
-					} else if (m.d == "action") {
-						if (m.a == "Play"){
-							
-							freq.postMessage({result:true});
-						} else if (m.a == "Pause") {
-							freq.postMessage({});
-						} else {
-							freq.postMessage({});
-						}
-						
-					}
-				});
-			});
-		}
 	}
 };
 var MusecOffline = {
