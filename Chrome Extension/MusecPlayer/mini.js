@@ -2,30 +2,26 @@ document.addEventListener('DOMContentLoaded', function(){
 	window._musecMini = {
 		d:document.getElementById("text"),
 		ConnectMusec:function(t){
+			console.info("Connected to: " + t);
 			_musecMini.d.innerHTML = "<div id='name'></div><div id='time'></div>";
 			document.getElementById("artwork").style.display = "block";
-			chrome.runtime.onMessageExternal.addListener(function(request,sender,sendResponse){
-				console.log(request);
-				if (request.time == false){
-					_musecMini.UpdateMini(request.song,"","",true);
+			chrome.runtime.onMessageExternal.addListener(function(req,sender,sendResponse){
+				console.log(req);
+				if (req.time == false){
+					_musecMini.UpdateMini(req.song,"","",true,"#fff","#000");
 				} else {
-					_musecMini.UpdateMini(request.song,request.time,request.art,request.playing);
+					_musecMini.UpdateMini(req.song,req.time,req.art,req.playing,req.textColour,req.interfaceColour);
 				}
 			});
 		},
-		UpdateMini:function(song,time,art,playing){
+		UpdateMini:function(song,time,art,playing,tcol,icol){
 			document.getElementById("name").innerHTML = "<h2>"+song+"</h2>";
 			document.getElementById("time").innerHTML = "<h2>"+time+"</h2>";
 			if (art != "" && art != document.getElementById("artimg").src){
 				document.getElementById("artimg").src = art;
 			}
-			if (playing == true){
-				document.body.style.backgroundColor = "#fff";
-				document.body.style.color = "#000";
-			} else {
-				document.body.style.backgroundColor = "#000";
-				document.body.style.color = "#fff";
-			}
+			document.body.style.backgroundColor = icol;
+			document.body.style.color = tcol;
 		}
 	};
 	chrome.tabs.query({url:"*://site.localhost/*"}, function(tabs) {
@@ -33,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			_musecMini.d.innerHTML = "<h1>Connecting...</h1>";
 			_musecMini.ConnectMusec(tabs[0].id);
 		} else if (tabs.length == 0){
-			chrome.tabs.create({url:"http://absolutedouble.co.uk/projects/musec/"});
+			chrome.tabs.create({url:"http://site.localhost/projects/musec/"});
 		} else {
 			_musecMini.d.innerHTML = "Currently, we only support 1 musec instance at a time.";
 		}

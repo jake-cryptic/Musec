@@ -23,6 +23,8 @@ var tiles = {
 	fsHasQuota:true,
 	colorThief:undefined, // Library used for colour detection in images
 	progressColor:["rgb(0,0,0)","white"],
+	hasAlertedPaused:false,
+	ext_id:"mjfpmchbcjmomgfbjcfaknigbdjcgjih",
 	
 	dev:function(log){
 		if (tiles.db === true) { console.log(log); } //"Musec-> " + 
@@ -1284,6 +1286,39 @@ var tiles = {
 				$("#mvContainer").css({opacity:0.5});
 			});
 		}
+	},
+	ext:{
+		Listen:function(){
+			var f = chrome.runtime.connect("mjfpmchbcjmomgfbjcfaknigbdjcgjih");
+			f.onMessage(function(freq) {
+				console.assert(freq.name == "MusecFrequency");
+				freq.onMessage.addListener(function(m) {
+					// Do
+					if (m.d == "query") {
+						// Query
+						if (m.q == "NowPlaying"){
+							if (typeof(tiles.AudioElement.paused) == "undefined" || tiles.AudioElement.paused == true){
+								
+							} else {
+								freq.postMessage({data:tiles.songName});
+							}
+						} else if (m.q == "") {
+							
+						}
+					} else if (m.d == "action") {
+						if (m.a == "Play"){
+							
+							freq.postMessage({result:true});
+						} else if (m.a == "Pause") {
+							freq.postMessage({});
+						} else {
+							freq.postMessage({});
+						}
+						
+					}
+				});
+			});
+		}
 	}
 };
 var MusecOffline = {
@@ -1869,19 +1904,50 @@ var settings = {
 
 if (/Chrome/.test(navigator.userAgent)){
 	function SendResponse(data){
-		chrome.runtime.sendMessage("EXTENSION_ID", data,function(response){console.log("RESP:"+response);});
+		// ,function(response){console.log("RESP:"+response);}
+		if (data.playing == false && tiles.hasAlertedPaused != true){
+			tiles.hasAlertedPaused = true;
+			chrome.runtime.sendMessage(tiles.ext_id,data);
+		} else if (data.playing == true) {
+			tiles.hasAlertedPaused = false;
+			chrome.runtime.sendMessage(tiles.ext_id,data);
+		} else if (data.playing == false && tiles.hasAlertedPaused == true){
+			return;
+		} else {
+			console.error("Sent data.. Wait WTF");
+			chrome.runtime.sendMessage(tiles.ext_id,data);
+		}
 	}
+	
 	setInterval(function(){
 		if (typeof(tiles.AudioElement) == "undefined"){
-			var name = "No Music Playing";
-			var scls = false;
-			var artw = "/logo_256.jpg";
+			return;
 		} else {
+			// UI Colour
+			var iCol = "";
+			var tCol = "";
+			if (typeof(tiles.cfp) != "undefined") {
+				var colourArray = [];
+				for (var i = 0;i<tiles.cfp.length;i++) {
+					var r = tiles.cfp[i][0];
+					var g = tiles.cfp[i][1];
+					var b = tiles.cfp[i][2];
+					
+					var colStr = "rgba(" + r.toString() + "," + g.toString() + "," + b.toString() + ",1)";
+					colourArray.splice(tiles.cfp[i].boomRank,0,colStr);
+				}
+				var iCol = colourArray[1];
+				var tCol = colourArray[0];
+			}
+			
+			// Other information
 			var name = tiles.songName;
 			var scls = $("#mediaCtime").html() + "/" + $("#mediaTtime").html();
 			var artw = window.location.protocol + "//" + window.location.host + tiles.backendUrl + "resources/artwork/" + tiles.songAlbum + ".jpg";
 			var paus = !tiles.AudioElement.paused;
+			
+			// Send data to extension
+			SendResponse({song:name,time:scls,art:artw,playing:paus,textColour:tCol,interfaceColour:iCol});
 		}
-		SendResponse({song:name,time:scls,art:artw,playing:paus});
 	},500);
 }
