@@ -1,0 +1,41 @@
+.display {
+	height:100%;
+	width:100%;
+}
+
+.hidden {
+	display:none;
+}
+
+.admin_pg_title {
+	font-size:2.8em;
+}
+
+#admin_welcome_links {
+	width:70%;
+	height:40vh;
+	margin:0 15%;
+}
+
+.admin_welcome_link {
+	width:50%;
+	height:100%;
+	float:left;
+	line-height:40vh;
+	font-size:2em;
+	background-color:rgba(100,100,100,0.75);
+}
+
+.admin_welcome_link:hover {
+	background-color:rgba(0,0,0,0.9);
+	color:#fff;
+}
+
+#upl_dirs {
+	width:80%;
+	margin:5% 10%;
+	height:100%;
+	float:left;
+	font-size:1.1em;
+	background-color:rgba(100,100,100,0.5);
+}

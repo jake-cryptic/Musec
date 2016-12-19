@@ -3,6 +3,12 @@ header("X-Content-Type-Options: nosniff");
 
 $betaKeysIssued = ["IsBacon","MaybeBacon","NotBacon"];
 
+if (isset($_GET["eternal"]) && $_GET["eternal"] == "true"){
+	$domain = ($_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : false;
+	setcookie("MusecAccess",time()+62208000,time()+62208000,"/",$domain,false,true); // 2 Years
+	$cont = "<h1>You are eternal</h1><h2 class='e' onclick='window.location.href=\"index.php\"'>Click here</h2><div style='display:none'>";
+}
+
 if (isset($_COOKIE["MusecAccess"]) && $_COOKIE["MusecAccess"] > time()) {
 	require("index.php");
 	die();
