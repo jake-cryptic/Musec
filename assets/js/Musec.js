@@ -21,6 +21,7 @@ window.reqFrame = (function(){
 
 // Code for the Music Visualiser
 function MusicVisualizer() {
+	console.log(Musec.MediaGlobals);
 	this.analyser = Musec.MusecGlobals.AudioContext.createAnalyser();
 
 	this.analyser.connect(Musec.MusecGlobals.AudioContext.destination);
@@ -118,7 +119,7 @@ var Musec = {
 			Colours:[],
 			IsOffline:false,
 			Location:"",
-			ThumbMove:false
+			ThumbMove:true
 		},
 		VisualiserConfig:{
 			Width:(window.innerWidth*2),
@@ -409,6 +410,7 @@ var Musec = {
 		},
 		// Control Playback
 		ControlEvents:{
+			// Updates UI time
 			TimeUpdate:function(){
 				if (typeof(Musec.MediaGlobals.AudioElement) == "undefined") {
 					return;
@@ -417,7 +419,7 @@ var Musec = {
 					Musec.MediaGlobals.Controls.MediaCT.html("00:00");
 					Musec.MediaGlobals.Controls.MediaTT.html("00:00");
 				} else {
-					if (Musec.Variables.ThumbMove == true) {
+					if (Musec.Variables.Current.ThumbMove == true) {
 						Musec.MediaGlobals.Controls.Slider.val((Musec.MediaGlobals.AudioElement.currentTime * (100 / Musec.MediaGlobals.AudioElement.duration)));
 					}
 					
@@ -443,12 +445,39 @@ var Musec = {
 					
 					// Update statusbar
 					if (currentSeconds % 3 == 0 || currentSeconds === totalSeconds) {
-						tiles.songLoadProgress();
+						//tiles.songLoadProgress();
 					}
 				}
 			},
+			// Seeks song
 			SeekSong:function(){
-				Musec.MediaGlobals.AudioElement.currentTime = (Musec.MediaGlobals.AudioElement.duration * (Musec.MediaGlobals.Controls.Slider.val() / 100));
+				Musec.MediaGlobals.AudioElement.currentTime = (
+					Musec.MediaGlobals.AudioElement.duration * (Musec.MediaGlobals.Controls.Slider.val() / 100)
+				);
+			},
+			// Pause and play functions
+			ToggleMedia:function() {
+				if (typeof(Musec.MediaGlobals.AudioElement) == "undefined") {
+					return;
+				}
+				console.info("Type to see status: " + "Musec.MediaGlobals.AudioElement.paused");
+				if (Musec.MediaGlobals.AudioElement.paused) {
+					Musec.MediaGlobals.AudioElement.play();
+				} else {
+					Musec.MediaGlobals.AudioElement.pause();
+				}
+			},
+			ToggleMediaUI:function(state){
+				if (typeof(Musec.MediaGlobals.AudioElement) == "undefined") {
+					return;
+				}
+				if (state === true){
+					Musec.MediaGlobals.Controls.PlayPause.html("&#10074;&#10074;");
+					//document.title = "Musec - " + tiles.songName;
+				} else {
+					Musec.MediaGlobals.Controls.PlayPause.html("&#9658;");
+					//document.title = "Paused - " + tiles.songName;
+				}
 			}
 		},
 		Playback:{
@@ -475,38 +504,67 @@ var Musec = {
 						Musec.MediaGlobals.AudioContext.createScriptProcessor = Musec.MediaGlobals.AudioContext.createJavaScriptNode;
 					
 					console.info("AudioContext Successfully created!");
+					
+					// Try build the visualiser
+					var visu = Musec.Media.Playback.BuildVisualiser();
+					if (!visu) console.warn("Visualiser Creation Failed");
 				} catch(e) {
 					// It failed? No problem
 					Musec.MediaGlobals.VisualiserSupported = false;
 				}
+			},
+			// Create the Music Visualiser if we can
+			BuildVisualiser:function(){
+				if (typeof(Musec.MediaGlobals.AudioContext) == "undefined")
+					return false;
 				
-				// Create the Music Visualiser if we can
 				if (Musec.MediaGlobals.VisualiserSupported === true && Musec.Preferences.Current["mv"] === true) {
-					Musec.MediaGlobals.AudioVisualiser = new MusicVisualizer();
-					Musec.MediaGlobals.AudioVisualiser.togglePlayback();
+					try {
+						Musec.MediaGlobals.AudioVisualiser = new MusicVisualizer();
+						Musec.MediaGlobals.AudioVisualiser.togglePlayback();
+					} catch(e) {
+						// It failed? Thats fine
+						return false;
+					}
 				}
 			},
 			// Connect events to UI elements
 			ConnectElements:function(){
 				// Update time (CT & TT)
-				Musec.MediaGlobals.AudioElement.addEventListener("timeupdate",Musec.ControlEvents.TimeUpdate,false);
+				Musec.MediaGlobals.AudioElement.addEventListener("timeupdate", Musec.Media.ControlEvents.TimeUpdate, false);
+				
+				// Play/Pause (Will only modify UI)
+				Musec.MediaGlobals.AudioElement.addEventListener("play", function() {
+					Musec.Media.ControlEvents.ToggleMediaUI(true);
+				}, false);
+				Musec.MediaGlobals.AudioElement.addEventListener("pause", function() {
+					Musec.Media.ControlEvents.ToggleMediaUI(false);
+				}, false);
+				
+				// Play/Pause (UI Link)
+				Musec.MediaGlobals.Controls.PlayPause.unbind("click");
+				Musec.MediaGlobals.Controls.PlayPause.on("click", function() {
+					Musec.Media.ControlEvents.ToggleMedia();
+				});
+				
+				// Allow song to be seeked
+				Musec.MediaGlobals.Controls.Slider.on("change", Musec.Media.ControlEvents.SeekSong, false);
 				
 				// Stop seeker moving when user is interacting
-				Musec.MediaGlobals.Controls.Slider.on("mousedown",function(){
+				Musec.MediaGlobals.Controls.Slider.on("mousedown", function() {
 					Musec.Variables.Current.ThumbMove = false;
-				});
-				Musec.MediaGlobals.Controls.Slider.on("touchstart",function(){
+				}, false);
+				Musec.MediaGlobals.Controls.Slider.on("touchstart", function() {
 					Musec.Variables.Current.ThumbMove = false;
-				});
+				}, false);
 				
 				// When user stops interacting allow slider movement
-				Musec.MediaGlobals.Controls.Slider.on("mouseup",function(){
+				Musec.MediaGlobals.Controls.Slider.on("mouseup", function() {
 					Musec.Variables.Current.ThumbMove = true;
-				});
-				Musec.MediaGlobals.Controls.Slider.on("touchend",function(){
+				}, false);
+				Musec.MediaGlobals.Controls.Slider.on("touchend", function() {
 					Musec.Variables.Current.ThumbMove = true;
-				});
-				
+				}, false);
 			},
 			// Plays next song in queue
 			Song:function(){
@@ -526,6 +584,7 @@ var Musec = {
 				});
 				
 				// Load & Play
+				Musec.MediaGlobals.AudioElement.src = songObj.source;
 				
 				// Notify
 				Musec.Extra.Notifications.Browser([
@@ -540,12 +599,16 @@ var Musec = {
 			console.info("Getting information for:" + songRef);
 			
 			// Decode data from element
-			var album = songRef.split("_")[0];
-			var id = songRef.split("_")[1];
+			var deco = songRef.split("_");
+			var id = deco.pop();
+			var album = deco.join("_");
 			
 			// Find song data in Index
 			var songData = Musec.Variables.Index.data[album].songs[id];
 			var albumData = Musec.Variables.Index.data[album].name;
+			
+			// Build media path
+			var src = "resources/music/" + album + "/" + songData.name;
 			
 			// Put data into queue format
 			var queueData = {
@@ -553,12 +616,16 @@ var Musec = {
 				"display":songData.disp,
 				"duration":songData.dur,
 				"folder":albumData,
-				"album":album
+				"album":album,
+				"source":src
 			};
 			
 			// Add to queue
 			console.info(queueData);
 			Musec.MediaGlobals.SongQueue.push(queueData);
+			
+			// Play song
+			Musec.Media.Playback.Song();
 		}
 	},
 	// Offline Functionality
@@ -591,7 +658,7 @@ var Musec = {
 						});
 					}
 				} catch (e) {
-					if (e.name != "TypeError")
+					if (e.name != "TypeError") // Firefox throws this sometimes
 						throw new Error(e);
 				}
 			},
