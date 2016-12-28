@@ -266,7 +266,7 @@ var Musec = {
 				var keys = Object.keys(Musec.Variables.Index.data);
 				var view = Musec.Core.View.Views.main;
 				
-				Musec.Core.Events.Elements.statusbar.html("Musec");
+				Musec.Core.Events.SetStatusbar("Musec");
 				Musec.Core.View.ChangeView("main");
 				if (keys.length == 0) {
 					view.html("<h2>Couldn't find anything</h2>");
@@ -371,7 +371,7 @@ var Musec = {
 								}).text(Musec.Variables.Index.data[album].songs[data].disp)
 							)
 						)
-					)
+					);
 					Musec.Variables.Index.data[album].songs[data];
 					i++;
 				}
@@ -445,8 +445,36 @@ var Musec = {
 					
 					// Update statusbar
 					if (currentSeconds % 3 == 0 || currentSeconds === totalSeconds) {
-						//tiles.songLoadProgress();
+						Musec.Media.ControlEvents.UILoadProgress();
 					}
+				}
+			},
+			// Song Progress UI indication
+			UILoadProgress:function(){
+				// Check if AudioElement is defined
+				if (typeof(Musec.MediaGlobals.AudioElement) == "undefined" || typeof(Musec.MediaGlobals.AudioElement.duration) == "undefined") {
+					var rawDuration = 0;
+				} else {
+					var rawDuration = Musec.MediaGlobals.AudioElement.duration;
+				}
+				// Get raw buffer
+				try {
+					var rawBuffer = Musec.MediaGlobals.AudioElement.buffered.end(Musec.MediaGlobals.AudioElement.buffered.length - 1);
+				} catch(e) {
+					var rawBuffer = 0;
+				}
+				
+				var percent = Math.round((rawBuffer / rawDuration) * 100);
+				var colours = ["black", "white"];
+				
+				if (isNaN(percent)) {
+					Musec.Core.Events.Elements.statusbar.css({
+						background: "linear-gradient(to right, " + colours[1] + " 0%, " + colours[0]
+					});
+				} else {
+					Musec.Core.Events.Elements.statusbar.css({
+						background: "linear-gradient(to right, " + colours[1] + " " + percent + "%, " + colours[0]
+					});
 				}
 			},
 			// Seeks song
@@ -533,6 +561,12 @@ var Musec = {
 				// Update time (CT & TT)
 				Musec.MediaGlobals.AudioElement.addEventListener("timeupdate", Musec.Media.ControlEvents.TimeUpdate, false);
 				
+				// Error event
+				Musec.MediaGlobals.AudioElement.addEventListener("error", function(e) {
+					console.error(e);
+					alert("Error Loading Data");
+				}, false);
+				
 				// Play/Pause (Will only modify UI)
 				Musec.MediaGlobals.AudioElement.addEventListener("play", function() {
 					Musec.Media.ControlEvents.ToggleMediaUI(true);
@@ -570,6 +604,9 @@ var Musec = {
 			Song:function(){
 				// Check queue
 				var songObj = Musec.MediaGlobals.SongQueue[Musec.MediaGlobals.CurrentID];
+				
+				// Move queue
+				Musec.MediaGlobals.CurrentID++;
 				
 				// Build Elements
 				Musec.Media.Playback.BuildObjects();
