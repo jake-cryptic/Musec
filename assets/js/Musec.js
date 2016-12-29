@@ -258,6 +258,25 @@ var Musec = {
 						break;
 				}
 			},
+			ColourUI:function(album){
+				// Needs work
+				if (typeof(tiles.colorThief) != "undefined" && tiles.enableColourSplash != false) {
+					var imgSrc = $("#tile_id_" + folder + "_bg").css("background-image");
+					var bg_url = /^url\((['"]?)(.*)\1\)$/.exec(imgSrc);
+					bg_url = bg_url ? bg_url[2] : "";
+				} else {
+					bg_url = window.defaultPath + "resources/artwork/" + folder + ".jpg";
+				}
+				try {
+					tiles.cfi = new Image();
+					tiles.cfi.src = bg_url;
+					tiles.cfa = tiles.colorThief.getPalette(tiles.cfi, 5);
+					tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
+					tiles.dev("ColorThief CP - 1");
+				} catch (e) {
+					tiles.cfp = undefined;
+				}
+			},
 			OpenQueue:function(){
 				
 			},
@@ -329,6 +348,7 @@ var Musec = {
 				console.info("Loading songs from album: " + album);
 				Musec.Core.Events.SetStatusbar(Musec.Variables.Index.data[album].name);
 				Musec.Core.View.ChangeView("songs");
+				Musec.Core.View.ColourUI(album);
 				if (keys.length == 0) {
 					view.html("<h2>Couldn't find anything</h2>");
 					return false;
