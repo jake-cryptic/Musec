@@ -112,6 +112,11 @@ var Musec = {
 		NotificationDuration:7500,	// 7.5s
 		Notif:undefined,			// Current notification
 		Index:undefined,			// Music Index (Songs & Albums)
+		// ColourThief is spelt the right way here
+		ColourThief:new ColorThief(),
+		ColourThiefImage:new Image(),
+		ColourThiefPalette:[],
+		ColourThiefProgressUI:[],
 		// Making my life so much easier (not)
 		Current:{
 			Song:"",
@@ -129,7 +134,7 @@ var Musec = {
 			MinimumDecibels:-170,	// -130, -140, -100, -200
 			MaximumDecibels:35, 	// 70, 0, 0, 70
 			Style:"hsl",
-			ColorSplash:undefined
+			ColorSplash:""
 		}
 	},
 	// Functions to assist Core
@@ -260,22 +265,62 @@ var Musec = {
 			},
 			ColourUI:function(album){
 				// Needs work
-				if (typeof(tiles.colorThief) != "undefined" && tiles.enableColourSplash != false) {
-					var imgSrc = $("#tile_id_" + folder + "_bg").css("background-image");
-					var bg_url = /^url\((['"]?)(.*)\1\)$/.exec(imgSrc);
-					bg_url = bg_url ? bg_url[2] : "";
-				} else {
-					bg_url = window.defaultPath + "resources/artwork/" + folder + ".jpg";
+				if (typeof(Musec.Variables.ColourThief) !== "object") {
+					return false;
 				}
+				
+				// Get the colour palette using ColorThief
+				var backgroundSource = Musec.Variables.Path + "resources/artwork/" + album + ".jpg";
+				
 				try {
-					tiles.cfi = new Image();
-					tiles.cfi.src = bg_url;
-					tiles.cfa = tiles.colorThief.getPalette(tiles.cfi, 5);
-					tiles.cfp = tiles.colorThief.markBoomColors(tiles.cfa);
-					tiles.dev("ColorThief CP - 1");
+					Musec.Variables.ColourThiefImage.src = backgroundSource;
+					Musec.Variables.ColourThiefPalette[0] = Musec.Variables.ColourThief.getPalette(Musec.Variables.ColourThiefImage, 5);
+					Musec.Variables.ColourThiefPalette[1] = Musec.Variables.ColourThief.markBoomColors(Musec.Variables.ColourThiefPalette[0]);
 				} catch (e) {
-					tiles.cfp = undefined;
+					return false;
 				}
+				
+				var colourArray = [], totalsArray = [];
+				for (var i = 0; i < Musec.Variables.ColourThiefPalette[1].length; i++) {
+					// Get the RGB values from certain points
+					var r = Musec.Variables.ColourThiefPalette[1][i][0];
+					var g = Musec.Variables.ColourThiefPalette[1][i][1];
+					var b = Musec.Variables.ColourThiefPalette[1][i][2];
+					
+					var totalsStr = r + g + b;
+					var colorsStr = r.toString() + "," + g.toString() + "," + b.toString();
+					
+					colourArray.splice(Musec.Variables.ColourThiefPalette[1][i].boomRank, 0, colorsStr);
+					totalsArray.push(totalsStr);
+				}
+				
+				// Set values
+				Musec.Variables.ColourThiefProgressUI = ["rgb(" + colourArray[2] + ")", "rgb(" + colourArray[1] + ")"];
+				Musec.Variables.VisualiserConfig.ColorSplash = "rgb(" + colourArray[1] + ")";
+				$("#pageTop").css({
+					background: "rgb(" + colourArray[1] + ")"
+				});
+				$("#pageTop").css({
+					color: "rgb(" + colourArray[0] + ")"
+				});
+				$("#pageCenter").css({
+					background: "rgb(" + colourArray[0] + ")"
+				});
+				$("#pageBottom").css({
+					background: "rgb(" + colourArray[1] + ")"
+				});
+				$("#pageBottom").css({
+					color: "rgb(" + colourArray[0] + ")"
+				});
+				$(".song_longclick").css({
+					background: "rgb(" + colourArray[2] + ")"
+				});
+				$(".song_longclick").css({
+					color: "#fff"
+				});
+				$("#folder").css({
+					background: "rgb(" + colourArray[1] + ")"
+				});
 			},
 			OpenQueue:function(){
 				
@@ -440,7 +485,9 @@ var Musec = {
 					Musec.MediaGlobals.Controls.MediaTT.html("00:00");
 				} else {
 					if (Musec.Variables.Current.ThumbMove == true) {
-						Musec.MediaGlobals.Controls.Slider.val((Musec.MediaGlobals.AudioElement.currentTime * (100 / Musec.MediaGlobals.AudioElement.duration)));
+						Musec.MediaGlobals.Controls.Slider.val(
+							parseFloat(Musec.MediaGlobals.AudioElement.currentTime * (100 / Musec.MediaGlobals.AudioElement.duration))
+						);
 					}
 					
 					// Calculate current and total times
@@ -485,7 +532,11 @@ var Musec = {
 				}
 				
 				var percent = Math.round((rawBuffer / rawDuration) * 100);
-				var colours = ["black", "white"];
+				if (Musec.Variables.ColourThiefProgressUI.length == 0) {
+					var colours = ["black", "white"];
+				} else {
+					var colours = Musec.Variables.ColourThiefProgressUI;
+				}
 				
 				if (isNaN(percent)) {
 					Musec.Core.Events.Elements.statusbar.css({
@@ -602,23 +653,17 @@ var Musec = {
 				});
 				
 				// Allow song to be seeked
-				Musec.MediaGlobals.Controls.Slider.on("change", Musec.Media.ControlEvents.SeekSong, false);
+				Musec.MediaGlobals.Controls.Slider.on("change", Musec.Media.ControlEvents.SeekSong);
 				
 				// Stop seeker moving when user is interacting
-				Musec.MediaGlobals.Controls.Slider.on("mousedown", function() {
+				Musec.MediaGlobals.Controls.Slider.on("mousedown touchstart", function() {
 					Musec.Variables.Current.ThumbMove = false;
-				}, false);
-				Musec.MediaGlobals.Controls.Slider.on("touchstart", function() {
-					Musec.Variables.Current.ThumbMove = false;
-				}, false);
+				});
 				
 				// When user stops interacting allow slider movement
-				Musec.MediaGlobals.Controls.Slider.on("mouseup", function() {
+				Musec.MediaGlobals.Controls.Slider.on("mouseup touchend", function() {
 					Musec.Variables.Current.ThumbMove = true;
-				}, false);
-				Musec.MediaGlobals.Controls.Slider.on("touchend", function() {
-					Musec.Variables.Current.ThumbMove = true;
-				}, false);
+				});
 			},
 			// Plays next song in queue
 			Song:function(){
