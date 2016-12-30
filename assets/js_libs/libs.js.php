@@ -8,13 +8,14 @@ $files = [
 	"base64.min.js",
 	"fastclick.js",
 	"chromestore.min.js",
-	"tinycolor.js",
-	"colorthief.js",
+	"tinycolor.min.js",
+	"colorthief.min.js",
 	"json3.min.js",
+	"jquery.color.js",
 	"jquery.longclick-min.js",
 	"notification.js",
 	"pointer_events.js",
-	"visualizer.js",
+	//"visualizer.js",
 	"safe-audio-context.js"
 ];
 

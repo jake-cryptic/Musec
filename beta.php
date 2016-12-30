@@ -37,9 +37,11 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 		</style>
 	</head>
 	<body>
-		<!--[if lte IE 8]>
+		<!--[if lte IE 9]>
 			<h1 style="text-align:center;font-size:2.2em;">Browser Not Supported</h1><h2 style="text-align:center;font-size:1.5em;">Please download a better browser</h2>
-			<a href="https://www.google.com/chrome/">Chrome</a> | <a href="https://mozilla.org/firefox/">Firefox</a> | <a href="https://www.opera.com/">Opera</a><br /><br /><br />
+			<a href="https://www.google.com/chrome/">Chrome</a> | <a href="https://mozilla.org/firefox/">Firefox</a> | <a href="https://www.opera.com/">Opera</a> | <a href="https://www.vivaldi.com/">Vivaldi</a><br /><br />
+			<u>Why is my browser not supported?</u><br />
+			Musec uses many new features which aren't available in older browsers,<br /> for Musec to function on this browser, we would need to re-write a lot of Musec, and we'd rather work on new features.<br /><br /><br />
 			<?php echo $_SERVER["HTTP_USER_AGENT"]; ?><div style="display:none">
 		<!--<![endif]-->
 		<div id="pageTop">
@@ -55,7 +57,7 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 				<canvas id="musicVisualizer"></canvas>
 			</div>
 			<div id="musicFolders">
-				<h1>Loading Content...<br /><progress id="__load" value="4" max="100"></progress></h1>
+				<h1>Loading Musec...<br /><progress id="__load" value="4" max="100"></progress></h1>
 			</div>
 			<div id="songFolder"></div>
 			<div id="queueFolder"></div>
@@ -136,9 +138,9 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 		}
 		var defaultPath = "<?php echo $_BASE; ?>/";
 		</script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js" integrity="sha384-cGoVZug22kU0KaYbL6jI8BRsGIAXIYe00lYKPHCwEqD9gwUjxaOBG3X/4mjG6xau" crossorigin="anonymous"></script>
-		<script type="text/javascript" crossorigin="anonymous" integrity="sha256-ihAoc6M/JPfrIiIeayPE9xjin4UWjsx2mjW/rtmxLM4=" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=28"></script>
-		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js_libs/libs.js.php" onload="document.getElementById('__load').value+=42"></script>
-		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js/Musec.js" onload="document.getElementById('__load').innerHTML+=33" defer></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js" integrity="sha384-cGoVZug22kU0KaYbL6jI8BRsGIAXIYe00lYKPHCwEqD9gwUjxaOBG3X/4mjG6xau" crossorigin="anonymous" onload="document.getElementById('__load').value+=10"></script>
+		<script type="text/javascript" crossorigin="anonymous" integrity="sha256-ihAoc6M/JPfrIiIeayPE9xjin4UWjsx2mjW/rtmxLM4=" src="https://code.jquery.com/jquery-2.2.0.min.js" onload="document.getElementById('__load').value+=24"></script>
+		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js_libs/libs.js.php" onload="document.getElementById('__load').value+=38"></script>
+		<script type="text/javascript" src="<?php echo $_BASE; ?>/assets/js/Musec.js" onload="document.getElementById('__load').innerHTML+=31" defer></script>
 	</body>
 </html>
