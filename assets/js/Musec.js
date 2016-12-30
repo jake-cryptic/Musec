@@ -192,10 +192,10 @@ var Musec = {
 				var TriggerObj = Musec.Core.Events.Elements;
 				
 				TriggerObj.back.click(function(){
-					Musec.Core.View.ChangeView("back");
+					Musec.Core.View.GoBack();
 				});
 				TriggerObj.queue.click(function(){
-					Musec.Core.View.ChangeView("queue");
+					Musec.Core.View.OpenQueue();
 				});
 				TriggerObj.downloads.click(function(){
 					Musec.Core.View.ChangeView("offline");
@@ -225,22 +225,46 @@ var Musec = {
 				"queue":$("#queueFolder"),
 				"offline":$("#offlineFolder")
 			},
-			SetBackState:function(to){
-				if (to !== "main") 
-					Musec.Core.Events.Elements.back.html("<-");
-				else
+			GoBack:function(){
+				if (Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.main.attr("id")) {
+					// Go to settings
+					console.warn("Not implemented");
+				}
+				
+				if (Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.songs.attr("id")) {
 					Musec.Core.Events.Elements.back.html("R");
+					Musec.Core.View.CurrentView = Musec.Core.View.Views.main;
+					Musec.Core.View.BeforeView = Musec.Core.View.Views.songs;
+					Musec.Core.View.BeforeView.hide();
+					Musec.Core.View.CurrentView.show();
+				}
+				
+				if (Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.queue.attr("id") 
+				||  Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.offline.attr("id")) {
+					if (Musec.Core.View.BeforeView.attr("id") === Musec.Core.View.Views.songs.attr("id")){
+						Musec.Core.Events.Elements.back.html("<-");
+						Musec.Core.View.CurrentView = Musec.Core.View.Views.songs;
+						Musec.Core.View.BeforeView = Musec.Core.View.Views.main;
+					} else {
+						Musec.Core.Events.Elements.back.html("R");
+						Musec.Core.View.CurrentView = Musec.Core.View.Views.main;
+						Musec.Core.View.BeforeView = Musec.Core.View.Views.main;
+					}
+					
+					Musec.Core.View.BeforeView.hide();
+					Musec.Core.View.CurrentView.show();
+				}
 			},
 			// Modify the view [string]
 			ChangeView:function(to){
-				if (to === "back") {
-					Musec.Core.View.CurrentView.hide();
-					Musec.Core.View.BeforeView.show();
-					Musec.Core.View.CurrentView = Musec.Core.View.BeforeView;
-					return;
+				console.info("State being set to " + to);
+				
+				if (to !== "main") {
+					Musec.Core.Events.Elements.back.html("<-");
+				} else {
+					Musec.Core.Events.Elements.back.html("R");
 				}
 				Musec.Core.View.BeforeView = Musec.Core.View.CurrentView;
-				Musec.Core.View.SetBackState(to);
 				
 				switch (to){
 					case "main":
@@ -248,19 +272,25 @@ var Musec = {
 						Musec.Core.View.Views.main.html("");
 						Musec.Core.View.BeforeView.hide();
 						Musec.Core.View.CurrentView.show();
-						break;
+					break;
 					case "songs":
 						Musec.Core.View.CurrentView = Musec.Core.View.Views.songs;
 						Musec.Core.View.Views.songs.html("");
 						Musec.Core.View.BeforeView.hide();
 						Musec.Core.View.CurrentView.show();
-						break;
+					break;
 					case "queue":
 						Musec.Core.View.CurrentView = Musec.Core.View.Views.queue;
 						Musec.Core.View.Views.queue.html("");
 						Musec.Core.View.BeforeView.hide();
 						Musec.Core.View.CurrentView.show();
-						break;
+					break;
+					case "offline":
+						Musec.Core.View.CurrentView = Musec.Core.View.Views.offline;
+						Musec.Core.View.Views.offline.html("");
+						Musec.Core.View.BeforeView.hide();
+						Musec.Core.View.CurrentView.show();
+					break;
 				}
 			},
 			ColourUI:function(album){
@@ -323,7 +353,7 @@ var Musec = {
 				});
 			},
 			OpenQueue:function(){
-				
+				Musec.Core.View.ChangeView("queue");
 			},
 			// Create Album Tiles
 			Tiles:function(){
@@ -331,7 +361,7 @@ var Musec = {
 				var view = Musec.Core.View.Views.main;
 				
 				Musec.Core.Events.SetStatusbar("Musec");
-				Musec.Core.View.ChangeView("main");
+				
 				if (keys.length == 0) {
 					view.html("<h2>Couldn't find anything</h2>");
 					return;
@@ -524,6 +554,7 @@ var Musec = {
 				} else {
 					var rawDuration = Musec.MediaGlobals.AudioElement.duration;
 				}
+				
 				// Get raw buffer
 				try {
 					var rawBuffer = Musec.MediaGlobals.AudioElement.buffered.end(Musec.MediaGlobals.AudioElement.buffered.length - 1);
