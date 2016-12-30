@@ -9,11 +9,11 @@
 
 // Cross Browser Support for requestAnimationFrame
 window.reqFrame = (function(){
-	return window.requestAnimationFrame || 
-		window.webkitRequestAnimationFrame || 
-		window.mozRequestAnimationFrame || 
-		window.oRequestAnimationFrame || 
-		window.msRequestAnimationFrame || 
+	return window.requestAnimationFrame 	|| 
+		window.webkitRequestAnimationFrame	|| 
+		window.mozRequestAnimationFrame 	|| 
+		window.oRequestAnimationFrame 		|| 
+		window.msRequestAnimationFrame 		|| 
 		function(callback){
 			window.setTimeout(callback, 10 / 60);
 		};
@@ -114,6 +114,7 @@ var Musec = {
 	Variables:{
 		Path:window.defaultPath != undefined ? window.defaultPath : "/",
 		LoadTime:Math.floor(Date.now() / 1000),
+		IsMobileDevice:false,		// Innocent until proven mobile
 		NotificationDuration:7500,	// 7.5s
 		Notif:undefined,			// Current notification
 		Index:undefined,			// Music Index (Songs & Albums)
@@ -129,11 +130,12 @@ var Musec = {
 			Colours:[],
 			IsOffline:false,
 			Location:"",
-			ThumbMove:true
+			ThumbMove:true,
+			UserTyping:false
 		},
 		VisualiserConfig:{
-			Width:(window.innerWidth*2),
-			Height:(window.innerHeight*2),
+			Width:(window.innerWidth),
+			Height:(window.innerHeight),
 			Smoothing:0.69,
 			fftSize:512,			// Adjustable
 			MinimumDecibels:-170,	// -130, -140, -100, -200
@@ -149,17 +151,17 @@ var Musec = {
 			return !isNaN(parseFloat(n)) && isFinite(n);
 		},
 		// Captialise society.. I mean strings
-		capitalise: function(t){
+		Capitalise: function(t){
 			return t.replace(/\w\S*/g,function(s){
 				return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();
 			});
 		},
 		// Check browser
-		compatibility: function(){
-			if (/Chrome|Opera|BB10|Firefox|Vivaldi/.test(navigator.userAgent)) 
-				return true;
-			else
-				return false;
+		Compatibility: function(){
+			if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ||
+				/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4)))
+				Musec.Variables.IsMobileDevice = true;
+			
 		}
 	},
 	// Musec's Core functionality
@@ -187,19 +189,26 @@ var Musec = {
 				"search":$("#search"),
 				"queue":$("#queue"),
 				"downloads":$("#down"),
-				"statusbar":$("#folder")
+				"statusbar":$("#folder"),
+				"musicvisualiser":$("#mvContainer")
 			},
 			// When the window loads
 			Start:function(){
-				Musec.Core.Events.UI();
-				Musec.Core.View.ChangeView("main");
-				Musec.Core.Network.LoadIndex(Musec.Core.View.Tiles);
-				Musec.Core.Events.SetStatusbar("");
+				Musec.Helpers.Compatibility();							// Check what we are using
+				Musec.Core.Events.UI();									// Assign UI Events
+				Musec.Core.View.ChangeView("main");						// Set main page
+				Musec.Core.Network.LoadIndex(Musec.Core.View.Tiles);	// Load the index
+				Musec.Core.Events.SetStatusbar("");						// Clear the status bar
+				Musec.Extra.RequestPermission();						// Request permission for Notifications
 			},
 			// Assign UI Events
 			UI:function(){
+				// UI Events
 				var TriggerObj = Musec.Core.Events.Elements;
 				
+				TriggerObj.musicvisualiser.click(function(event) {
+					event.preventDefault();
+				});
 				TriggerObj.back.click(function(){
 					Musec.Core.View.GoBack();
 				});
@@ -210,6 +219,19 @@ var Musec = {
 					Musec.Core.View.ChangeView("offline");
 				});
 				TriggerObj.search.click(Musec.Core.View.SearchBar);
+				
+				// Window events (keyboard shortcuts & music visualiser)
+				$(window).resize(function() {
+					Musec.Variables.VisualiserConfig.Width = (window.innerWidth * 2);
+					Musec.Variables.VisualiserConfig.Height = (window.innerHeight * 2);
+				});
+				$(window).keydown(Musec.Extra.KeyboardEvent);
+				
+				// Polyfills
+				$(function() {
+					FastClick.attach(document.body);
+				});
+				PointerEventsPolyfill.initialize({});
 			},
 			// Sets the statusbar text
 			SetStatusbar:function(text){
@@ -840,6 +862,18 @@ var Musec = {
 	},
 	// Extra functionality
 	Extra:{
+		RequestPermission:function() {
+			if (!("Notification" in window)) {
+				console.warn("No Notification Support");
+			} else if (Notification.permission !== 'denied') {
+				Notification.requestPermission(function(permission) {
+					if (permission === "granted")
+						console.info("Notification Permission Granted");
+					else
+						console.warn("Notification Permission Denied");
+				});
+			}
+		},
 		Notifications:{
 			// Browser Notifications [Title,Message,Icon]
 			Browser:function(info){
@@ -877,6 +911,38 @@ var Musec = {
 				setTimeout(function() {
 					$("#sAlert").fadeOut(info[2]);
 				},info[2]*3);
+			}
+		},
+		KeyboardEvent:function(event) {
+			if (Musec.Variables.Current.UserTyping === true || Musec.Variables.IsMobileDevice === true) {
+				return true;
+			}
+			
+			console.log("Key Pressed:" + event.keyCode);
+			
+			switch (event.keyCode) {
+				case 8: 					// Backspace
+					event.preventDefault();
+					Musec.Core.View.GoBack();
+					break;
+				case 32:					 // Space bar
+					Musec.Media.ControlEvents.ToggleMedia();
+					break;
+				case 81: 					// Letter Q
+					Musec.Variables.VisualiserConfig.fftSize = 256;
+					break;
+				case 87: 					// Letter W
+					Musec.Variables.VisualiserConfig.fftSize = 512;
+					break;
+				case 69: 					// Letter E
+					Musec.Variables.VisualiserConfig.fftSize = 1024;
+					break;
+				case 82: 					// Letter R
+					Musec.Variables.VisualiserConfig.fftSize = 2048;
+					break;
+				default:					// Unknown key
+					console.warn("No action taken for key");
+					break;
 			}
 		}
 	},
