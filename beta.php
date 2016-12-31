@@ -9,6 +9,28 @@ function getBase($path) {
 $_BASE = getBase($_SERVER["PHP_SELF"]);
 ?>
 <!DOCTYPE HTML>
+<!--
+	Musec v2-Build 1
+	
+	This project uses many libraries, time to give credit where credit is due.
+	
+	Credits:
+		JQuery: 			https://jquery.com/
+		JQuery Color:		https://github.com/jquery/jquery-color
+		JQuery Longclick:	https://github.com/pisi/Longclick
+		ChromeStore: 		https://github.com/summera/chromestore.js
+		ColorThief:			https://github.com/lokesh/color-thief
+		ColorThief Helper:	https://gist.github.com/Pluto1010/f26beed7fdebfb2e2110
+		Fastclick:			https://github.com/ftlabs/fastclick
+		TinyColor:			https://github.com/bgrins/TinyColor
+		PointerEvents:		https://github.com/kmewhort/pointer_events_polyfill
+		NotificationJS:		http://adodson.com/notification.js
+		JSON3:				https://bestiejs.github.io/json3
+		iOS SAC:			https://github.com/Jam3/ios-safe-audio-context/
+		Material Icons: 	https://github.com/google/material-design-icons
+	
+	Why re-invent the wheel?
+-->
 <html lang="en" dir="ltr">
 	<head>
 		
@@ -85,7 +107,6 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 			<div id="options">
 				<h1>Musec Panel</h1>
 				<button class="oButton" onclick="tiles.togglePanel()">Close</button> |
-				<button class="oButton" onclick="tiles.fix()">Clean</button> |
 				<button class="oButton" onclick="settings.resetSettings()">Reset</button><br />
 				
 				<h2 aria-label="Change musec settings">Preferences</h2>
