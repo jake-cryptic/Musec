@@ -172,7 +172,7 @@ var Musec = {
 	Core:{
 		// Network Functions
 		Network:{
-			LoadIndex:function(callback){
+			LoadIndex:function(callback,attempt){
 				Musec.Core.View.Views.main.html("<h1>Loading Index...</h1>");
 				
 				// Loads the Musec Index via AJAX
@@ -181,7 +181,27 @@ var Musec = {
 					Musec.Core.View.Views.main.html("");
 					callback(true);
 				}).fail(function() {
-					callback(false);
+					if (attempt !== 6){
+						var msg = "Connection Attempt " + attempt;
+					} else {
+						Musec.Extra.SmartAlert({
+							"icon":"cross.svg",
+							"message":"Failed to load",
+							"duration":"show"
+						});
+						alert("5 Connection attempts have failed\nPlease refresh the page");
+						return;
+					}
+					Musec.Extra.SmartAlert({
+						"icon":"loader.gif",
+						"message":msg,
+						"duration":"show"
+					});
+					
+					attempt++;
+					setTimeout(function(){
+						Musec.Core.Network.LoadIndex(callback,attempt);
+					},3000);
 				});
 			}
 		},
@@ -201,9 +221,10 @@ var Musec = {
 				Musec.Helpers.Compatibility();							// Check what we are using
 				Musec.Core.Events.UI();									// Assign UI Events
 				Musec.Core.View.ChangeView("main");						// Set main page
-				Musec.Core.Network.LoadIndex(Musec.Core.View.Tiles);	// Load the index
+				Musec.Core.Network.LoadIndex(Musec.Core.View.Tiles,1);	// Load the index
 				Musec.Core.Events.SetStatusbar("");						// Clear the status bar
 				Musec.Extra.RequestPermission();						// Request permission for Notifications
+				document.title = "Musec";
 			},
 			// Assign UI Events
 			UI:function(){
@@ -220,7 +241,7 @@ var Musec = {
 					Musec.Core.Queue.Open();
 				});
 				TriggerObj.downloads.click(function(){
-					Musec.Core.View.ChangeView("offline");
+					Musec.Offline.Open();
 				});
 				TriggerObj.search.click(Musec.Core.View.SearchBar);
 				
@@ -285,6 +306,12 @@ var Musec = {
 						Musec.Core.View.CurrentView = Musec.Core.View.Views.main;
 						Musec.Core.View.BeforeView = Musec.Core.View.Views.main;
 					}
+					
+					// Hide queue and offline folder
+					if (Musec.Core.View.Views.queue.is(":visible"))
+						Musec.Core.View.Views.queue.hide();
+					if (Musec.Core.View.Views.offline.is(":visible"))
+						Musec.Core.View.Views.offline.hide();
 					
 					Musec.Core.View.BeforeView.hide();
 					Musec.Core.View.CurrentView.show();
@@ -388,7 +415,14 @@ var Musec = {
 			},
 			// Create Album Tiles
 			Tiles:function(x){
-				if (!x) alert("Musec failed to load fully");
+				if (x === true){
+					Musec.Extra.SmartAlert({
+						"icon":"loader.gif",
+						"message":"Connected",
+						"duration":"hide"
+					});
+				}
+				
 				var keys = Object.keys(Musec.Variables.Index.data);
 				var view = Musec.Core.View.Views.main;
 				
@@ -457,9 +491,9 @@ var Musec = {
 				
 				var cont = '<div class="tile_table">\
 					<div class="tileTrow tileTitle">' + title + '</div>\
-					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.Action(\'' + album + '\',\'opn\')">Open Folder</div>\
-					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.Action(\'' + album + '\',\'add\')">Add all to queue</div>\
-					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.Action(\'' + album + '\',\'fav\')">Add to favourites</div>\
+					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.TileMenuAction(\'' + album + '\',\'opn\',' + tileID + ')">Open Folder</div>\
+					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.TileMenuAction(\'' + album + '\',\'add\',' + tileID + ')">Add all to queue</div>\
+					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.TileMenuAction(\'' + album + '\',\'fav\',' + tileID + ')">Add to favourites</div>\
 				</div>';
 				
 				contentElem.html(cont);
@@ -470,7 +504,11 @@ var Musec = {
 			// Display songs [HTML Element]
 			Songs:function(elem){
 				// I'm so sorry, this is gonna get messy
-				var album = $(elem).parent().data("album");
+				if (typeof(elem) === "string") {
+					var album = elem;
+				} else {
+					var album = $(elem).parent().data("album");
+				}
 				var keys = Object.keys(Musec.Variables.Index.data[album].songs);
 				var view = Musec.Core.View.Views.songs;
 				var i = 0;
@@ -489,7 +527,7 @@ var Musec = {
 					<thead>\
 						<tr>\
 							<th>\
-								<button onclick='' class='acircle'>Add all to Queue</button>\
+								<button onclick='Musec.Core.Queue.AddAlbumToQueue(\"" + album + "\")' class='acircle'>Add all to Queue</button>\
 							</th>\
 						</tr>\
 					</thead>\
@@ -572,7 +610,7 @@ var Musec = {
 					$("#queue_list").html("<tr><td colspan=\"2\">" + queueActions + "</td></tr>");
 					for (var i = 0; i < (Musec.MediaGlobals.SongQueue.length); i++) {
 						console.log(Musec.MediaGlobals.SongQueue[i]);
-						console.log("Parsing queue data for song id " + i + " which is " + Musec.MediaGlobals.SongQueue[i]);
+						console.log("Parsing queue data for song id " + i + " which is " + Musec.MediaGlobals.SongQueue[i].name);
 						
 						// Move up, Play next, Play now, Remove, Move down, Repeat?
 						queueCtrls = "<span class='clickable' onclick=\"tiles.alterQueue('delete'," + i + ")\">Remove</span>";
@@ -585,7 +623,7 @@ var Musec = {
 						}
 						
 						sB = "<tr class='" + stat + " draggable_qro'>\
-							<td class='clickable qro_button' onclick='tiles.goToSong(" + i + ")'>" + Musec.MediaGlobals.SongQueue[i].display + "</td>\
+							<td class='clickable qro_button' onclick='Musec.Core.Queue.GoToPosition(" + i + ")'>" + Musec.MediaGlobals.SongQueue[i].display + "</td>\
 							<td>" + queueCtrls + "</td>\
 						</tr>";
 
@@ -632,15 +670,63 @@ var Musec = {
 				} else {
 					alert("Error: Not Implemented");
 				}
+				
+				Musec.Core.Queue.Reload();
 			},
-			TileMenuAction:function(album,action) {
-				console.log(album + " - " + action);
+			TileMenuAction:function(album,action,tileID) {
+				if (action === "add") {
+					// Add album to queue
+					Musec.Core.Queue.AddAlbumToQueue(album);
+				} else if (action === "fav") {
+					// Favourite album (soon)
+					alert("Coming soon");
+				} else {
+					// Open album
+					$(".tile_bg").removeClass("blur");
+					$("#tile_id_" + tileID + "_content").fadeOut(500);
+					Musec.Variables.CurrentTile = undefined;
+					
+					Musec.Core.View.Songs(album);
+				}
 			},
 			// Clears section of queue
 			Clean:function(at) {
 				if (at === 0) {
 					// Entire queue
-					alert("Not implemented");
+					if (typeof(Musec.MediaGlobals.AudioElement) != "undefined") {
+						Musec.MediaGlobals.AudioElement.pause();
+					}
+					var yeah = confirm("Are you sure you wish to continue?");
+					if (yeah == true) {
+						if (typeof(Musec.Variables.ColorThief) == "undefined") {
+							var coloursProgess = ["rgb(0,0,0)", "white"];
+						} else {
+							var coloursProgess = Musec.Variables.ColourThiefProgressUI;
+						}
+						Musec.Core.Events.Elements.statusbar.css({
+							background: coloursProgess[1]
+						});
+						Musec.Media.ControlEvents.ToggleMediaUI(false);
+						Musec.MediaGlobals.AudioElement = undefined;
+						Musec.MediaGlobals.AudioContext = undefined;
+
+						Musec.MediaGlobals.SongQueue = [];
+						Musec.MediaGlobals.CurrentID = 1;
+						Musec.Core.Events.SetStatusbar("Musec");
+						localStorage.removeItem("LastQueue");
+
+						Musec.Core.Queue.Reload();
+						Musec.Extra.SmartAlert({
+							"icon":"cross.svg",
+							"message":"Cleared",
+							"duration":200
+						});
+					} else {
+						if (typeof(Musec.MediaGlobals.AudioElement) != "undefined") {
+							Musec.MediaGlobals.AudioElement.play();
+						}
+						return;
+					}
 				} else {
 					// Queue history
 					if (Musec.MediaGlobals.SongQueue.length == 0 || Musec.MediaGlobals.CurrentID == 0) {
@@ -649,18 +735,59 @@ var Musec = {
 					}
 					
 					var newQueue = [];
-
-					for (var i = Musec.MediaGlobals.CurrentID; i < Musec.MediaGlobals.SongQueue.length; i++) {
+					
+					for (var i = (Musec.MediaGlobals.CurrentID - 1); i < Musec.MediaGlobals.SongQueue.length; i++) {
 						newQueue.push(Musec.MediaGlobals.SongQueue[i]);
 					}
 					console.log(Musec.MediaGlobals.SongQueue);
 					console.log(newQueue);
-
+					
 					Musec.MediaGlobals.SongQueue = newQueue;
-					Musec.MediaGlobals.CurrentID = 0;
-
+					Musec.MediaGlobals.CurrentID = 1;
+					
 					Musec.Core.Queue.Reload();
 				}
+			},
+			// Goes to a song in the queue
+			GoToPosition:function(id) {
+				Musec.MediaGlobals.CurrentID = id;
+				Musec.Media.Playback.Song();
+				Musec.Core.Queue.Reload();
+			},
+			AddAlbumToQueue:function(album) {
+				console.info("Adding all songs from " + album + " to the queue");
+				
+				var songData = Musec.Variables.Index.data[album].songs;
+				var albumData = Musec.Variables.Index.data[album].name;
+				
+				for (var i = 0; i < (songData.length); i++) {
+					// Build media path
+					var src = "resources/music/" + album + "/" + songData[i].name;
+					
+					// Put data into queue format
+					var queueData = {
+						"name":songData[i].name,
+						"display":songData[i].disp,
+						"duration":songData[i].dur,
+						"folder":albumData,
+						"album":album,
+						"source":src
+					};
+					
+					// Add to queue
+					console.info(queueData);
+					Musec.MediaGlobals.SongQueue.push(queueData);
+				}
+				
+				// Alert the user
+				var songs = (i === 1) ? "song" : "songs";
+				var msg = "Added " + i + " " + songs;
+				
+				Musec.Extra.SmartAlert({
+					"icon":"plus.svg",
+					"message":msg,
+					"duration":250
+				});
 			}
 		}
 	},
@@ -759,7 +886,12 @@ var Musec = {
 				}
 			},
 			// Seeks song
-			SeekSong:function(){
+			SeekSong:function() {
+				if (typeof(Musec.MediaGlobals.AudioElement) == "undefined"
+				||	typeof(Musec.MediaGlobals.AudioElement.duration) == "undefined"
+				|| 	!Musec.Helpers.isNumeric(Musec.MediaGlobals.AudioElement.duration)) {
+					return;
+				}
 				Musec.MediaGlobals.AudioElement.currentTime = (
 					Musec.MediaGlobals.AudioElement.duration * (Musec.MediaGlobals.Controls.Slider.val() / 100)
 				);
@@ -944,7 +1076,9 @@ var Musec = {
 	},
 	// Offline Functionality
 	Offline:{
-		
+		Open:function() {
+			Musec.Core.View.ChangeView("offline");	
+		}
 	},
 	// Extra functionality
 	Extra:{
@@ -999,9 +1133,25 @@ var Musec = {
 				},info[2]*3);
 			}
 		},
-		//
-		SmartAlert:function() {
+		// A more controllable alert function
+		SmartAlert:function(data) {
+			console.info("Alerted " + data.message);
 			
+			$("#sAlertImg").attr("src", window.defaultPath + "assets/img/i/" + data.icon);
+			$("#sAlertTxt").html(data.message);
+			
+			if (Musec.Helpers.isNumeric(data.duration)) {
+				$("#sAlert").fadeIn(data.duration);
+				$("#sAlert").delay(data.duration * 3).fadeOut(data.duration);
+			} else {
+				if (data.duration === "show" && !$("#sAlert").is(":visible")) {
+					$("#sAlert").fadeIn(250);
+				} else if (data.duration === "hide") {
+					$("#sAlert").fadeOut(250);
+				} else {
+					return;
+				}
+			}
 		},
 		KeyboardEvent:function(event) {
 			if (Musec.Variables.Current.UserTyping === true || Musec.Variables.IsMobileDevice === true) {
@@ -1044,4 +1194,5 @@ var Musec = {
 	}
 }
 
-$(document).ready(Musec.Core.Events.Start);
+// Let us begin
+$(window).ready(Musec.Core.Events.Start);
