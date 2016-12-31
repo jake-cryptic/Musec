@@ -736,30 +736,19 @@ var Musec = {
 					
 					var newQueue = [];
 					
-<<<<<<< HEAD
 					for (var i = (Musec.MediaGlobals.CurrentID - 1); i < Musec.MediaGlobals.SongQueue.length; i++) {
-=======
-					for (var i = Musec.MediaGlobals.CurrentID; i < Musec.MediaGlobals.SongQueue.length; i++) {
->>>>>>> 787a19e0f41d83fcd7cad243afe44481ef655c6f
 						newQueue.push(Musec.MediaGlobals.SongQueue[i]);
 					}
 					console.log(Musec.MediaGlobals.SongQueue);
 					console.log(newQueue);
 					
 					Musec.MediaGlobals.SongQueue = newQueue;
-<<<<<<< HEAD
 					Musec.MediaGlobals.CurrentID = 1;
-=======
-					Musec.MediaGlobals.CurrentID = 0;
->>>>>>> 787a19e0f41d83fcd7cad243afe44481ef655c6f
 					
 					Musec.Core.Queue.Reload();
 				}
 			},
-<<<<<<< HEAD
 			// Goes to a song in the queue
-=======
->>>>>>> 787a19e0f41d83fcd7cad243afe44481ef655c6f
 			GoToPosition:function(id) {
 				Musec.MediaGlobals.CurrentID = id;
 				Musec.Media.Playback.Song();
@@ -789,7 +778,6 @@ var Musec = {
 					console.info(queueData);
 					Musec.MediaGlobals.SongQueue.push(queueData);
 				}
-<<<<<<< HEAD
 				
 				// Alert the user
 				var songs = (i === 1) ? "song" : "songs";
@@ -800,8 +788,6 @@ var Musec = {
 					"message":msg,
 					"duration":250
 				});
-=======
->>>>>>> 787a19e0f41d83fcd7cad243afe44481ef655c6f
 			}
 		}
 	},
@@ -1208,9 +1194,5 @@ var Musec = {
 	}
 }
 
-<<<<<<< HEAD
 // Let us begin
 $(window).ready(Musec.Core.Events.Start);
-=======
-$(document).ready(Musec.Core.Events.Start);
->>>>>>> 787a19e0f41d83fcd7cad243afe44481ef655c6f
