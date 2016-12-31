@@ -204,6 +204,7 @@ var Musec = {
 				Musec.Core.Network.LoadIndex(Musec.Core.View.Tiles);	// Load the index
 				Musec.Core.Events.SetStatusbar("");						// Clear the status bar
 				Musec.Extra.RequestPermission();						// Request permission for Notifications
+				document.title = "Musec";
 			},
 			// Assign UI Events
 			UI:function(){
@@ -457,9 +458,9 @@ var Musec = {
 				
 				var cont = '<div class="tile_table">\
 					<div class="tileTrow tileTitle">' + title + '</div>\
-					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.Action(\'' + album + '\',\'opn\')">Open Folder</div>\
-					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.Action(\'' + album + '\',\'add\')">Add all to queue</div>\
-					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.Action(\'' + album + '\',\'fav\')">Add to favourites</div>\
+					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.TileMenuAction(\'' + album + '\',\'opn\',' + tileID + ')">Open Folder</div>\
+					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.TileMenuAction(\'' + album + '\',\'add\',' + tileID + ')">Add all to queue</div>\
+					<div class="tileTrow tileAct" onclick="Musec.Core.Queue.TileMenuAction(\'' + album + '\',\'fav\',' + tileID + ')">Add to favourites</div>\
 				</div>';
 				
 				contentElem.html(cont);
@@ -470,7 +471,11 @@ var Musec = {
 			// Display songs [HTML Element]
 			Songs:function(elem){
 				// I'm so sorry, this is gonna get messy
-				var album = $(elem).parent().data("album");
+				if (typeof(elem) === "string") {
+					var album = elem;
+				} else {
+					var album = $(elem).parent().data("album");
+				}
 				var keys = Object.keys(Musec.Variables.Index.data[album].songs);
 				var view = Musec.Core.View.Views.songs;
 				var i = 0;
@@ -572,7 +577,7 @@ var Musec = {
 					$("#queue_list").html("<tr><td colspan=\"2\">" + queueActions + "</td></tr>");
 					for (var i = 0; i < (Musec.MediaGlobals.SongQueue.length); i++) {
 						console.log(Musec.MediaGlobals.SongQueue[i]);
-						console.log("Parsing queue data for song id " + i + " which is " + Musec.MediaGlobals.SongQueue[i]);
+						console.log("Parsing queue data for song id " + i + " which is " + Musec.MediaGlobals.SongQueue[i].name);
 						
 						// Move up, Play next, Play now, Remove, Move down, Repeat?
 						queueCtrls = "<span class='clickable' onclick=\"tiles.alterQueue('delete'," + i + ")\">Remove</span>";
@@ -585,7 +590,7 @@ var Musec = {
 						}
 						
 						sB = "<tr class='" + stat + " draggable_qro'>\
-							<td class='clickable qro_button' onclick='tiles.goToSong(" + i + ")'>" + Musec.MediaGlobals.SongQueue[i].display + "</td>\
+							<td class='clickable qro_button' onclick='Musec.Core.Queue.GoToPosition(" + i + ")'>" + Musec.MediaGlobals.SongQueue[i].display + "</td>\
 							<td>" + queueCtrls + "</td>\
 						</tr>";
 
@@ -632,9 +637,24 @@ var Musec = {
 				} else {
 					alert("Error: Not Implemented");
 				}
+				
+				Musec.Core.Queue.Reload();
 			},
-			TileMenuAction:function(album,action) {
-				console.log(album + " - " + action);
+			TileMenuAction:function(album,action,tileID) {
+				if (action === "add") {
+					// Add album to queue
+					Musec.Core.Queue.AddAlbumToQueue(album);
+				} else if (action === "fav") {
+					// Favourite album (soon)
+					alert("Coming soon");
+				} else {
+					// Open album
+					$(".tile_bg").removeClass("blur");
+					$("#tile_id_" + tileID + "_content").fadeOut(500);
+					Musec.Variables.CurrentTile = undefined;
+					
+					Musec.Core.View.Songs(album);
+				}
 			},
 			// Clears section of queue
 			Clean:function(at) {
@@ -649,17 +669,47 @@ var Musec = {
 					}
 					
 					var newQueue = [];
-
+					
 					for (var i = Musec.MediaGlobals.CurrentID; i < Musec.MediaGlobals.SongQueue.length; i++) {
 						newQueue.push(Musec.MediaGlobals.SongQueue[i]);
 					}
 					console.log(Musec.MediaGlobals.SongQueue);
 					console.log(newQueue);
-
+					
 					Musec.MediaGlobals.SongQueue = newQueue;
 					Musec.MediaGlobals.CurrentID = 0;
-
+					
 					Musec.Core.Queue.Reload();
+				}
+			},
+			GoToPosition:function(id) {
+				Musec.MediaGlobals.CurrentID = id;
+				Musec.Media.Playback.Song();
+				Musec.Core.Queue.Reload();
+			},
+			AddAlbumToQueue:function(album) {
+				console.info("Adding all songs from " + album + " to the queue");
+				
+				var songData = Musec.Variables.Index.data[album].songs;
+				var albumData = Musec.Variables.Index.data[album].name;
+				
+				for (var i = 0; i < (songData.length); i++) {
+					// Build media path
+					var src = "resources/music/" + album + "/" + songData[i].name;
+					
+					// Put data into queue format
+					var queueData = {
+						"name":songData[i].name,
+						"display":songData[i].disp,
+						"duration":songData[i].dur,
+						"folder":albumData,
+						"album":album,
+						"source":src
+					};
+					
+					// Add to queue
+					console.info(queueData);
+					Musec.MediaGlobals.SongQueue.push(queueData);
 				}
 			}
 		}
