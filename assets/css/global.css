@@ -239,6 +239,9 @@ input[type=range]::-ms-thumb {
 	width:100%;
 	word-wrap:break-word;
 }
+.song_ctrl_hidden {
+	display:none;
+}
 .queueCurrentSong {
 	background-color:rgba(0,0,0,0.5);
 }
@@ -256,6 +259,9 @@ input[type=range]::-ms-thumb {
 }
 .bcircle,.fullWidthButton {
 	margin-top:10px;
+}
+.bcircle {
+	margin:0 2.5px;
 }
 .bcircle:active {
 	-webkit-animation:bounce .3s infinite alternate;

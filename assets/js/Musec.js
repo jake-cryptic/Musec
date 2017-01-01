@@ -389,25 +389,19 @@ var Musec = {
 				Musec.Variables.ColourThiefProgressUI = ["rgb(" + colourArray[2] + ")", "rgb(" + colourArray[1] + ")"];
 				Musec.Variables.VisualiserConfig.ColorSplash = "rgb(" + colourArray[1] + ")";
 				$("#pageTop").css({
+					color: "rgb(" + colourArray[0] + ")",
 					background: "rgb(" + colourArray[1] + ")"
-				});
-				$("#pageTop").css({
-					color: "rgb(" + colourArray[0] + ")"
 				});
 				$("#pageCenter").css({
 					background: "rgb(" + colourArray[0] + ")"
 				});
 				$("#pageBottom").css({
+					color: "rgb(" + colourArray[0] + ")",
 					background: "rgb(" + colourArray[1] + ")"
 				});
-				$("#pageBottom").css({
-					color: "rgb(" + colourArray[0] + ")"
-				});
 				$(".song_longclick").css({
+					color: "#fff",
 					background: "rgb(" + colourArray[2] + ")"
-				});
-				$(".song_longclick").css({
-					color: "#fff"
 				});
 				$("#folder").css({
 					background: "rgb(" + colourArray[1] + ")"
@@ -501,9 +495,54 @@ var Musec = {
 				Musec.Variables.CurrentTile = elem;
 				console.log("Tile ID: " + tileID);
 			},
+			// Show song menu
+			SongMenu:function(elem) {
+				$(".song_ctrl_active").addClass("song_ctrl_hidden");
+				$(".song_ctrl_active").removeClass("song_ctrl_active");
+				
+				if (Musec.Variables.CurrentSongMenu === elem.id) {
+					Musec.Variables.CurrentSongMenu = undefined;
+					return;
+				}
+				
+				$("#" + elem.id + "_controls").addClass("song_ctrl_active");
+				$("#" + elem.id + "_controls").removeClass("song_ctrl_hidden");
+				
+				Musec.Variables.CurrentSongMenu = elem.id;
+				console.log("Showing song menu for " + elem.id);
+			},
+			// Completes actions
+			SongMenuAction:function(action,songRef) {
+				
+				// Decode data from element
+				var deco = songRef.split("_");
+				var id = deco.pop();
+				var album = deco.join("_");
+				
+				// Find song data in Index
+				var songData = Musec.Variables.Index.data[album].songs[id];
+				var albumData = Musec.Variables.Index.data[album].name;
+				
+				// Build media path
+				var src = "resources/music/" + album + "/" + songData.name;
+				
+				// Put data into queue format
+				var queueData = {
+					"name":songData.name,
+					"display":songData.disp,
+					"duration":songData.dur,
+					"folder":albumData,
+					"album":album,
+					"source":src
+				};
+				
+				// Add to queue
+				console.info(queueData);
+				Musec.MediaGlobals.SongQueue.push(queueData);
+			},
 			// Display songs [HTML Element]
 			Songs:function(elem){
-				// I'm so sorry, this is gonna get messy
+				// I'm so sorry, this is gonna get messy, VERY messy
 				if (typeof(elem) === "string") {
 					var album = elem;
 				} else {
@@ -537,7 +576,12 @@ var Musec = {
 				// Populate table and assign events
 				Musec.Core.View.Views.songs.html(song_list_html);
 				for (data in Musec.Variables.Index.data[album].songs){
+					var cClass = /iPhone|iPod/.test(navigator.userAgent) ? "fullWidthButton" : "bcircle";
 					var reference = album + "_" + i;
+					
+				//if (tiles.supportsFS) {
+				//	newContent += " <button class='bcircle' onclick='tiles.makeAvailableOffline(\"" + song_id + "\");'>Download</button></td>";
+				//}
 					$("#songs_list").append(
 						$("<tr/>",{
 							"class":"song_longclick",
@@ -552,12 +596,48 @@ var Musec = {
 							Musec.Media.SongClick(event.currentTarget);
 						}).append(
 							$("<td/>",{
-								"id":"song_row_inner_" + i
+								"id":"song_row_" + i + "_inner"
 							}).append(
 								$("<span/>",{
-									"id":"song_row_name_" + i,
+									"id":"song_row_" + i + "_text",
 									"class":"__song_AllowSearch song_lc_name"
-								}).text(Musec.Variables.Index.data[album].songs[data].disp)
+								}).text(Musec.Variables.Index.data[album].songs[data].disp),
+								
+								// Control section
+								$("<span/>",{
+									"id":"song_row_" + i + "_controls",
+									"class":"song_ctrl_hidden"
+								}).append(
+									// Song controls
+									$("<br/>"),
+									
+									// Play next button
+									$("<button/>",{
+										"class":cClass
+									}).text(
+										"Play Next"
+									).click(function(){
+										alert("Play next");
+									}),
+									
+									// Add to queue button
+									$("<button/>",{
+										"class":cClass
+									}).text(
+										"Add to queue"
+									).click(function(){
+										alert("Add to queue");
+									}),
+									
+									// Play now button
+									$("<button/>",{
+										"class":cClass
+									}).text(
+										"Play now"
+									).click(function(){
+										alert("Play now");
+									})
+								)
 							)
 						)
 					);
