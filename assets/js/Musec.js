@@ -21,8 +21,6 @@ window.reqFrame = (function(){
 
 // Code for the Music Visualiser
 function MusecVisualiser() {
-	console.log(Musec.MediaGlobals);
-	console.log(Musec.MediaGlobals.AudioContext);
 	this.analyser = Musec.MediaGlobals.AudioContext.createAnalyser();
 
 	this.analyser.connect(Musec.MediaGlobals.AudioContext.destination);
@@ -37,12 +35,12 @@ function MusecVisualiser() {
 };
 MusecVisualiser.prototype.togglePlayback = function() {
 	if (this.isPlaying) {
-		this.source[this.source.stop ? 'stop': 'noteOff'](0);
+		this.source[this.source.stop ? "stop": "noteOff"](0);
 		this.startOffset += Musec.MediaGlobals.AudioContext.currentTime - this.startTime;
-		console.log('(MusecVisualiser): Paused at', this.startOffset);
+		console.log("(MusecVisualiser): Paused at" + this.startOffset);
 	} else {
 		this.startTime = Musec.MediaGlobals.AudioContext.currentTime;
-		console.log('Started at ', this.startOffset);
+		console.log("Started at " + this.startOffset);
 		if (!(Musec.MediaGlobals.AudioElement instanceof AudioNode)) {
 			this.source = (Musec.MediaGlobals.AudioElement instanceof Audio || Musec.MediaGlobals.AudioElement instanceof HTMLAudioElement)
 			? Musec.MediaGlobals.AudioContext.createMediaElementSource(Musec.MediaGlobals.AudioElement)
@@ -66,8 +64,8 @@ MusecVisualiser.prototype.draw = function() {
 
 	var width = Math.floor(1/this.freqs.length, 10);
 
-	var canvas = document.querySelector('canvas');
-	var drawContext = canvas.getContext('2d');
+	var canvas = document.querySelector("canvas");
+	var drawContext = canvas.getContext("2d");
 	canvas.width = Musec.Variables.VisualiserConfig.Width;
 	canvas.height = Musec.Variables.VisualiserConfig.Height;
 	
@@ -85,10 +83,10 @@ MusecVisualiser.prototype.draw = function() {
 			if (typeof(Musec.Variables.VisualiserConfig.ColorSplash) != "undefined") {
 				drawContext.fillStyle = Musec.Variables.VisualiserConfig.ColorSplash;
 			} else {
-				drawContext.fillStyle = 'rgba(255,255,255,0.9)';
+				drawContext.fillStyle = "rgba(255,255,255,0.9)";
 			}
 		} else {
-			drawContext.fillStyle = 'rgba(255,255,255,0.9)';
+			drawContext.fillStyle = "rgba(255,255,255,0.9)";
 		}
 		drawContext.fillRect(i * barWidth*2.5, offset, barWidth, height);
 	}
@@ -114,6 +112,7 @@ var Musec = {
 		Path:window.defaultPath != undefined ? window.defaultPath : "/",
 		LoadTime:Math.floor(Date.now() / 1000),
 		IsMobileDevice:false,		// Innocent until proven mobile
+		SupportsOffline:false,
 		NotificationDuration:7500,	// 7.5s
 		Notif:undefined,			// Current notification
 		Index:undefined,			// Music Index (Songs & Albums)
@@ -121,7 +120,7 @@ var Musec = {
 		ColourThief:new ColorThief(),
 		ColourThiefImage:new Image(),
 		ColourThiefPalette:[],
-		ColourThiefProgressUI:[],
+		ColourThiefProgressUI:["white","white"],
 		// Animation settings
 		Animations:{
 			Queue:150,	// Queue delay
@@ -135,7 +134,8 @@ var Musec = {
 			IsOffline:false,
 			Location:"",
 			ThumbMove:true,
-			UserTyping:false
+			UserTyping:false,
+			StartY:0
 		},
 		VisualiserConfig:{
 			Width:(window.innerWidth),
@@ -166,6 +166,33 @@ var Musec = {
 				/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4)))
 				Musec.Variables.IsMobileDevice = true;
 			
+			if (/Chrome|Opera|BB10/.test(navigator.userAgent))
+				Musec.Variables.SupportsOffline = true;
+		},
+		// Turn song reference into array
+		DecodePointer:function(reference) {
+			var deco = reference.split("_");
+			var id = deco.pop();
+			var album = deco.join("_");
+			
+			// Find song data in Index
+			var songData = Musec.Variables.Index.data[album].songs[id];
+			var albumData = Musec.Variables.Index.data[album].name;
+			
+			// Build media path
+			var src = "resources/music/" + album + "/" + songData.name;
+			
+			// Put data into queue format
+			var queueData = {
+				"name":songData.name,
+				"display":songData.disp,
+				"duration":songData.dur,
+				"folder":albumData,
+				"album":album,
+				"source":src
+			};
+			
+			return queueData;
 		}
 	},
 	// Musec's Core functionality
@@ -214,6 +241,7 @@ var Musec = {
 				"queue":$("#queue"),
 				"downloads":$("#down"),
 				"statusbar":$("#folder"),
+				"nowplayingx":$("#now_playing_x"),
 				"musicvisualiser":$("#mvContainer")
 			},
 			// When the window loads
@@ -244,6 +272,17 @@ var Musec = {
 					Musec.Offline.Open();
 				});
 				TriggerObj.search.click(Musec.Core.View.SearchBar);
+				
+				// Now playing section
+				TriggerObj.statusbar.click(function(){
+					Musec.Core.View.Views.nowplaying.fadeIn(1000);
+					Musec.Core.View.Views.musec_main.fadeOut(1000);
+				});
+				
+				TriggerObj.nowplayingx.click(function(){
+					Musec.Core.View.Views.nowplaying.fadeOut(1000);
+					Musec.Core.View.Views.musec_main.fadeIn(1000);
+				});
 				
 				// Window events (keyboard shortcuts & music visualiser)
 				$(window).resize(function() {
@@ -279,7 +318,9 @@ var Musec = {
 				"songs":$("#songFolder"),
 				"main":$("#musicFolders"),
 				"queue":$("#queueFolder"),
-				"offline":$("#offlineFolder")
+				"offline":$("#offlineFolder"),
+				"nowplaying":$("#now_playing"),
+				"musec_main":$("#musec_main")
 			},
 			GoBack:function() {
 				if (Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.main.attr("id")) {
@@ -288,6 +329,9 @@ var Musec = {
 				}
 				
 				if (Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.songs.attr("id")) {
+					// Remove currentSongMenu to stop issues
+					Musec.Variables.CurrentSongMenu = undefined;
+					
 					Musec.Core.Events.Elements.back.html("R");
 					Musec.Core.View.CurrentView = Musec.Core.View.Views.main;
 					Musec.Core.View.BeforeView = Musec.Core.View.Views.songs;
@@ -396,6 +440,10 @@ var Musec = {
 					background: "rgb(" + colourArray[0] + ")"
 				});
 				$("#pageBottom").css({
+					color: "rgb(" + colourArray[0] + ")",
+					background: "rgb(" + colourArray[1] + ")"
+				});
+				Musec.Core.View.Views.nowplaying.css({
 					color: "rgb(" + colourArray[0] + ")",
 					background: "rgb(" + colourArray[1] + ")"
 				});
@@ -511,35 +559,6 @@ var Musec = {
 				Musec.Variables.CurrentSongMenu = elem.id;
 				console.log("Showing song menu for " + elem.id);
 			},
-			// Completes actions
-			SongMenuAction:function(action,songRef) {
-				
-				// Decode data from element
-				var deco = songRef.split("_");
-				var id = deco.pop();
-				var album = deco.join("_");
-				
-				// Find song data in Index
-				var songData = Musec.Variables.Index.data[album].songs[id];
-				var albumData = Musec.Variables.Index.data[album].name;
-				
-				// Build media path
-				var src = "resources/music/" + album + "/" + songData.name;
-				
-				// Put data into queue format
-				var queueData = {
-					"name":songData.name,
-					"display":songData.disp,
-					"duration":songData.dur,
-					"folder":albumData,
-					"album":album,
-					"source":src
-				};
-				
-				// Add to queue
-				console.info(queueData);
-				Musec.MediaGlobals.SongQueue.push(queueData);
-			},
 			// Display songs [HTML Element]
 			Songs:function(elem){
 				// I'm so sorry, this is gonna get messy, VERY messy
@@ -574,14 +593,17 @@ var Musec = {
 				</table>";
 				
 				// Populate table and assign events
+				var refs = [];
 				Musec.Core.View.Views.songs.html(song_list_html);
 				for (data in Musec.Variables.Index.data[album].songs){
 					var cClass = /iPhone|iPod/.test(navigator.userAgent) ? "fullWidthButton" : "bcircle";
+					var offlineSupport = Musec.Variables.SupportsOffline === true ? "offl_yes" : "offl_no"
 					var reference = album + "_" + i;
+					refs[i] = reference;
 					
-				//if (tiles.supportsFS) {
-				//	newContent += " <button class='bcircle' onclick='tiles.makeAvailableOffline(\"" + song_id + "\");'>Download</button></td>";
-				//}
+					//if (tiles.supportsFS) {
+					//	newContent += " <button class='bcircle' onclick='tiles.makeAvailableOffline(\"" + song_id + "\");'>Download</button></td>";
+					//}
 					$("#songs_list").append(
 						$("<tr/>",{
 							"class":"song_longclick",
@@ -593,6 +615,7 @@ var Musec = {
 						}).longclick(250,function(event) {
 							Musec.Core.View.SongMenu(event.currentTarget);
 						}).click(function(event) {
+							if ($("#" + event.currentTarget.id + "_controls").hasClass("song_ctrl_active")) return false; 
 							Musec.Media.SongClick(event.currentTarget);
 						}).append(
 							$("<td/>",{
@@ -616,8 +639,12 @@ var Musec = {
 										"class":cClass
 									}).text(
 										"Play Next"
-									).click(function(){
-										alert("Play next");
+									).click(function(event) {
+										event.preventDefault();
+										Musec.Core.Queue.Action([
+											"playnext",
+											$($(this).parents()[2]).data("ref")
+										]);
 									}),
 									
 									// Add to queue button
@@ -625,8 +652,13 @@ var Musec = {
 										"class":cClass
 									}).text(
 										"Add to queue"
-									).click(function(){
-										alert("Add to queue");
+									).click(function(event) {
+										event.preventDefault();
+										console.log($($(this).parents()[2]).data("ref"));
+										Musec.Core.Queue.Action([
+											"add",
+											$($(this).parents()[2]).data("ref")
+										]);
 									}),
 									
 									// Play now button
@@ -634,20 +666,42 @@ var Musec = {
 										"class":cClass
 									}).text(
 										"Play now"
-									).click(function(){
-										alert("Play now");
+									).click(function(event) {
+										event.preventDefault();
+										
+										// Called with string
+										Musec.Media.SongClick($($(this).parents()[2]).data("ref"));
+									}),
+									
+									// Save for offline button
+									$("<button/>",{
+										"class":cClass + " " + offlineSupport,
+									}).text(
+										"Offline"
+									).click(function(event) {
+										event.preventDefault();
+										alert("Not Implemented");
 									})
 								)
 							)
 						)
 					);
-					Musec.Variables.Index.data[album].songs[data];
+					
 					i++;
+					console.log(refs);
 				}
 			},
 			// Displays search results (similar to Musec->Core->View->Songs)
-			SearchResults:function(elem){
+			SearchResults:function(elem) {
 				
+			},
+			// Update the now playing page
+			UpdateNowPlaying:function(data) {
+				var imgSrc = window.defaultPath + "resources/artwork/" + data.album + ".jpg";
+				var song = data.display;
+				
+				$("#now_playing_img").attr("src",imgSrc);
+				$("#now_playing_song").text(song);
 			}
 		},
 		// Song Queue
@@ -709,13 +763,13 @@ var Musec = {
 
 						$("#queue_list").append(sB);
 					}
-					/*Sortable.create(document.getElementById("queue_list"), {
+					Sortable.create(document.getElementById("queue_list"), {
 						draggable: ".draggable_qro",
 						handle: ".qro_button",
 						onSort: function(event) {
-							tiles.alterQueue("rearrange", [event.oldIndex, event.newIndex]);
+							Musec.Core.Queue.Action(["rearrange", event.oldIndex, event.newIndex]);
 						}
-					});*/
+					});
 				}
 			},
 			// Called when Queue changes
@@ -737,18 +791,52 @@ var Musec = {
 			},
 			// Minipulate Queue [Element, Action]
 			Action:function(array){
+				console.log(array);
 				if (array[0] == "add") {
+					// In this case, array index 1 is a song reference which we need to decode (e.g. avicii_12)
+					var queueData = Musec.Helpers.DecodePointer(array[1]);
 					
+					Musec.MediaGlobals.SongQueue.push(queueData);
+					
+					Musec.Extra.SmartAlert({
+						"icon":"plus.svg",
+						"message":"Cleared",
+						"duration":200
+					});
+					
+					return;
 				} else if (array[0] == "playnow") {
-					
+					// In this case, array index 1 is a song reference (e.g. avicii_12)
+					Musec.Media.SongClick(array[1]);
 				} else if (array[0] == "playnext") {
+					// In this case, array index 1 is a song reference which we need to decode (e.g. avicii_12)
+					var queueData = Musec.Helpers.DecodePointer(array[1]);
 					
+					Musec.MediaGlobals.SongQueue.splice(
+						(Musec.MediaGlobals.CurrentID + 1),
+						0,
+						queueData
+					);
+					
+					Musec.Extra.SmartAlert({
+						"icon":"play.svg",
+						"message":"Playing Next",
+						"duration":200
+					});
+					
+					return;
 				} else if (array[0] == "delete") {
 					
 				} else if (array[0] == "rearrange") {
+					if (array.length !== 3) return false;
+					if (array[1] === array[2]) return false;
 					
+					var data = Musec.MediaGlobals.SongQueue[array[1]];
+					
+					Musec.MediaGlobals.SongQueue.splice(array[1], 1);
+					Musec.MediaGlobals.SongQueue.splice(array[2], 0, data);
 				} else {
-					alert("Error: Not Implemented");
+					alert("Error: Not Implemented\n" + array[0]);
 				}
 				
 				Musec.Core.Queue.Reload();
@@ -1100,6 +1188,9 @@ var Musec = {
 				// Build Elements
 				Musec.Media.Playback.BuildObjects();
 				
+				// Update Now Playing Page
+				Musec.Core.View.UpdateNowPlaying(songObj);
+				
 				// Assign Events upon data loading
 				Musec.MediaGlobals.AudioElement.addEventListener("loadeddata",function(){
 					// Immediately commence playback
@@ -1121,30 +1212,15 @@ var Musec = {
 			}
 		},
 		SongClick:function(elem){
-			var songRef = $(elem).data("ref");
+			if (typeof(elem) === "string") {
+				var songRef = elem;
+			} else {
+				var songRef = $(elem).data("ref");
+			}
 			console.info("Getting information for:" + songRef);
 			
-			// Decode data from element
-			var deco = songRef.split("_");
-			var id = deco.pop();
-			var album = deco.join("_");
-			
-			// Find song data in Index
-			var songData = Musec.Variables.Index.data[album].songs[id];
-			var albumData = Musec.Variables.Index.data[album].name;
-			
-			// Build media path
-			var src = "resources/music/" + album + "/" + songData.name;
-			
-			// Put data into queue format
-			var queueData = {
-				"name":songData.name,
-				"display":songData.disp,
-				"duration":songData.dur,
-				"folder":albumData,
-				"album":album,
-				"source":src
-			};
+			// Decode the song reference
+			var queueData = Musec.Helpers.DecodePointer(songRef);
 			
 			// Add to queue
 			console.info(queueData);

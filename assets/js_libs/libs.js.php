@@ -4,6 +4,8 @@ header("Cache-Control: max-age=2592000");
 
 if (substr_count($_SERVER["HTTP_ACCEPT_ENCODING"], "gzip")) ob_start("ob_gzhandler"); else ob_start();
 
+// Make sure touch punch loads before jq-ui
+
 $files = [
 	"base64.min.js",
 	"fastclick.js",
@@ -13,9 +15,11 @@ $files = [
 	"json3.min.js",
 	"jquery.color.js",
 	"jquery.longclick-min.js",
+	"jquery-ui.min.js",
+	"jquery.touch.punch.min.js",
 	"notification.js",
 	"pointer_events.js",
-	//"visualizer.js",
+	"visualizer.js",
 	"safe-audio-context.js"
 ];
 

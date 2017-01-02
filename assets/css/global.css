@@ -169,6 +169,7 @@ input[type=range]::-ms-thumb {
 	font-size:2em;
 }
 #folder {
+	z-index:1000;
 	width:80%;
 	line-height:7.5vh;
 }
@@ -176,8 +177,27 @@ input[type=range]::-ms-thumb {
 	width:95vw;
 	line-height:6.5vh;
 }
+#now_playing {
+	display:none;
+	min-height:100vh;
+}
 #pageCenter::-webkit-scrollbar { 
 	display:none; 
+}
+
+#now_playing_x {
+	height:2em;
+	width:100%;
+	text-align:left;
+}
+#now_playing_img {
+	padding:0;
+	width:80%;
+	margin:5% 10%;
+	box-shadow:10px 10px 10px #888888;
+}
+#now_playing_song {
+	font-size:2.4em;
 }
 
 .tile {
@@ -272,6 +292,9 @@ input[type=range]::-ms-thumb {
 	-o-animation-iteration-count:2;
 	-moz-animation-iteration-count:2;
 	animation-iteration-count:2;
+}
+.offl_no {
+	display:none;
 }
 .qro_button {
 	cursor:move;

@@ -18,6 +18,7 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 		JQuery: 			https://jquery.com/
 		JQuery Color:		https://github.com/jquery/jquery-color
 		JQuery Longclick:	https://github.com/pisi/Longclick
+		JQuery Touchpunch:	https://github.com/furf/jquery-ui-touch-punch/
 		ChromeStore: 		https://github.com/summera/chromestore.js
 		ColorThief:			https://github.com/lokesh/color-thief
 		ColorThief Helper:	https://gist.github.com/Pluto1010/f26beed7fdebfb2e2110
@@ -66,31 +67,39 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 			Musec uses many new features which aren't available in older browsers,<br /> for Musec to function on this browser, we would need to re-write a lot of Musec, and we'd rather work on new features.<br /><br /><br />
 			<?php echo $_SERVER["HTTP_USER_AGENT"]; ?><div style="display:none">
 		<!--<![endif]-->
-		<div id="pageTop">
-			<span id="back" do="refresh" class="impButton" aria-label="Back/Refresh">&#x21bb;</span>
-			<span id="search" class="impButton" aria-label="Open/Close search bar">&#x1f50e;</span>
-			<span id="queue" do="showQ" class="impButton" aria-label="Show/Hide queue tab">&#9776;</span>
-			<span id="down" do="showF" class="impButton" aria-label="Show/Hide offline media tab">&#9660;</span>
-			<div id="search_container"><input type="text" id="search_box" placeholder="Search for a song" /><button id="do_search" aria-label="Search button">Search All</button></div>
-			<span id="folder">Please Wait</span>
-		</div>
-		<div id="pageCenter">
-			<div id="mvContainer">
-				<canvas id="musicVisualizer"></canvas>
+		<div id="musec_main">
+			<div id="pageTop">
+				<span id="back" do="refresh" class="impButton" aria-label="Back/Refresh">&#x21bb;</span>
+				<span id="search" class="impButton" aria-label="Open/Close search bar">&#x1f50e;</span>
+				<span id="queue" do="showQ" class="impButton" aria-label="Show/Hide queue tab">&#9776;</span>
+				<span id="down" do="showF" class="impButton" aria-label="Show/Hide offline media tab">&#9660;</span>
+				<div id="search_container"><input type="text" id="search_box" placeholder="Search for a song" /><button id="do_search" aria-label="Search button">Search All</button></div>
+				<span id="folder">Please Wait</span>
 			</div>
-			<div id="musicFolders">
-				<h1>Loading Musec...<br /><progress id="__load" value="4" max="100"></progress></h1>
+			<div id="pageCenter">
+				<div id="mvContainer">
+					<canvas id="musicVisualizer"></canvas>
+				</div>
+				<div id="musicFolders">
+					<h1>Loading Musec...<br /><progress id="__load" value="4" max="100"></progress></h1>
+				</div>
+				<div id="songFolder"></div>
+				<div id="queueFolder"></div>
+				<div id="offlineFolder"></div>
 			</div>
-			<div id="songFolder"></div>
-			<div id="queueFolder"></div>
-			<div id="offlineFolder"></div>
+			<div id="pageBottom">
+				<span id="playpause" class="disabled impButton" aria-label="Play/Pause button">&#9658;</span>
+				<span id="mediacontrols">
+					<input id="playbackslider" class="msicSldr" type="range" min="0" max="100" value="0" step="0.01" />
+					<span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>
+				</span>
+			</div>
 		</div>
-		<div id="pageBottom">
-			<span id="playpause" class="disabled impButton" aria-label="Play/Pause button">&#9658;</span>
-			<span id="mediacontrols">
-				<input id="playbackslider" class="msicSldr" type="range" min="0" max="100" value="0" step="0.01" />
-				<span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>
-			</span>
+		
+		<div id="now_playing">
+			<div id="now_playing_x">Close</div>
+			<img src="<?php echo $_BASE; ?>/assets/img/Musec!.jpg" id="now_playing_img" alt="Now playing image" /><br />
+			<span id="now_playing_song">No music playing</span>
 		</div>
 		
 		<div id="sAlert">
@@ -103,7 +112,7 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 			<div class="bo"></div>
 		</div>
 		
-		<div id="optionsPanel">
+		<!--<div id="optionsPanel">
 			<div id="options">
 				<h1>Musec Panel</h1>
 				<button class="oButton" onclick="tiles.togglePanel()">Close</button> |
@@ -150,9 +159,10 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 					</tbody></table>
 				</div>
 			</div>
-		</div>
+		</div>-->
 		
 		<link rel="stylesheet" type="text/css" href="<?php echo $_BASE; ?>/assets/css/global.css" media="screen" onload="document.getElementById('__load').value+=15" />
+		<link href="<?php echo $_BASE; ?>/assets/font/material-icons.css" rel="stylesheet">
 		<script type="text/javascript">
 		if(typeof(jQuery)=="undefined") {
 			document.write('<script src="<?php echo $_BASE; ?>/assets/js_libs/jquery-2.1.4.min.js" type="text/javascript"><\/script>');
