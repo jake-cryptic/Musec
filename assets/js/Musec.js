@@ -747,7 +747,7 @@ var Musec = {
 						console.log("Parsing queue data for song id " + i + " which is " + Musec.MediaGlobals.SongQueue[i].name);
 						
 						// Move up, Play next, Play now, Remove, Move down, Repeat?
-						queueCtrls = "<span class='clickable' onclick=\"tiles.alterQueue('delete'," + i + ")\">Remove</span>";
+						queueCtrls = "<span class='clickable' onclick=\"Musec.Core.Queue.Action(['delete'," + i + "])\">Remove</span>";
 						queueAltr = "<span class='clickable qro_button' id=\"qro_' + i + '\">☰</span>";
 						
 						if (Musec.MediaGlobals.CurrentID - 1 == i) {
@@ -767,7 +767,7 @@ var Musec = {
 						draggable: ".draggable_qro",
 						handle: ".qro_button",
 						onSort: function(event) {
-							Musec.Core.Queue.Action(["rearrange", event.oldIndex, event.newIndex]);
+							Musec.Core.Queue.Action(["rearrange", event.oldIndex-1, event.newIndex-1]);
 						}
 					});
 				}
@@ -776,7 +776,7 @@ var Musec = {
 			Reload:function() {
 				// Fade out
 				Musec.Core.View.Views.queue.animate({
-					opacity: 0.2
+					opacity: 0.1
 				}, Musec.Variables.Animations.Queue*2);
 				
 				// Update Queue
@@ -826,15 +826,27 @@ var Musec = {
 					
 					return;
 				} else if (array[0] == "delete") {
+					// Deletes item from queue, array item 2 is an index
+					Musec.MediaGlobals.SongQueue.splice(array[1],1);
 					
+					Musec.Extra.SmartAlert({
+						"icon":"cross.svg",
+						"message":"Removed",
+						"duration":175
+					});
 				} else if (array[0] == "rearrange") {
 					if (array.length !== 3) return false;
 					if (array[1] === array[2]) return false;
 					
 					var data = Musec.MediaGlobals.SongQueue[array[1]];
 					
+					// Remove old data and move to new position
 					Musec.MediaGlobals.SongQueue.splice(array[1], 1);
 					Musec.MediaGlobals.SongQueue.splice(array[2], 0, data);
+					
+					if (Musec.MediaGlobals.CurrentID === array[1]) {
+						Musec.MediaGlobals.CurrentID = array[2];
+					}
 				} else {
 					alert("Error: Not Implemented\n" + array[0]);
 				}
@@ -1233,7 +1245,19 @@ var Musec = {
 	// Offline Functionality
 	Offline:{
 		Open:function() {
-			Musec.Core.View.ChangeView("offline");	
+			Musec.Core.View.ChangeView("offline");
+			Musec.Core.View.Views.offline.html("<table>\
+				<thead>\
+					<tr>\
+						<th>Album</th>\
+						<th>Song</th>\
+						<th>Action</th>\
+					</tr>\
+				</thead>\
+				<tbody id=\"offlineSongs\">\
+					<tr><td colspan='3'>Coming Soon</td></tr>\
+				</tbody>\
+			</table>");
 		}
 	},
 	// Extra functionality
