@@ -317,6 +317,7 @@ var Musec = {
 			Views:{
 				"songs":$("#songFolder"),
 				"main":$("#musicFolders"),
+				"search":$("#searchFolder"),
 				"queue":$("#queueFolder"),
 				"offline":$("#offlineFolder"),
 				"nowplaying":$("#now_playing"),
@@ -332,7 +333,7 @@ var Musec = {
 					// Remove currentSongMenu to stop issues
 					Musec.Variables.CurrentSongMenu = undefined;
 					
-					Musec.Core.Events.Elements.back.html("R");
+					Musec.Core.Events.Elements.back.html("<i class=\"material-icons\">settings</i>");
 					Musec.Core.View.CurrentView = Musec.Core.View.Views.main;
 					Musec.Core.View.BeforeView = Musec.Core.View.Views.songs;
 					Musec.Core.View.BeforeView.hide();
@@ -342,11 +343,11 @@ var Musec = {
 				if (Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.queue.attr("id") 
 				||  Musec.Core.View.CurrentView.attr("id") === Musec.Core.View.Views.offline.attr("id")) {
 					if (Musec.Core.View.BeforeView.attr("id") === Musec.Core.View.Views.songs.attr("id")){
-						Musec.Core.Events.Elements.back.html("<-");
+						Musec.Core.Events.Elements.back.html("<i class=\"material-icons\">arrow_back</i>");
 						Musec.Core.View.CurrentView = Musec.Core.View.Views.songs;
 						Musec.Core.View.BeforeView = Musec.Core.View.Views.main;
 					} else {
-						Musec.Core.Events.Elements.back.html("R");
+						Musec.Core.Events.Elements.back.html("<i class=\"material-icons\">settings</i>");
 						Musec.Core.View.CurrentView = Musec.Core.View.Views.main;
 						Musec.Core.View.BeforeView = Musec.Core.View.Views.main;
 					}
@@ -366,9 +367,9 @@ var Musec = {
 				console.info("State being set to " + to);
 				
 				if (to !== "main") {
-					Musec.Core.Events.Elements.back.html("<-");
+					Musec.Core.Events.Elements.back.html("<i class=\"material-icons\">arrow_back</i>");
 				} else {
-					Musec.Core.Events.Elements.back.html("R");
+					Musec.Core.Events.Elements.back.html("<i class=\"material-icons\">settings</i>");
 				}
 				Musec.Core.View.BeforeView = Musec.Core.View.CurrentView;
 				
@@ -382,6 +383,12 @@ var Musec = {
 					case "songs":
 						Musec.Core.View.CurrentView = Musec.Core.View.Views.songs;
 						Musec.Core.View.Views.songs.html("");
+						Musec.Core.View.BeforeView.hide();
+						Musec.Core.View.CurrentView.show();
+					break;
+					case "search":
+						Musec.Core.View.CurrentView = Musec.Core.View.Views.search;
+						Musec.Core.View.Views.search.html("");
 						Musec.Core.View.BeforeView.hide();
 						Musec.Core.View.CurrentView.show();
 					break;
@@ -688,7 +695,6 @@ var Musec = {
 					);
 					
 					i++;
-					console.log(refs);
 				}
 			},
 			// Displays search results (similar to Musec->Core->View->Songs)
@@ -743,7 +749,6 @@ var Musec = {
 
 					$("#queue_list").html("<tr><td colspan=\"2\">" + queueActions + "</td></tr>");
 					for (var i = 0; i < (Musec.MediaGlobals.SongQueue.length); i++) {
-						console.log(Musec.MediaGlobals.SongQueue[i]);
 						console.log("Parsing queue data for song id " + i + " which is " + Musec.MediaGlobals.SongQueue[i].name);
 						
 						// Move up, Play next, Play now, Remove, Move down, Repeat?
@@ -955,7 +960,6 @@ var Musec = {
 					};
 					
 					// Add to queue
-					console.info(queueData);
 					Musec.MediaGlobals.SongQueue.push(queueData);
 				}
 				
@@ -1076,6 +1080,23 @@ var Musec = {
 					Musec.MediaGlobals.AudioElement.duration * (Musec.MediaGlobals.Controls.Slider.val() / 100)
 				);
 			},
+			// Song end function
+			End:function() {
+				if (Musec.MediaGlobals.SongQueue.length === Musec.MediaGlobals.CurrentID) {
+					Musec.MediaGlobals.AudioElement.pause();
+					Musec.Extra.Notifications.Browser([
+						"Musec",
+						"End of queue",
+						"assets/img/Musec!3.jpg"
+					]);
+				} else {
+					Musec.Media.Playback.Song();
+					
+					if (Musec.Core.View.Views.queue.is(":visible")) {
+						Musec.Core.Queue.Reload();
+					}
+				}
+			},
 			// Pause and play functions
 			ToggleMedia:function() {
 				if (typeof(Musec.MediaGlobals.AudioElement) == "undefined") {
@@ -1094,10 +1115,10 @@ var Musec = {
 					return;
 				}
 				if (state === true){
-					Musec.MediaGlobals.Controls.PlayPause.html("&#10074;&#10074;");
+					Musec.MediaGlobals.Controls.PlayPause.html("<i class=\"material-icons\">pause</i>");
 					document.title = "Playing";
 				} else {
-					Musec.MediaGlobals.Controls.PlayPause.html("&#9658;");
+					Musec.MediaGlobals.Controls.PlayPause.html("<i class=\"material-icons\">play</i>");
 					document.title = "Paused";
 				}
 			}
@@ -1155,6 +1176,9 @@ var Musec = {
 			ConnectElements:function(){
 				// Update time (CT & TT)
 				Musec.MediaGlobals.AudioElement.addEventListener("timeupdate", Musec.Media.ControlEvents.TimeUpdate, false);
+				
+				// What to do on media end
+				Musec.MediaGlobals.AudioElement.addEventListener("ended", Musec.Media.ControlEvents.End, false);
 				
 				// Error event
 				Musec.MediaGlobals.AudioElement.addEventListener("error", function(e) {
@@ -1237,6 +1261,9 @@ var Musec = {
 			// Add to queue
 			console.info(queueData);
 			Musec.MediaGlobals.SongQueue.push(queueData);
+			
+			// Change queue position
+			Musec.MediaGlobals.CurrentID = (Musec.MediaGlobals.SongQueue.length-1);
 			
 			// Play song
 			Musec.Media.Playback.Song();

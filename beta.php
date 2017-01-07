@@ -70,10 +70,15 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 		<div id="musec_main">
 			<div id="pageTop">
 				<span id="back" do="refresh" class="impButton" aria-label="Back/Refresh">&#x21bb;</span>
-				<span id="search" class="impButton" aria-label="Open/Close search bar">&#x1f50e;</span>
-				<span id="queue" do="showQ" class="impButton" aria-label="Show/Hide queue tab">&#9776;</span>
-				<span id="down" do="showF" class="impButton" aria-label="Show/Hide offline media tab">&#9660;</span>
-				<div id="search_container"><input type="text" id="search_box" placeholder="Search for a song" /><button id="do_search" aria-label="Search button">Search All</button></div>
+				<span id="search" class="impButton" aria-label="Open/Close search bar">
+					<i class="material-icons">search</i>
+				</span>
+				<span id="queue" do="showQ" class="impButton" aria-label="Show/Hide queue tab">
+					<i class="material-icons">view_list</i>
+				</span>
+				<span id="down" do="showF" class="impButton" aria-label="Show/Hide offline media tab">
+					<i class="material-icons">cloud_download</i>
+				</span>
 				<span id="folder">Please Wait</span>
 			</div>
 			<div id="pageCenter">
@@ -88,7 +93,9 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 				<div id="offlineFolder"></div>
 			</div>
 			<div id="pageBottom">
-				<span id="playpause" class="disabled impButton" aria-label="Play/Pause button">&#9658;</span>
+				<span id="playpause" class="disabled impButton" aria-label="Play/Pause button">
+					<i class="material-icons">play</i>
+				</span>
 				<span id="mediacontrols">
 					<input id="playbackslider" class="msicSldr" type="range" min="0" max="100" value="0" step="0.01" />
 					<span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>
@@ -97,7 +104,9 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 		</div>
 		
 		<div id="now_playing">
-			<div id="now_playing_x">Close</div>
+			<div id="now_playing_x">
+				<i class="material-icons">close</i>
+			</div>
 			<img src="<?php echo $_BASE; ?>/assets/img/Musec!.jpg" id="now_playing_img" alt="Now playing image" /><br />
 			<span id="now_playing_song">No music playing</span>
 		</div>
