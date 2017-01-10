@@ -454,13 +454,15 @@ var Musec = {
 					color: "rgb(" + colourArray[0] + ")",
 					background: "rgb(" + colourArray[1] + ")"
 				});
-				$(".song_longclick").css({
-					color: "#fff",
+				$(".song_longclick_inner .queueCurrentSong .queueSong").css({
+					color: "rgb(" + colourArray[3] + ")",
 					background: "rgb(" + colourArray[2] + ")"
 				});
 				$("#folder").css({
 					background: "rgb(" + colourArray[1] + ")"
 				});
+				
+				console.log(colourArray);
 			},
 			// Create Album Tiles
 			Tiles:function(x){
@@ -626,7 +628,8 @@ var Musec = {
 							Musec.Media.SongClick(event.currentTarget);
 						}).append(
 							$("<td/>",{
-								"id":"song_row_" + i + "_inner"
+								"id":"song_row_" + i + "_inner",
+								"class":"song_longclick_inner"
 							}).append(
 								$("<span/>",{
 									"id":"song_row_" + i + "_text",
@@ -805,7 +808,7 @@ var Musec = {
 					
 					Musec.Extra.SmartAlert({
 						"icon":"plus.svg",
-						"message":"Cleared",
+						"message":"Added",
 						"duration":200
 					});
 					
@@ -840,6 +843,7 @@ var Musec = {
 						"duration":175
 					});
 				} else if (array[0] == "rearrange") {
+					// Array(1) old | Array(2) new
 					if (array.length !== 3) return false;
 					if (array[1] === array[2]) return false;
 					
@@ -850,8 +854,12 @@ var Musec = {
 					Musec.MediaGlobals.SongQueue.splice(array[2], 0, data);
 					
 					if (Musec.MediaGlobals.CurrentID === array[1]) {
-						Musec.MediaGlobals.CurrentID = array[2];
+						Musec.MediaGlobals.CurrentID = array[2] + 1;
 					}
+					if (array[2] > array[1])
+						Musec.MediaGlobals.CurrentID--;
+					else
+						Musec.MediaGlobals.CurrentID++;
 				} else {
 					alert("Error: Not Implemented\n" + array[0]);
 				}
@@ -1115,10 +1123,10 @@ var Musec = {
 					return;
 				}
 				if (state === true){
-					Musec.MediaGlobals.Controls.PlayPause.html("<i class=\"material-icons\">pause</i>");
+					Musec.MediaGlobals.Controls.PlayPause.html("&#10074;&#10074;");
 					document.title = "Playing";
 				} else {
-					Musec.MediaGlobals.Controls.PlayPause.html("<i class=\"material-icons\">play</i>");
+					Musec.MediaGlobals.Controls.PlayPause.html("&#9658;");
 					document.title = "Paused";
 				}
 			}
@@ -1238,6 +1246,9 @@ var Musec = {
 				
 				// Load & Play
 				Musec.MediaGlobals.AudioElement.src = songObj.source;
+				if (Musec.Variables.IsMobileDevice) {
+					Musec.MediaGlobals.AudioElement.play(); // Give mobile browsers a hint
+				}
 				
 				// Notify
 				Musec.Extra.Notifications.Browser([

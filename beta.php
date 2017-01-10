@@ -93,9 +93,7 @@ $_BASE = getBase($_SERVER["PHP_SELF"]);
 				<div id="offlineFolder"></div>
 			</div>
 			<div id="pageBottom">
-				<span id="playpause" class="disabled impButton" aria-label="Play/Pause button">
-					<i class="material-icons">play</i>
-				</span>
+				<span id="playpause" class="disabled impButton" aria-label="Play/Pause button">&#9658;</span>
 				<span id="mediacontrols">
 					<input id="playbackslider" class="msicSldr" type="range" min="0" max="100" value="0" step="0.01" />
 					<span id="mediaCtime">00:00</span>/<span id="mediaTtime">00:00</span>
