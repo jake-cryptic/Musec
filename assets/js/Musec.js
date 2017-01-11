@@ -1246,9 +1246,10 @@ var Musec = {
 				
 				// Load & Play
 				Musec.MediaGlobals.AudioElement.src = songObj.source;
-				if (Musec.Variables.IsMobileDevice) {
-					Musec.MediaGlobals.AudioElement.play(); // Give mobile browsers a hint
-				}
+				
+				// Commence loading
+				Musec.MediaGlobals.AudioElement.play();
+				Musec.Media.ControlEvents.ToggleMediaUI(true);
 				
 				// Notify
 				Musec.Extra.Notifications.Browser([
