@@ -59,10 +59,10 @@ MusecVisualiser.prototype.draw = function() {
 	this.analyser.smoothingTimeConstant = Musec.Variables.VisualiserConfig.Smoothing;
 	this.analyser.fftSize = Musec.Variables.VisualiserConfig.fftSize;
 
-	this.analyser.getByteFrequencyData(this.freqs);
+	this.getFrequencyValue(this.analyser.getByteFrequencyData(this.freqs));
 	this.analyser.getByteTimeDomainData(this.times);
 
-	var width = Math.floor(1/this.freqs.length, 10);
+	var width = Math.floor(1/this.freqs.length, 5);
 
 	var canvas = document.querySelector("canvas");
 	var drawContext = canvas.getContext("2d");
@@ -71,10 +71,10 @@ MusecVisualiser.prototype.draw = function() {
 	
 	for (var i = 0; i < this.analyser.frequencyBinCount; i++) {
 		var value = this.freqs[i];
-		var percent = value / 512;
+		var percent = value / Musec.Variables.VisualiserConfig.Size;
 		var height = Musec.Variables.VisualiserConfig.Height * percent;
 		var offset = Musec.Variables.VisualiserConfig.Height - height - 1;
-		var barWidth = Musec.Variables.VisualiserConfig.Width/this.analyser.frequencyBinCount/2;
+		var barWidth = Musec.Variables.VisualiserConfig.Width/this.analyser.frequencyBinCount;
 		
 		if (Musec.Variables.VisualiserConfig.Style == "hsl") {
 			var hue = i/this.analyser.frequencyBinCount * 360;
@@ -145,7 +145,8 @@ var Musec = {
 			MinimumDecibels:-170,	// -130, -140, -100, -200
 			MaximumDecibels:35, 	// 70, 0, 0, 70
 			Style:"splash",
-			ColorSplash:""
+			ColorSplash:"",
+			Size:684
 		}
 	},
 	// Functions to assist Core
@@ -202,9 +203,42 @@ var Musec = {
 			LoadIndex:function(callback,attempt){
 				Musec.Core.View.Views.main.html("<h1>Loading Index...</h1>");
 				
+				// Load a recent index from localStorage
+				if (typeof(Storage) !== "undefined") {
+					if (localStorage.getItem("IndexTimeCache") != null
+					&&  localStorage.getItem("IndexShortCache") != null) {
+						var checkTime = new Date().getTime();
+						if ((localStorage.getItem("IndexTimeCache")) > checkTime) {
+							var IndexCache = JSON.parse(localStorage.getItem("IndexShortCache"));
+							// Load the index into Musec and Cache
+							Musec.Variables.Index = IndexCache;
+							
+							console.info("Using cached Index, valid for " + (localStorage.getItem("IndexTimeCache")-checkTime)/1000 + " seconds");
+							
+							// Let's begin for real now
+							Musec.Core.View.Views.main.html("");
+							callback(true);
+							return true;
+						} else {
+							console.warn("Cached index is out of date");
+							localStorage.removeItem("IndexTimeCache");
+							localStorage.removeItem("IndexShortCache");
+						}
+					}
+				} else {
+					return;
+				}
+				
 				// Loads the Musec Index via AJAX
 				$.get(Musec.Variables.Path + "resources/music_index.json", function(data) {
+					// Load the index into Musec and Cache
 					Musec.Variables.Index = data;
+					
+					var cacheTime = new Date().getTime();
+					localStorage.setItem("IndexTimeCache", cacheTime+300000);
+					localStorage.setItem("IndexShortCache", JSON.stringify(data));
+					
+					// Let's begin for real now
 					Musec.Core.View.Views.main.html("");
 					callback(true);
 				}).fail(function() {
@@ -1246,9 +1280,10 @@ var Musec = {
 				
 				// Load & Play
 				Musec.MediaGlobals.AudioElement.src = songObj.source;
-				if (Musec.Variables.IsMobileDevice) {
-					Musec.MediaGlobals.AudioElement.play(); // Give mobile browsers a hint
-				}
+				
+				// Commence loading
+				Musec.MediaGlobals.AudioElement.play();
+				Musec.Media.ControlEvents.ToggleMediaUI(true);
 				
 				// Notify
 				Musec.Extra.Notifications.Browser([

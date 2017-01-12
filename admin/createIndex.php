@@ -3,6 +3,8 @@ define("MUSIC_DIR", "../resources/");
 define("INDEX_FILE", "../resources/music_index.json");
 define("INCLUDES", "php/");
 
+// http://lyrics.wikia.com/wiki/Drowning_Pool:Tear_Away
+
 require(INCLUDES . "classes/mp3file.class.php");
 
 $indexStartTime = time();
@@ -19,6 +21,10 @@ function CleanSongName($song){
 	$song = str_replace("_"," ",$song);
 	$song = ucwords($song);
 	return $song;
+}
+
+function GetLyrics($album,$song){
+	// Create .lyric files
 }
 
 if (!set_time_limit(300)){
